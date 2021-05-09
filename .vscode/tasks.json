@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "g++.exe build active file",
+            //Pay attention to change to your own MinGW directory
+            "command": "C:\\Users\\Eleve\\mingw64\\bin\\g++.exe",
+            "args": [
+                "-g",
+                "${file}",
+                "-o",
+                "${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "-lmingw32",
+                "-lSDL2main",
+                "-lSDL2",
+                "-mwindows"
+            ],
+            "options": {
+                //Pay attention to change to your own MinGW directory
+                "cwd": "C:\\Users\\Eleve\\mingw64\\bin"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}
