@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <SDL2/SDL.h>
+    #include <SDL2/SDL.h>
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 500
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
 
 
 void pause();

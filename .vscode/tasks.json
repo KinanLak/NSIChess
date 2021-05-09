@@ -5,7 +5,7 @@
             "type": "shell",
             "label": "g++.exe build active file",
             //Pay attention to change to your own MinGW directory
-            "command": "C:\\Users\\Eleve\\mingw64\\bin\\g++.exe",
+            "command": "C:\\mingw64\\bin\\g++.exe",
             "args": [
                 "-g",
                 "${file}",
@@ -18,7 +18,7 @@
             ],
             "options": {
                 //Pay attention to change to your own MinGW directory
-                "cwd": "C:\\Users\\Eleve\\mingw64\\bin"
+                "cwd": "C:\\mingw64\\bin"
             },
             "problemMatcher": [
                 "$gcc"
