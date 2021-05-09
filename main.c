@@ -38,6 +38,10 @@ void pause()
         {
             case SDL_QUIT:
                 continuer = 0;
+            case SDL_KEYDOWN:
+                continuer = 0;
+            case SDL_MOUSEBUTTONDOWN:
+                continuer = 0;
         }
     }
 }
