@@ -1,15 +1,12 @@
 //For minimisation of the window with a '-' -> SDL_WM_IconifyWindow()
 
 
-//For minimisation of the window with a '-' -> SDL_WM_IconifyWindow()
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 
-#define SCREEN_WIDTH 800
-#define SCREEN_HEIGHT 500
+#define SCREEN_WIDTH 1920
+#define SCREEN_HEIGHT 1080
 
 
 void pause();
@@ -27,7 +24,7 @@ int main(int argc, char* argv[])
     //Initialisation of the video mode that we will use
     SDL_Init(SDL_INIT_VIDEO);
 
-    window = SDL_CreateWindow("Hello world", 50, 50, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_SWSURFACE);
+    window = SDL_CreateWindow("Hello world", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_SWSURFACE);
     
     windowSurface = SDL_GetWindowSurface(window);
 
