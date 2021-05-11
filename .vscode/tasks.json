@@ -3,7 +3,7 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "g++.exe build active file",
+            "label": "Builder",
             //Pay attention to change to your own MinGW directory
             "command": "C:\\Users\\Eleve\\mingw64\\bin\\g++.exe",
             "args": [
@@ -14,7 +14,8 @@
                 "-lmingw32",
                 "-lSDL2main",
                 "-lSDL2",
-                "-mwindows"
+                "-mwindows",
+                "C:\\Users\\Eleve\\Documents\\Github\\NsiChess\\my.res"
             ],
             "options": {
                 //Pay attention to change to your own MinGW directory

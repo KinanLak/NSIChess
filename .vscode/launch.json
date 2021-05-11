@@ -21,7 +21,7 @@
                     "ignoreFailures": true
                 }
             ],
-            "preLaunchTask": "g++.exe build active file"
+            "preLaunchTask": "Builder"
         }
     ]
 }
