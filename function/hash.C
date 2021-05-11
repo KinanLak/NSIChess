@@ -9,6 +9,7 @@ unsigned long long int jpow(unsigned long long int x, int n)
     for (int i = 0; i < n; i++)
     {
         cpt *= x;
+        printf("test")
     }
     return cpt;
 }
