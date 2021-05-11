@@ -4,7 +4,6 @@
         {
             "type": "shell",
             "label": "Builder",
-            //Pay attention to change to your own MinGW directory
             "command": "C:\\Users\\Eleve\\mingw64\\bin\\g++.exe",
             "args": [
                 "-g",
@@ -18,7 +17,6 @@
                 "C:\\Users\\Eleve\\Documents\\Github\\NsiChess\\my.res"
             ],
             "options": {
-                //Pay attention to change to your own MinGW directory
                 "cwd": "C:\\Users\\Eleve\\mingw64\\bin"
             },
             "problemMatcher": [
