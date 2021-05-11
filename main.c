@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
     SDL_Surface *windowSurface = NULL;
     SDL_Surface *bgImage = NULL;
     SDL_Surface *currentImage = NULL;
-
+    SDL_Surface *icon = NULL;
 
     //Initialisation of the video mode that we will use
     SDL_Init(SDL_INIT_VIDEO);
@@ -28,17 +28,20 @@ int main(int argc, char* argv[])
     
     windowSurface = SDL_GetWindowSurface(window);
 
-    bgImage = SDL_LoadBMP("mountain.bmp");
+    bgImage = SDL_LoadBMP("main_window.bmp");
 
     currentImage = bgImage;
-
-
 
     SDL_Event event;
  
     int continuer = 1;
     while (continuer)
     {
+
+        //Set up window's icon
+        icon = SDL_LoadBMP("images/logo.bmp");
+        SDL_SetWindowIcon(window, icon);
+
         SDL_WaitEvent(&event);
         switch(event.type)
         {
