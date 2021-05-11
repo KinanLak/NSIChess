@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
     
     windowSurface = SDL_GetWindowSurface(window);
 
-    bgImage = SDL_LoadBMP("main_windows.bmp");
+    bgImage = SDL_LoadBMP("mountain.bmp");
 
     currentImage = bgImage;
 
