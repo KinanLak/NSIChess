@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include <SDL2/SDL.h>
 
 #define SCREEN_WIDTH 1920
@@ -30,8 +31,6 @@
 int giveCaseNumber(int eventX, int eventY);
 
 
-
-
 int main(int argc, char* argv[])
 {
     SDL_Window* window = NULL;
@@ -50,18 +49,34 @@ int main(int argc, char* argv[])
     image2 = SDL_LoadBMP(BoardBgImage);
     texture2 = SDL_CreateTextureFromSurface(render, image2);
     SDL_RenderCopy(render, texture2, NULL, NULL);
-    SDL_RenderPresent(render);
+
     image = SDL_LoadBMP(BlackPawnImage);
     SDL_SetColorKey(image, SDL_TRUE, SDL_MapRGB(image->format, 239, 239, 239));
     texture = SDL_CreateTextureFromSurface(render, image);
+    SDL_Rect dstrect;
 
-    /*SDL_Rect dstrect;
-    dstrect.x= 300;
-    dstrect.y= 300;
-    dstrect.h= 118;
-    dstrect.w= 118;
-    SDL_RenderCopy(render, texture, NULL, &dstrect);
-    SDL_RenderPresent(render);*/
+    //Initialisation of the audio
+    SDL_AudioSpec wavSpec;
+    Uint32 wavLength;
+    Uint8 *wavBuffer;
+    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+
+    int chessBoard[64] = {1,1,1,0};
+    int change = -1;
+    for (int i=0; i<64; i++)
+    {
+        if (chessBoard[i]==1)
+        {
+            dstrect.x= (xMinBoard+(i%8)*117);
+            dstrect.y= (yMinBoard+(i/8)*117);
+            dstrect.h= 118;
+            dstrect.w= 118;
+            SDL_RenderCopy(render, texture, NULL, &dstrect);
+        }
+    }
+    SDL_RenderPresent(render);
+
 
     SDL_Event event;
     int continuer = 1;
@@ -80,22 +95,55 @@ int main(int argc, char* argv[])
             case SDL_KEYDOWN:
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
-                    int x=event.button.x;
-                    int y=event.button.y;
-                    SDL_Rect dstrect;
-                    dstrect.x= (xMinBoard+(x-xMinBoard)/117*117);
-                    dstrect.y= (yMinBoard+(y-yMinBoard)/117*117);
-                    dstrect.h= 118;
-                    dstrect.w= 118;
-                    SDL_RenderCopy(render, texture, NULL, &dstrect);
-                    SDL_RenderPresent(render);
-                    /*SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
-                    SDL_RenderClear(render);
-                    SDL_RenderPresent(render);*/
+                    if (change ==-1)
+                    {
+                        if (chessBoard[giveCaseNumber(event.button.x, event.button.y)]==1)
+                        {
+                            change = giveCaseNumber(event.button.x, event.button.y);
+                        }
+                    }
+                    else
+                    {
+                        //Change the spieces
+                        chessBoard[giveCaseNumber(event.button.x, event.button.y)] = 1;
+                        chessBoard[change] = 0;
+
+                        //clear the window
+                        SDL_RenderClear(render);
+
+                        //show the background
+                        SDL_RenderCopy(render, texture2, NULL, NULL);
+
+                        //show all the pieces
+                        for (int i=0; i<64; i++)
+                        {
+                            if (chessBoard[i]==1)
+                            {
+                                dstrect.x= (xMinBoard+(i%8)*117);
+                                dstrect.y= (yMinBoard+(i/8)*117);
+                                dstrect.h= 118;
+                                dstrect.w= 118;
+                                SDL_RenderCopy(render, texture, NULL, &dstrect);
+                            }
+                        }
+                        SDL_RenderPresent(render);
+
+                        //Reset change
+                        change = -1;
+                    }
 
                 }
                 else
                 {
+                    //Reset change
+                    change = -1;
+
+                    // clear the window
+                    SDL_RenderClear(render);
+
+                    SDL_RenderCopy(render, texture2, NULL, NULL);
+                    SDL_RenderPresent(render);
+                    
                     /*int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
                     SDL_PauseAudioDevice(deviceId, 0);
                     SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
@@ -117,3 +165,20 @@ int main(int argc, char* argv[])
     SDL_DestroyWindow(window);
     return 1;
 }
+
+
+
+
+int giveCaseNumber(int eventX, int eventY)
+{
+    return (eventX-xMinBoard)/lenSquare + (((eventY-yMinBoard)/lenSquare)*8);
+}
+
+/*void placePieces()
+{
+    //Placement of black pawn
+    for (int x=0; x<8; x++)
+    {
+
+    }
+}*/
