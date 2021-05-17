@@ -155,10 +155,10 @@ int main(int argc, char* argv[])
                     //SDL_RenderClear(render);
 
                     //Show the background
-                    SDL_RenderCopy(render, texture2, NULL, NULL);
+                    //SDL_RenderCopy(render, texture2, NULL, NULL);
 
                     //Change the modification
-                    SDL_RenderPresent(render);
+                    //SDL_RenderPresent(render);
                 }
         }
         
