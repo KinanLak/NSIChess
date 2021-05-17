@@ -1,10 +1,14 @@
 //For minimisation of the window with a '-' -> SDL_WM_IconifyWindow()
 
 
+
+//To play a song (?), doesn't work anymore
+//int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
+//SDL_PauseAudioDevice(deviceId, 0);
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 #include <SDL2/SDL.h>
+#include <time.h>
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -62,6 +66,7 @@ int main(int argc, char* argv[])
     SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
+    
     int chessBoard[64] = {1,1,1,0};
     int change = -1;
     for (int i=0; i<64; i++)
@@ -95,11 +100,19 @@ int main(int argc, char* argv[])
             case SDL_KEYDOWN:
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
-                    if (change ==-1)
+                    if (change ==-1 || giveCaseNumber(event.button.x, event.button.y)==change)
                     {
                         if (chessBoard[giveCaseNumber(event.button.x, event.button.y)]==1)
                         {
                             change = giveCaseNumber(event.button.x, event.button.y);
+                            SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
+                            SDL_Rect rect;
+                            rect.x = (xMinBoard+(change%8)*117);
+                            rect.y = (yMinBoard+(change/8)*117);
+                            rect.w = 118;
+                            rect.h = 118;
+                            SDL_RenderDrawRect(render, &rect);
+                            SDL_RenderPresent(render);
                         }
                     }
                     else
@@ -108,13 +121,13 @@ int main(int argc, char* argv[])
                         chessBoard[giveCaseNumber(event.button.x, event.button.y)] = 1;
                         chessBoard[change] = 0;
 
-                        //clear the window
+                        //Clear the window
                         SDL_RenderClear(render);
 
-                        //show the background
+                        //Show the background
                         SDL_RenderCopy(render, texture2, NULL, NULL);
 
-                        //show all the pieces
+                        //Show all the pieces
                         for (int i=0; i<64; i++)
                         {
                             if (chessBoard[i]==1)
@@ -138,24 +151,17 @@ int main(int argc, char* argv[])
                     //Reset change
                     change = -1;
 
-                    // clear the window
-                    SDL_RenderClear(render);
+                    //Clear the window
+                    //SDL_RenderClear(render);
 
+                    //Show the background
                     SDL_RenderCopy(render, texture2, NULL, NULL);
+
+                    //Change the modification
                     SDL_RenderPresent(render);
-                    
-                    /*int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
-                    SDL_PauseAudioDevice(deviceId, 0);
-                    SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
-                    SDL_Rect rect;
-                    rect.x = 0;
-                    rect.y = 0;
-                    rect.w = 32;
-                    rect.h = 32;
-                    SDL_RenderFillRect(render, &rect);
-                    SDL_RenderPresent(render);*/
                 }
         }
+        
     }
 
 
@@ -175,7 +181,7 @@ int giveCaseNumber(int eventX, int eventY)
 }
 
 /*void placePieces()
-{
+{       
     //Placement of black pawn
     for (int x=0; x<8; x++)
     {
