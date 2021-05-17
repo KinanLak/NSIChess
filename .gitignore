@@ -1,4 +1,6 @@
-.vscode/c_ccp_properties.json
-.vscode/launch.json
-.vscode/tasks.json
+
 main.exe
+my.rc
+.vscode/launch.json
+.gitignore
+.gitignore
