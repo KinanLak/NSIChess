@@ -4,7 +4,7 @@
         {
             "type": "shell",
             "label": "Builder",
-            "command": "C:\\Users\\Eleve\\mingw64\\bin\\g++.exe",
+            "command": "C:\\mingw64\\bin\\gcc.exe",
             "args": [
                 "-g",
                 "${file}",
@@ -14,10 +14,12 @@
                 "-lSDL2main",
                 "-lSDL2",
                 "-mwindows",
-                "C:\\Users\\Eleve\\Documents\\Github\\NsiChess\\my.res"
+                "-lSDL2_ttf",
+                "-lmysql",
+                "C:\\Users\\Kinan\\Documents\\GitHub\\NSIChess\\my.res"
             ],
             "options": {
-                "cwd": "C:\\Users\\Eleve\\mingw64\\bin"
+                "cwd": "C:\\mingw64\\bin"
             },
             "problemMatcher": [
                 "$gcc"

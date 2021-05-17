@@ -9,6 +9,8 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <time.h>
+#include <SDL2/SDL_ttf.h>
+#include <mysql.h>
 
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -35,7 +37,7 @@
 int giveCaseNumber(int eventX, int eventY);
 
 
-int main(int argc, char* argv[])
+int main(int argc, char* argv[])  
 {
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
