@@ -34,10 +34,13 @@
 #define GameOverSound "sounds/gameOver.wav"
 
 
+//Prototypes of functions
 int giveCaseNumber(int eventX, int eventY);
+void drawSquare(int squareNumber, SDL_Renderer* render);
 
+   
 
-int main(int argc, char* argv[])  
+int main(int argc, char* argv[])
 {
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
@@ -60,6 +63,7 @@ int main(int argc, char* argv[])
     SDL_SetColorKey(image, SDL_TRUE, SDL_MapRGB(image->format, 239, 239, 239));
     texture = SDL_CreateTextureFromSurface(render, image);
     SDL_Rect dstrect;
+    int previousMove[2]={-1, -1};
 
     //Initialisation of the audio
     SDL_AudioSpec wavSpec;
@@ -67,6 +71,7 @@ int main(int argc, char* argv[])
     Uint8 *wavBuffer;
     SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+    
 
     
     int chessBoard[64] = {1,1,1,0};
@@ -108,18 +113,17 @@ int main(int argc, char* argv[])
                         {
                             change = giveCaseNumber(event.button.x, event.button.y);
                             SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
-                            SDL_Rect rect;
-                            rect.x = (xMinBoard+(change%8)*117);
-                            rect.y = (yMinBoard+(change/8)*117);
-                            rect.w = 118;
-                            rect.h = 118;
-                            SDL_RenderDrawRect(render, &rect);
+                            drawSquare(change, render);
                             SDL_RenderPresent(render);
                         }
                     }
                     else
                     {
-                        //Change the spieces
+                        //Change the moves in the previousMove array
+                        previousMove[0] = change;
+                        previousMove[1] = giveCaseNumber(event.button.x, event.button.y);
+                        
+                        //Change the pieces of position
                         chessBoard[giveCaseNumber(event.button.x, event.button.y)] = 1;
                         chessBoard[change] = 0;
 
@@ -141,6 +145,12 @@ int main(int argc, char* argv[])
                                 SDL_RenderCopy(render, texture, NULL, &dstrect);
                             }
                         }
+                        if (previousMove[0]!=-1)
+                        {
+                            SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
+                            drawSquare(previousMove[0], render);
+                            drawSquare(previousMove[1], render);
+                        }
                         SDL_RenderPresent(render);
 
                         //Reset change
@@ -152,15 +162,6 @@ int main(int argc, char* argv[])
                 {
                     //Reset change
                     change = -1;
-
-                    //Clear the window
-                    //SDL_RenderClear(render);
-
-                    //Show the background
-                    //SDL_RenderCopy(render, texture2, NULL, NULL);
-
-                    //Change the modification
-                    //SDL_RenderPresent(render);
                 }
         }
         
@@ -182,11 +183,12 @@ int giveCaseNumber(int eventX, int eventY)
     return (eventX-xMinBoard)/lenSquare + (((eventY-yMinBoard)/lenSquare)*8);
 }
 
-/*void placePieces()
-{       
-    //Placement of black pawn
-    for (int x=0; x<8; x++)
-    {
-
-    }
-}*/
+void drawSquare(int squareNumber, SDL_Renderer* render)
+{
+    SDL_Rect rect;
+    rect.x = (xMinBoard+(squareNumber%8)*117);
+    rect.y = (yMinBoard+(squareNumber/8)*117);
+    rect.w = 118;
+    rect.h = 118;
+    SDL_RenderDrawRect(render, &rect);
+}
