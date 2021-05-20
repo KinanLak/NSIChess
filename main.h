@@ -5,8 +5,8 @@
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 #define xMinBoard 494
-#define yMinBoard 77
 #define xMaxBoard 1427
+#define yMinBoard 77
 #define yMaxBoard 1010
 #define lenSquare 117
 #define RED 255, 100, 100, 255

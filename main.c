@@ -191,7 +191,7 @@ To Do:
 --Create a function that displays all the pieces
 --Create a double function that collect the 
 Initialisation of the game:
--the computer must choose the white and the black pawn (can be influence be a parameter)
+-the computer must choose the white and the black pawn (can be influence by a parameter)
 --It has to put a variable which is 1 if the user is white else it's 0 so black
 -Display all the pawn
 -initialisation of the timer
