@@ -1,7 +1,3 @@
-//For minimisation of the window with a '-' -> SDL_WM_IconifyWindow()
-
-
-
 //To play a song (?), doesn't work anymore
 //int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);
 //SDL_PauseAudioDevice(deviceId, 0);
@@ -9,60 +5,75 @@
 #include <stdlib.h>
 #include <SDL2/SDL.h>
 #include <time.h>
-#include <SDL2/SDL_ttf.h>
+#include "main.h"
+#include "move.h"
 
-#define SCREEN_WIDTH 1920
-#define SCREEN_HEIGHT 1080
-#define xMinBoard 494
-#define yMinBoard 77
-#define xMaxBoard 1427
-#define yMaxBoard 1010
-#define lenSquare 117
+/*
+x001 -> pawn
+x010 -> knight
+x011 -> bishop
+x100 -> rook
+x110 -> queen
+x111 -> king
+*/
 
-
-//Definition of images path
-#define BoardBgImage "images/board/bg.bmp"
-#define BlackPawnImage "images/board/pion.bmp"
-
-//Definition of files path
-#define MoveSound "sounds/move.wav"
-#define CheckSound "sounds/check.wav"
-#define CaptureSound "sounds/capture.wav"
-#define RockSound "sounds/rock.wav"
-#define GameStartSound "sounds/gameStart.wav"
-#define GameOverSound "sounds/gameOver.wav"
-
-
-//Prototypes of functions
-int giveCaseNumber(int eventX, int eventY);
-void drawSquare(int squareNumber, SDL_Renderer* render);
-
-   
 
 int main(int argc, char* argv[])
 {
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
-    SDL_Surface* image = NULL; 
-    SDL_Surface* image2 = NULL; 
-    SDL_Texture* texture = NULL;
-    SDL_Texture* texture2 = NULL;
+    SDL_Surface* imageBlackPawn = NULL; 
+    SDL_Surface* imageBlackKnight = NULL; 
+    SDL_Surface* imageBlackRook = NULL; 
+    SDL_Surface* imageBlackBishop = NULL; 
+    SDL_Surface* imageBlackQueen = NULL; 
+    SDL_Surface* imageBlackKing = NULL; 
+    SDL_Surface* imageWhitePawn = NULL; 
+    SDL_Surface* imageWhiteKnight = NULL; 
+    SDL_Surface* imageWhiteRook = NULL; 
+    SDL_Surface* imageWhiteBishop = NULL; 
+    SDL_Surface* imageWhiteQueen = NULL; 
+    SDL_Surface* imageWhiteKing = NULL; 
+    SDL_Surface* imageBackground = NULL; 
+
+    SDL_Texture* textureBlackPawn = NULL; 
+    SDL_Texture* textureBlackKnight = NULL; 
+    SDL_Texture* textureBlackRook = NULL; 
+    SDL_Texture* textureBlackBishop = NULL; 
+    SDL_Texture* textureBlackQueen = NULL; 
+    SDL_Texture* textureBlackKing = NULL; 
+    SDL_Texture* textureWhitePawn = NULL; 
+    SDL_Texture* textureWhiteKnight = NULL; 
+    SDL_Texture* textureWhiteRook = NULL; 
+    SDL_Texture* textureWhiteBishop = NULL; 
+    SDL_Texture* textureWhiteQueen = NULL; 
+    SDL_Texture* textureWhiteKing = NULL; 
+    SDL_Texture* textureBackground = NULL; 
 
     //Initialisation of the SDL mode(s) that we will use
     SDL_Init(SDL_INIT_VIDEO);
+    CreateRenderInNewWindow(window, render)
 
-    window = SDL_CreateWindow("Hello world", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_SWSURFACE);
-    render = SDL_CreateRenderer(window, -1, 0);
+    //Create all images
+    ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)
 
-    image2 = SDL_LoadBMP(BoardBgImage);
-    texture2 = SDL_CreateTextureFromSurface(render, image2);
-    SDL_RenderCopy(render, texture2, NULL, NULL);
+    ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)
+    ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)
+    ALLImageAndTransparencyINIT(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)
+    ALLImageAndTransparencyINIT(imageBlackKnight ,textureBlackKnight, BlackKnightImageBMP, render)
+    ALLImageAndTransparencyINIT(imageBlackQueen ,textureBlackQueen, BlackQueenImageBMP, render)
+    ALLImageAndTransparencyINIT(imageBlackKing ,textureBlackKing, BlackKingImageBMP, render)
 
-    image = SDL_LoadBMP(BlackPawnImage);
-    SDL_SetColorKey(image, SDL_TRUE, SDL_MapRGB(image->format, 239, 239, 239));
-    texture = SDL_CreateTextureFromSurface(render, image);
+    ALLImageAndTransparencyINIT(imageWhitePawn ,textureWhitePawn, WhitePawnImageBMP, render)
+    ALLImageAndTransparencyINIT(imageWhiteRook ,textureWhiteRook, WhiteRookImageBMP, render)
+    ALLImageAndTransparencyINIT(imageWhiteBishop ,textureWhiteBishop, WhiteBishopImageBMP, render)
+    ALLImageAndTransparencyINIT(imageWhiteKnight ,textureWhiteKnight, WhiteKnightImageBMP, render)
+    ALLImageAndTransparencyINIT(imageWhiteQueen ,textureWhiteQueen, WhiteQueenImageBMP, render)
+    ALLImageAndTransparencyINIT(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)
+
+
     SDL_Rect dstrect;
-    int previousMove[2]={-1, -1};
+    int previousMove[2]={NOTHING, NOTHING};
 
     //Initialisation of the audio
     SDL_AudioSpec wavSpec;
@@ -72,18 +83,87 @@ int main(int argc, char* argv[])
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
     
 
-    
-    int chessBoard[64] = {1,1,1,0};
-    int change = -1;
+
+    unsigned int chessBoard[64] = {
+    4,2,3,7,6,3,2,4,
+    1,1,1,1,1,1,1,1,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    0,0,0,0,0,0,0,0,
+    9,9,9,9,9,9,9,9,
+    12,10,11,14,15,11,10,12};
+
+    int change = NOTHING;
+
+    SDL_RenderCopy(render, textureBackground, NULL, NULL);
     for (int i=0; i<64; i++)
     {
-        if (chessBoard[i]==1)
+        if (chessBoard[i]%8==1)
         {
-            dstrect.x= (xMinBoard+(i%8)*117);
-            dstrect.y= (yMinBoard+(i/8)*117);
-            dstrect.h= 118;
-            dstrect.w= 118;
-            SDL_RenderCopy(render, texture, NULL, &dstrect);
+            if (chessBoard[i]/8==1)
+            {
+                DrawImage(dstrect, &dstrect, i, textureBlackPawn)
+            }
+            else
+            {
+                DrawImage(dstrect, &dstrect, i, textureWhitePawn)
+            }
+        }
+        else if (chessBoard[i]%8==2)
+        {
+            if (chessBoard[i]/8==1)
+            {
+                DrawImage(dstrect, &dstrect, i, textureBlackKnight)
+            }
+            else
+            {
+                DrawImage(dstrect, &dstrect, i, textureWhiteKnight)
+            }
+        }
+        else if (chessBoard[i]%8==3)
+        {
+            if (chessBoard[i]/8==1)
+            {
+                DrawImage(dstrect, &dstrect, i, textureBlackBishop)
+            }
+            else
+            {
+                DrawImage(dstrect, &dstrect, i, textureWhiteBishop)
+            }
+        }
+        else if (chessBoard[i]%8==4)
+        {
+            if (chessBoard[i]/8==1)
+            {
+                DrawImage(dstrect, &dstrect, i, textureBlackRook)
+            }
+            else
+            {
+                DrawImage(dstrect, &dstrect, i, textureWhiteRook)
+            }
+        }
+        else if (chessBoard[i]%8==6)
+        {
+            if (chessBoard[i]/8==1)
+            {
+                DrawImage(dstrect, &dstrect, i, textureBlackQueen)
+            }
+            else
+            {
+                DrawImage(dstrect, &dstrect, i, textureWhiteQueen)
+            }
+        }
+        else if (chessBoard[i]%8==7)
+        {
+            if (chessBoard[i]/8==1)
+            {
+                DrawImage(dstrect, &dstrect, i, textureBlackKing)
+            }
+            else
+            {
+                DrawImage(dstrect, &dstrect, i, textureWhiteKing)
+            }
         }
     }
     SDL_RenderPresent(render);
@@ -106,12 +186,12 @@ int main(int argc, char* argv[])
             case SDL_KEYDOWN:
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
-                    if (change ==-1 || giveCaseNumber(event.button.x, event.button.y)==change)
+                    if (change ==NOTHING || giveCaseNumber(event.button.x, event.button.y)==change)
                     {
-                        if (chessBoard[giveCaseNumber(event.button.x, event.button.y)]==1)
+                        if (chessBoard[giveCaseNumber(event.button.x, event.button.y)]!=0)
                         {
                             change = giveCaseNumber(event.button.x, event.button.y);
-                            SDL_SetRenderDrawColor(render, 0, 0, 0, 255);
+                            SDL_SetRenderDrawColor(render, BLACK);
                             drawSquare(change, render);
                             SDL_RenderPresent(render);
                         }
@@ -123,52 +203,140 @@ int main(int argc, char* argv[])
                         previousMove[1] = giveCaseNumber(event.button.x, event.button.y);
                         
                         //Change the pieces of position
-                        chessBoard[giveCaseNumber(event.button.x, event.button.y)] = 1;
+                        chessBoard[giveCaseNumber(event.button.x, event.button.y)] = chessBoard[change];
                         chessBoard[change] = 0;
 
                         //Clear the window
                         SDL_RenderClear(render);
 
                         //Show the background
-                        SDL_RenderCopy(render, texture2, NULL, NULL);
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
 
                         //Show all the pieces
                         for (int i=0; i<64; i++)
                         {
-                            if (chessBoard[i]==1)
+                            if (chessBoard[i]!=0)
                             {
-                                dstrect.x= (xMinBoard+(i%8)*117);
-                                dstrect.y= (yMinBoard+(i/8)*117);
-                                dstrect.h= 118;
-                                dstrect.w= 118;
-                                SDL_RenderCopy(render, texture, NULL, &dstrect);
+                                if (chessBoard[i]%8==1)
+                                {
+                                    if (chessBoard[i]/8==1)
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureBlackPawn)
+                                    }
+                                    else
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureWhitePawn)
+                                    }
+                                }
+                                else if (chessBoard[i]%8==2)
+                                {
+                                    if (chessBoard[i]/8==1)
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureBlackKnight)
+                                    }
+                                    else
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureWhiteKnight)
+                                    }
+                                }
+                                else if (chessBoard[i]%8==3)
+                                {
+                                    if (chessBoard[i]/8==1)
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureBlackBishop)
+                                    }
+                                    else
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureWhiteBishop)
+                                    }
+                                }
+                                else if (chessBoard[i]%8==4)
+                                {
+                                    if (chessBoard[i]/8==1)
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureBlackRook)
+                                    }
+                                    else
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureWhiteRook)
+                                    }
+                                }
+                                else if (chessBoard[i]%8==6)
+                                {
+                                    if (chessBoard[i]/8==1)
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureBlackQueen)
+                                    }
+                                    else
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureWhiteQueen)
+                                    }
+                                }
+                                else if (chessBoard[i]%8==7)
+                                {
+                                    if (chessBoard[i]/8==1)
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureBlackKing)
+                                    }
+                                    else
+                                    {
+                                        DrawImage(dstrect, &dstrect, i, textureWhiteKing)
+                                    }
+                                }
                             }
                         }
-                        if (previousMove[0]!=-1)
+                        if (previousMove[0]!=NOTHING)
                         {
-                            SDL_SetRenderDrawColor(render, 255, 0, 0, 255);
+                            SDL_SetRenderDrawColor(render, RED);
                             drawSquare(previousMove[0], render);
                             drawSquare(previousMove[1], render);
                         }
                         SDL_RenderPresent(render);
 
                         //Reset change
-                        change = -1;
+                        change = NOTHING;
                     }
 
                 }
                 else
                 {
                     //Reset change
-                    change = -1;
+                    change = NOTHING;
                 }
         }
         
     }
 
 
-    SDL_DestroyTexture(texture);
-    SDL_FreeSurface(image);
+    //Destroy all textures
+    SDL_DestroyTexture(textureBlackPawn);
+    SDL_DestroyTexture(textureBlackRook);
+    SDL_DestroyTexture(textureBlackKnight);
+    SDL_DestroyTexture(textureBlackBishop);
+    SDL_DestroyTexture(textureBlackQueen);
+    SDL_DestroyTexture(textureBlackKing);
+    SDL_DestroyTexture(textureWhitePawn);
+    SDL_DestroyTexture(textureWhiteRook);
+    SDL_DestroyTexture(textureWhiteKnight);
+    SDL_DestroyTexture(textureWhiteBishop);
+    SDL_DestroyTexture(textureWhiteQueen);
+    SDL_DestroyTexture(textureWhiteKing);
+    
+    //Destroy all the images
+    SDL_FreeSurface(imageBlackPawn);
+    SDL_FreeSurface(imageBlackRook);
+    SDL_FreeSurface(imageBlackKnight);
+    SDL_FreeSurface(imageBlackBishop);
+    SDL_FreeSurface(imageBlackQueen);
+    SDL_FreeSurface(imageBlackKing);
+    SDL_FreeSurface(imageWhitePawn);
+    SDL_FreeSurface(imageWhiteRook);
+    SDL_FreeSurface(imageWhiteKnight);
+    SDL_FreeSurface(imageWhiteBishop);
+    SDL_FreeSurface(imageWhiteQueen);
+    SDL_FreeSurface(imageWhiteKing);
+
+    //Destroy the window
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
     return 1;
@@ -185,9 +353,32 @@ int giveCaseNumber(int eventX, int eventY)
 void drawSquare(int squareNumber, SDL_Renderer* render)
 {
     SDL_Rect rect;
-    rect.x = (xMinBoard+(squareNumber%8)*117);
-    rect.y = (yMinBoard+(squareNumber/8)*117);
-    rect.w = 118;
-    rect.h = 118;
+    rect.x = (xMinBoard+(squareNumber%8)*lenSquare);
+    rect.y = (yMinBoard+(squareNumber/8)*lenSquare);
+    rect.w = lenSquare;
+    rect.h = lenSquare;
     SDL_RenderDrawRect(render, &rect);
 }
+
+// Recap of all the things that has to be done
+
+/*
+To Do:
+--Change the function give case number, in order to take into account the color of the player
+--Create a function that collecte all the legal moves from a case
+--Implement a chained list of all legals moves
+--Create a function that show all the legals moves
+--Create a function that displays all the pieces
+--Create a double function that collect the 
+
+Initialisation of the game:
+-the computer must choose the white and the black pawn (can be influence be a parameter)
+--It has to put a variable which is 1 if the user is white else it's 0 so black
+-Display all the pawn
+-initialisation of the timer
+-launch the timer for the white
+----launch the relevant 
+
+
+
+*/
