@@ -20,6 +20,7 @@ x111 -> king
 
 int main(int argc, char* argv[])
 {
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
     SDL_Surface* imageBlackPawn = NULL; 
@@ -34,7 +35,8 @@ int main(int argc, char* argv[])
     SDL_Surface* imageWhiteBishop = NULL; 
     SDL_Surface* imageWhiteQueen = NULL; 
     SDL_Surface* imageWhiteKing = NULL; 
-    SDL_Surface* imageBackground = NULL; 
+    SDL_Surface* imageBackground = NULL;
+    SDL_Surface* imageBlueBoard = NULL;
 
     SDL_Texture* textureBlackPawn = NULL; 
     SDL_Texture* textureBlackKnight = NULL; 
@@ -48,7 +50,8 @@ int main(int argc, char* argv[])
     SDL_Texture* textureWhiteBishop = NULL; 
     SDL_Texture* textureWhiteQueen = NULL; 
     SDL_Texture* textureWhiteKing = NULL; 
-    SDL_Texture* textureBackground = NULL; 
+    SDL_Texture* textureBackground = NULL;
+    SDL_Texture* textureBlueBoard = NULL;
 
     //Initialisation of the SDL mode(s) that we will use
     SDL_Init(SDL_INIT_VIDEO);
@@ -56,8 +59,10 @@ int main(int argc, char* argv[])
 
     //Create all images
     ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)
+    ALLImageINIT(imageBlueBoard, textureBlueBoard, BlueBoardBMP, render)
+    
 
-    ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)
+    //ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)
     ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)
     ALLImageAndTransparencyINIT(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)
     ALLImageAndTransparencyINIT(imageBlackKnight ,textureBlackKnight, BlackKnightImageBMP, render)

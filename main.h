@@ -17,21 +17,21 @@
 
 //Definition of images path
 #define BoardBgImageBMP "images/board/bg.bmp"
+#define BlueBoardBMP "images/board/blue_board.bmp"
 
-#define BlackPawnImageBMP "images/board/black/pawn.bmp"
-#define BlackKnightImageBMP "images/board/black/knight.bmp"
-#define BlackKingImageBMP "images/board/black/king.bmp"
-#define BlackQueenImageBMP "images/board/black/queen.bmp"
-#define BlackRookImageBMP "images/board/black/rook.bmp"
-#define BlackBishopImageBMP "images/board/black/bishop.bmp"
+#define BlackPawnImageBMP "images/board/black/black_pawn.bmp"
+#define BlackKnightImageBMP "images/board/black/black_knight.bmp"
+#define BlackKingImageBMP "images/board/black/black_king.bmp"
+#define BlackQueenImageBMP "images/board/black/black_queen.bmp"
+#define BlackRookImageBMP "images/board/black/black_rook.bmp"
+#define BlackBishopImageBMP "images/board/black/black_bishop.bmp"
 
-#define WhitePawnImageBMP "images/board/white/pawn.bmp"
-#define WhiteKnightImageBMP "images/board/white/knight.bmp"
-#define WhiteKingImageBMP "images/board/white/reine2.bmp"
-#define WhiteQueenImageBMP "images/board/white/queen.bmp"
-#define WhiteRookImageBMP "images/board/white/rook.bmp"
-#define WhiteBishopImageBMP "images/board/white/bishop.bmp"
-
+#define WhitePawnImageBMP "images/board/white/blank_pawn.bmp"
+#define WhiteKnightImageBMP "images/board/white/blank_knight.bmp"
+#define WhiteKingImageBMP "images/board/white/blank_king.bmp"
+#define WhiteQueenImageBMP "images/board/white/blank_queen.bmp"
+#define WhiteRookImageBMP "images/board/white/blank_rook.bmp"
+#define WhiteBishopImageBMP "images/board/white/blank_bishop.bmp"
 
 //Definition of files path
 #define MoveSound "sounds/move.wav"
