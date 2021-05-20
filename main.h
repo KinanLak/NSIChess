@@ -4,11 +4,11 @@
 //Definitions of variables
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
-#define xMinBoard 494
-#define xMaxBoard 1427
-#define yMinBoard 77
-#define yMaxBoard 1010
-#define lenSquare 117
+#define xMinBoard 488
+#define xMaxBoard 1432
+#define yMinBoard 69
+#define yMaxBoard 1013
+#define lenSquare 118
 #define RED 255, 100, 100, 255
 #define REDLight 255, 155, 155, 255
 #define BLACK 0, 0, 0, 255
