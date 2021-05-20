@@ -22,54 +22,15 @@ int main(int argc, char* argv[])
 {
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
-    SDL_Surface* imageBlackPawn = NULL; 
-    SDL_Surface* imageBlackKnight = NULL; 
-    SDL_Surface* imageBlackRook = NULL; 
-    SDL_Surface* imageBlackBishop = NULL; 
-    SDL_Surface* imageBlackQueen = NULL; 
-    SDL_Surface* imageBlackKing = NULL; 
-    SDL_Surface* imageWhitePawn = NULL; 
-    SDL_Surface* imageWhiteKnight = NULL; 
-    SDL_Surface* imageWhiteRook = NULL; 
-    SDL_Surface* imageWhiteBishop = NULL; 
-    SDL_Surface* imageWhiteQueen = NULL; 
-    SDL_Surface* imageWhiteKing = NULL; 
-    SDL_Surface* imageBackground = NULL; 
-
-    SDL_Texture* textureBlackPawn = NULL; 
-    SDL_Texture* textureBlackKnight = NULL; 
-    SDL_Texture* textureBlackRook = NULL; 
-    SDL_Texture* textureBlackBishop = NULL; 
-    SDL_Texture* textureBlackQueen = NULL; 
-    SDL_Texture* textureBlackKing = NULL; 
-    SDL_Texture* textureWhitePawn = NULL; 
-    SDL_Texture* textureWhiteKnight = NULL; 
-    SDL_Texture* textureWhiteRook = NULL; 
-    SDL_Texture* textureWhiteBishop = NULL; 
-    SDL_Texture* textureWhiteQueen = NULL; 
-    SDL_Texture* textureWhiteKing = NULL; 
-    SDL_Texture* textureBackground = NULL; 
+    initAllSurfaces()
+    initAllTextures() 
 
     //Initialisation of the SDL mode(s) that we will use
     SDL_Init(SDL_INIT_VIDEO);
     CreateRenderInNewWindow(window, render)
 
     //Create all images
-    ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)
-
-    ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)
-    ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)
-    ALLImageAndTransparencyINIT(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)
-    ALLImageAndTransparencyINIT(imageBlackKnight ,textureBlackKnight, BlackKnightImageBMP, render)
-    ALLImageAndTransparencyINIT(imageBlackQueen ,textureBlackQueen, BlackQueenImageBMP, render)
-    ALLImageAndTransparencyINIT(imageBlackKing ,textureBlackKing, BlackKingImageBMP, render)
-
-    ALLImageAndTransparencyINIT(imageWhitePawn ,textureWhitePawn, WhitePawnImageBMP, render)
-    ALLImageAndTransparencyINIT(imageWhiteRook ,textureWhiteRook, WhiteRookImageBMP, render)
-    ALLImageAndTransparencyINIT(imageWhiteBishop ,textureWhiteBishop, WhiteBishopImageBMP, render)
-    ALLImageAndTransparencyINIT(imageWhiteKnight ,textureWhiteKnight, WhiteKnightImageBMP, render)
-    ALLImageAndTransparencyINIT(imageWhiteQueen ,textureWhiteQueen, WhiteQueenImageBMP, render)
-    ALLImageAndTransparencyINIT(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)
+    initAllImages()
 
 
     SDL_Rect dstrect;
@@ -84,88 +45,12 @@ int main(int argc, char* argv[])
     
 
 
-    unsigned int chessBoard[64] = {
-    4,2,3,7,6,3,2,4,
-    1,1,1,1,1,1,1,1,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    9,9,9,9,9,9,9,9,
-    12,10,11,14,15,11,10,12};
+    unsigned int chessBoard[64] = departPosition;
 
     int change = NOTHING;
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
-    for (int i=0; i<64; i++)
-    {
-        if (chessBoard[i]%8==1)
-        {
-            if (chessBoard[i]/8==1)
-            {
-                DrawImage(dstrect, &dstrect, i, textureBlackPawn)
-            }
-            else
-            {
-                DrawImage(dstrect, &dstrect, i, textureWhitePawn)
-            }
-        }
-        else if (chessBoard[i]%8==2)
-        {
-            if (chessBoard[i]/8==1)
-            {
-                DrawImage(dstrect, &dstrect, i, textureBlackKnight)
-            }
-            else
-            {
-                DrawImage(dstrect, &dstrect, i, textureWhiteKnight)
-            }
-        }
-        else if (chessBoard[i]%8==3)
-        {
-            if (chessBoard[i]/8==1)
-            {
-                DrawImage(dstrect, &dstrect, i, textureBlackBishop)
-            }
-            else
-            {
-                DrawImage(dstrect, &dstrect, i, textureWhiteBishop)
-            }
-        }
-        else if (chessBoard[i]%8==4)
-        {
-            if (chessBoard[i]/8==1)
-            {
-                DrawImage(dstrect, &dstrect, i, textureBlackRook)
-            }
-            else
-            {
-                DrawImage(dstrect, &dstrect, i, textureWhiteRook)
-            }
-        }
-        else if (chessBoard[i]%8==6)
-        {
-            if (chessBoard[i]/8==1)
-            {
-                DrawImage(dstrect, &dstrect, i, textureBlackQueen)
-            }
-            else
-            {
-                DrawImage(dstrect, &dstrect, i, textureWhiteQueen)
-            }
-        }
-        else if (chessBoard[i]%8==7)
-        {
-            if (chessBoard[i]/8==1)
-            {
-                DrawImage(dstrect, &dstrect, i, textureBlackKing)
-            }
-            else
-            {
-                DrawImage(dstrect, &dstrect, i, textureWhiteKing)
-            }
-        }
-    }
+    displayAllpiecesInRender()
     SDL_RenderPresent(render);
 
 
@@ -212,85 +97,12 @@ int main(int argc, char* argv[])
                         //Show the background
                         SDL_RenderCopy(render, textureBackground, NULL, NULL);
 
+                        //Show the previous move
+                       showPreviousMoves()
+
                         //Show all the pieces
-                        for (int i=0; i<64; i++)
-                        {
-                            if (chessBoard[i]!=0)
-                            {
-                                if (chessBoard[i]%8==1)
-                                {
-                                    if (chessBoard[i]/8==1)
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureBlackPawn)
-                                    }
-                                    else
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureWhitePawn)
-                                    }
-                                }
-                                else if (chessBoard[i]%8==2)
-                                {
-                                    if (chessBoard[i]/8==1)
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureBlackKnight)
-                                    }
-                                    else
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureWhiteKnight)
-                                    }
-                                }
-                                else if (chessBoard[i]%8==3)
-                                {
-                                    if (chessBoard[i]/8==1)
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureBlackBishop)
-                                    }
-                                    else
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureWhiteBishop)
-                                    }
-                                }
-                                else if (chessBoard[i]%8==4)
-                                {
-                                    if (chessBoard[i]/8==1)
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureBlackRook)
-                                    }
-                                    else
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureWhiteRook)
-                                    }
-                                }
-                                else if (chessBoard[i]%8==6)
-                                {
-                                    if (chessBoard[i]/8==1)
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureBlackQueen)
-                                    }
-                                    else
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureWhiteQueen)
-                                    }
-                                }
-                                else if (chessBoard[i]%8==7)
-                                {
-                                    if (chessBoard[i]/8==1)
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureBlackKing)
-                                    }
-                                    else
-                                    {
-                                        DrawImage(dstrect, &dstrect, i, textureWhiteKing)
-                                    }
-                                }
-                            }
-                        }
-                        if (previousMove[0]!=NOTHING)
-                        {
-                            SDL_SetRenderDrawColor(render, RED);
-                            drawSquare(previousMove[0], render);
-                            drawSquare(previousMove[1], render);
-                        }
+                        displayAllpiecesInRender()
+
                         SDL_RenderPresent(render);
 
                         //Reset change
@@ -358,6 +170,24 @@ void drawSquare(int squareNumber, SDL_Renderer* render)
     rect.w = lenSquare;
     rect.h = lenSquare;
     SDL_RenderDrawRect(render, &rect);
+}
+
+void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
+{
+    if (((squareNumber/8)+(squareNumber%8))%2==0)
+    {
+        SDL_SetRenderDrawColor(render, REDLight);
+    }
+    else
+    {
+        SDL_SetRenderDrawColor(render, RED);
+    }
+    SDL_Rect rect;
+    rect.x = (xMinBoard+(squareNumber%8)*lenSquare);
+    rect.y = (yMinBoard+(squareNumber/8)*lenSquare);
+    rect.w = lenSquare;
+    rect.h = lenSquare;
+    SDL_RenderFillRect(render, &rect);
 }
 
 // Recap of all the things that has to be done
