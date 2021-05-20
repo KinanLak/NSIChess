@@ -8,3 +8,4 @@ main.exe
 *.json
 main.exe
 *.json
+.bowerrc
