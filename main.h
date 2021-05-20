@@ -9,7 +9,8 @@
 #define xMaxBoard 1427
 #define yMaxBoard 1010
 #define lenSquare 117
-#define RED 255, 0, 0, 255
+#define RED 255, 100, 100, 255
+#define REDLight 255, 155, 155, 255
 #define BLACK 0, 0, 0, 255
 #define NOTHING -1
 #define transparentColor 239, 239, 239
@@ -27,7 +28,7 @@
 
 #define WhitePawnImageBMP "images/board/white/pawn.bmp"
 #define WhiteKnightImageBMP "images/board/white/knight.bmp"
-#define WhiteKingImageBMP "images/board/white/reine2.bmp"
+#define WhiteKingImageBMP "images/board/white/king.bmp"
 #define WhiteQueenImageBMP "images/board/white/queen.bmp"
 #define WhiteRookImageBMP "images/board/white/rook.bmp"
 #define WhiteBishopImageBMP "images/board/white/bishop.bmp"
@@ -59,8 +60,91 @@
     render = SDL_CreateRenderer(window, NOTHING, 0);
 
 
+#define departPosition { \
+    4,2,3,7,6,3,2,4, \
+    1,1,1,1,1,1,1,1,\
+    0,0,0,0,0,0,0,0,\
+    0,0,0,0,0,0,0,0,\
+    0,0,0,0,0,0,0,0,\
+    0,0,0,0,0,0,0,0,\
+    9,9,9,9,9,9,9,9,\
+    12,10,11,14,15,11,10,12}
+
+#define initAllTextures() SDL_Texture* textureBlackPawn = NULL;\
+    SDL_Texture* textureBlackKnight = NULL; \
+    SDL_Texture* textureBlackRook = NULL; \
+    SDL_Texture* textureBlackBishop = NULL;\
+    SDL_Texture* textureBlackQueen = NULL; \
+    SDL_Texture* textureBlackKing = NULL; \
+    SDL_Texture* textureWhitePawn = NULL; \
+    SDL_Texture* textureWhiteKnight = NULL;\
+    SDL_Texture* textureWhiteRook = NULL; \
+    SDL_Texture* textureWhiteBishop = NULL;\
+    SDL_Texture* textureWhiteQueen = NULL; \
+    SDL_Texture* textureWhiteKing = NULL;\
+    SDL_Texture* textureBackground = NULL;
+
+#define initAllSurfaces() SDL_Surface* imageBlackPawn = NULL; \
+    SDL_Surface* imageBlackKnight = NULL; \
+    SDL_Surface* imageBlackRook = NULL; \
+    SDL_Surface* imageBlackBishop = NULL; \
+    SDL_Surface* imageBlackQueen = NULL; \
+    SDL_Surface* imageBlackKing = NULL; \
+    SDL_Surface* imageWhitePawn = NULL; \
+    SDL_Surface* imageWhiteKnight = NULL;\
+    SDL_Surface* imageWhiteRook = NULL; \
+    SDL_Surface* imageWhiteBishop = NULL;\
+    SDL_Surface* imageWhiteQueen = NULL; \
+    SDL_Surface* imageWhiteKing = NULL;\
+    SDL_Surface* imageBackground = NULL;
+
+#define drawImageColor(dstrect, i, textureBlack, textureWhite, nb) if (chessBoard[i]%8==nb)\
+            {\
+                if (chessBoard[i]/8==1)\
+                {\
+                    DrawImage(dstrect, &dstrect, i, textureBlack)\
+                }\
+                else\
+                {\
+                    DrawImage(dstrect, &dstrect, i, textureWhite)\
+                }\
+            }
+#define initAllImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageBlackKnight ,textureBlackKnight, BlackKnightImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageBlackQueen ,textureBlackQueen, BlackQueenImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageBlackKing ,textureBlackKing, BlackKingImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageWhitePawn ,textureWhitePawn, WhitePawnImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageWhiteRook ,textureWhiteRook, WhiteRookImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageWhiteBishop ,textureWhiteBishop, WhiteBishopImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageWhiteKnight ,textureWhiteKnight, WhiteKnightImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageWhiteQueen ,textureWhiteQueen, WhiteQueenImageBMP, render)\
+    ALLImageAndTransparencyINIT(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)
+
+#define showPreviousMoves()  if (previousMove[0]!=NOTHING)\
+                        {\
+                            drawFullSquarePreviousMove(previousMove[0], render);\
+                            drawFullSquarePreviousMove(previousMove[1], render);\
+                        }
+#define displayAllpiecesInRender() for (int i=0; i<64; i++)\
+    {\
+        if (chessBoard[i]!=0)\
+        {\
+            drawImageColor(dstrect, i, textureBlackPawn, textureWhitePawn,1)\
+            else drawImageColor(dstrect, i, textureBlackKnight, textureWhiteKnight,2)\
+            else drawImageColor(dstrect, i, textureBlackBishop, textureWhiteBishop,3)\
+            else drawImageColor(dstrect, i, textureBlackRook, textureWhiteRook,4)\
+            else drawImageColor(dstrect, i, textureBlackQueen, textureWhiteQueen,6)\
+            else drawImageColor(dstrect, i, textureBlackKing, textureWhiteKing,7)\
+        }\
+    }
+
+
 //Prototypes
 int giveCaseNumber(int eventX, int eventY);
 void drawSquare(int squareNumber, SDL_Renderer* render);
+void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render);
 
 #endif
