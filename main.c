@@ -23,16 +23,19 @@ int main(int argc, char *argv[])
     SDL_Window *window = NULL;
     SDL_Renderer *render = NULL;
     initAllSurfaces()
-        initAllTextures()
+    initAllTextures()
 
-        //Initialisation of the SDL mode(s) that we will use
-        SDL_Init(SDL_INIT_VIDEO);
+    //Initialisation of SDL_ttf
+    TTF_init();
+
+    //Initialisation of the SDL mode(s) that we will use
+    SDL_Init(SDL_INIT_VIDEO);
     CreateRenderInNewWindow(window, render)
 
-        //Create all images
-        initAllImages()
+    //Create all images
+    initAllImages()
 
-            SDL_Rect dstrect;
+    SDL_Rect dstrect;
     int previousMove[2] = {NOTHING, NOTHING};
 
     //Initialisation of the audio
@@ -89,6 +92,9 @@ int main(int argc, char *argv[])
 
                     //Clear the window
                     SDL_RenderClear(render);
+
+                    //Quit SLD_ttf
+                    TTF_quit();
 
                     //Show the background
                     SDL_RenderCopy(render, textureBackground, NULL, NULL);
@@ -175,6 +181,12 @@ void drawSquare(int squareNumber, SDL_Renderer *render)
     rect.w = lenSquare - 6;
     rect.h = lenSquare - 6;
     SDL_RenderDrawRect(render, &rect);
+}
+
+void displayTimer()
+{
+
+
 }
 
 void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer *render)
