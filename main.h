@@ -102,11 +102,11 @@
             {\
                 if (chessBoard[i]/8==1)\
                 {\
-                    DrawImage(dstrect, &dstrect, i, textureBlack)\
+                    DrawImage(dstrect, &dstrect, i, textureWhite)\
                 }\
                 else\
                 {\
-                    DrawImage(dstrect, &dstrect, i, textureWhite)\
+                    DrawImage(dstrect, &dstrect, i, textureBlack)\
                 }\
             }
 #define initAllImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
