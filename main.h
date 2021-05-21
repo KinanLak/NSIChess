@@ -9,8 +9,8 @@
 #define yMinBoard 69
 #define yMaxBoard 1013
 #define lenSquare 118
-#define RED 255, 100, 100, 255
-#define REDLight 255, 155, 155, 255
+#define RED 255, 155, 155, 255
+#define REDLight 255, 200, 200, 255
 #define BLACK 0, 0, 0, 255
 #define NOTHING -1
 #define transparentColor 239, 239, 239
