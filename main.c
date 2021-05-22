@@ -72,7 +72,15 @@ int main(int argc, char *argv[])
             {
                 if (change == NOTHING || giveCaseNumber(event.button.x, event.button.y) == change)
                 {
-                    if (chessBoard[giveCaseNumber(event.button.x, event.button.y)] != 0)
+                    if (giveCaseNumber(event.button.x, event.button.y)==change)
+                    {
+                        change=NOTHING;
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                        displayAllpiecesInRender()
+                        SDL_RenderPresent(render);
+                    }
+                    else if (chessBoard[giveCaseNumber(event.button.x, event.button.y)] != 0)
                     {
                         change = giveCaseNumber(event.button.x, event.button.y);
                         SDL_SetRenderDrawColor(render, BLACK);
