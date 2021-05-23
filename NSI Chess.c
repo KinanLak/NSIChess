@@ -192,7 +192,7 @@ void legalMovesPawn(unsigned int* chessBoard, int position, int enPassant, FileM
 {
     if (chessBoard[position]/8==1) // C'est un pion blanc, donc doit monter (baisser en terme de position)
     {
-        if (chessBoard[position-8]/8==0)
+        if (chessBoard[position-8]==0)
         {
             ifSimpleMovePossibleMakeIt(position, position-8, 1, file);
             if (position/8==6 && chessBoard[position-16]==0)
