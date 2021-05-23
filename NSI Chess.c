@@ -1592,7 +1592,7 @@ int main(int argc, char* argv[])
                     change = NOTHING;
                 }
         }
-        SDL_Delay(50);
+        SDL_Delay(5);
     }
 
 
@@ -1645,6 +1645,26 @@ void drawSquare(int squareNumber, SDL_Renderer* render)
     rect.y = (yMinBoard+(squareNumber/8)*lenSquare);
     rect.w = lenSquare;
     rect.h = lenSquare;
+    SDL_RenderDrawRect(render, &rect);
+    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+1);
+    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+1);
+    rect.w = lenSquare-2;
+    rect.h = lenSquare-2;
+    SDL_RenderDrawRect(render, &rect);
+    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+2);
+    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare)+2;
+    rect.w = lenSquare-4;
+    rect.h = lenSquare-4;
+    SDL_RenderDrawRect(render, &rect);
+    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+3);
+    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+3);
+    rect.w = lenSquare-6;
+    rect.h = lenSquare-6;
+    SDL_RenderDrawRect(render, &rect);
+    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+4);
+    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+4);
+    rect.w = lenSquare-8;
+    rect.h = lenSquare-8;
     SDL_RenderDrawRect(render, &rect);
 }
 
