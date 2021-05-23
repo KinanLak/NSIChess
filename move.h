@@ -1,5 +1,7 @@
 #ifndef H_FILE
 #define H_FILE
+#include <stdlib.h>
+#include <stdio.h>
 
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;

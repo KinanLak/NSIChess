@@ -1,6 +1,6 @@
 #ifndef H_FILE
 #define H_FILE
-
+#include "move.h"
 //Definitions of variables
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -18,7 +18,6 @@
 
 //Definition of images path
 #define BoardBgImageBMP "images/board/bg.bmp"
-#define BlueBoardBMP "images/board/blue_board.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
@@ -33,6 +32,7 @@
 #define WhiteQueenImageBMP "images/board/white/queen.bmp"
 #define WhiteRookImageBMP "images/board/white/rook.bmp"
 #define WhiteBishopImageBMP "images/board/white/bishop.bmp"
+
 
 //Definition of files path
 #define MoveSound "sounds/move.wav"
@@ -61,7 +61,7 @@
 
 
 #define departPosition { \
-    4,2,3,7,6,3,2,4, \
+    4,2,3,6,7,3,2,4, \
     1,1,1,1,1,1,1,1,\
     0,0,0,0,0,0,0,0,\
     0,0,0,0,0,0,0,0,\
@@ -140,6 +140,15 @@
             else drawImageColor(dstrect, i, textureBlackKing, textureWhiteKing,7)\
         }\
     }
+
+#define movePosssibles() FileMoveStructure* file = initialise(); \
+                            legalMovePiece(chessBoard, change, 0, 0, file);\
+                            MoveStructure *actualMove= file->firstMove;\
+                            while (actualMove!=NULL)\
+                            {\
+                                drawSquare(actualMove->arrivalCase, render);\
+                                actualMove = actualMove->nextMove;\
+                            };
 
 
 //Prototypes
