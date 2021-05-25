@@ -193,7 +193,7 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     SDL_RenderFillRect(render, &rect);
 }
 
-// Recap of all the things that has to be done.
+// Recap of all the things that has to be done
 
 /*
 To Do:
