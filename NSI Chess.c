@@ -1527,7 +1527,7 @@ int main(int argc, char* argv[])
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
-    SDL_RenderCopy(render, texture, NULL, NULL);
+    //SDL_RenderCopy(render, texture, NULL, NULL);
     SDL_RenderPresent(render);
 
 
