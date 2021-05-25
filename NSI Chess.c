@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 
-//Creation of the structure for each move
+//Creation of the structure for each move.
 typedef struct MoveStructure MoveStructure;
 struct MoveStructure
 {
