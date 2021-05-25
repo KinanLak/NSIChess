@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
 #include <time.h>
+#include <SDL2/SDL_ttf.h>
+#include "sqlite3.h"
 
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
@@ -97,10 +99,21 @@ void storeAllMovesSQL(FileMoveStructure *file, int gameId)
 
 
 
+int caseIsInCheck(int team, unsigned int* chessBoard, int position);
+int Min(int a, int b);
+int Max(int a, int b);
+int kingPosition(int team, unsigned int* chessBoard);
+void legalMovePiece(unsigned int* chessBoard, int position, int enPassant, int* rock, FileMoveStructure* file);
+void legalMovesPawn(unsigned int* chessBoard, int position, int enPassant, FileMoveStructure* file);
+void legalMovesKnight(unsigned int* chessBoard, int position, FileMoveStructure* file);
+void legalMovesRook(unsigned int* chessBoard, int position, FileMoveStructure* file);
+void legalMovesBishop(unsigned int* chessBoard, int position, FileMoveStructure* file);
+void legalMovesQueen(unsigned int* chessBoard, int position, FileMoveStructure* file);
+void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveStructure* file);
 
 
 
-#define addMoveIfPossible(team, chessBoard, file, departure, arrival) if (!(caseIsInCheck(team, chessBoard)))\
+#define addMoveIfPossible(team, chessBoard, file, departure, arrival) if (!(caseIsInCheck(team, chessBoard, kingPosition(team, chessBoard))))\
                                                                         {\
                                                                             addMoveFile(file, departure, arrival);\
                                                                         }
@@ -121,17 +134,6 @@ void storeAllMovesSQL(FileMoveStructure *file, int gameId)
                                                 chessBoard[enPassant]=save
 
 
-int caseIsInCheck(int team, unsigned int* chessBoard);
-int Min(int a, int b);
-int Max(int a, int b);
-int kingPosition(int team, unsigned int* chessBoard);
-void legalMovePiece(unsigned int* chessBoard, int position, int enPassant, int rock, FileMoveStructure* file);
-void legalMovesPawn(unsigned int* chessBoard, int position, int enPassant, FileMoveStructure* file);
-void legalMovesKnight(unsigned int* chessBoard, int position, FileMoveStructure* file);
-void legalMovesRook(unsigned int* chessBoard, int position, FileMoveStructure* file);
-void legalMovesBishop(unsigned int* chessBoard, int position, FileMoveStructure* file);
-void legalMovesQueen(unsigned int* chessBoard, int position, FileMoveStructure* file);
-void legalMovesKing(unsigned int* chessBoard, int position, int rock, FileMoveStructure* file);
 
 
 int Min(int a, int b)
@@ -351,11 +353,10 @@ void legalMovesKnight(unsigned int* chessBoard, int position, FileMoveStructure*
 }
 
 
-//------------------------------------------------------------
-//----------------------Rock must be add----------------------
-//------------------------------------------------------------
+//0/1------------------------------------------------------0/2
+//0/4------------------------------------------------------0/8
 
-void legalMovesKing(unsigned int* chessBoard, int position, int rock, FileMoveStructure* file)
+void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveStructure* file)
 {
     int column = position%8;
     int row = position/8;
@@ -376,11 +377,49 @@ void legalMovesKing(unsigned int* chessBoard, int position, int rock, FileMoveSt
                 ifSimpleMovePossibleMakeIt(position, position+9, 1, file);
             }
         }
-        if (column>0 && chessBoard[position-1] && chessBoard[position+9]/8==0)
+        else if (position==60)
+        {
+            if (((*rock)/4)%2==1)
+            {
+                if (chessBoard[56]==12)
+                {
+                    if (chessBoard[57]==0 && chessBoard[58]==0 && chessBoard[59]==0)
+                    {
+                        if ((!(caseIsInCheck(1, chessBoard, 58))) && (!(caseIsInCheck(1, chessBoard, 59))) && (!(caseIsInCheck(1, chessBoard, 60))))
+                        {
+                            addMoveIfPossible(1, chessBoard, file, 60,58)
+                        }
+                    }
+                }
+                else
+                {
+                    *rock = 0;
+                }
+            }
+            if (((*rock)/8)%2==1)
+            {
+                if (chessBoard[63]==12)
+                {
+                    if (chessBoard[61]==0 && chessBoard[62]==0)
+                    {
+                        if ((!(caseIsInCheck(1, chessBoard, 60))) && (!(caseIsInCheck(1, chessBoard, 61))) && (!(caseIsInCheck(1, chessBoard, 62))))
+                        {
+                            addMoveIfPossible(1, chessBoard, file, 60, 62)
+                        }
+                    }
+                }
+                else
+                {
+                    *rock = 0;
+                }
+            }
+            
+        }
+        if (column>0 && (chessBoard[position-1]==0 || chessBoard[position-1]/8==0))
         {
             ifSimpleMovePossibleMakeIt(position, position-1, 1, file);
         }
-        if (column<7 && chessBoard[position+1] && chessBoard[position+9]/8==0)
+        if (column<7 && (chessBoard[position+1]==0 || chessBoard[position+1]/8==0))
         {
             ifSimpleMovePossibleMakeIt(position, position+1, 1, file);
         }
@@ -438,6 +477,41 @@ void legalMovesKing(unsigned int* chessBoard, int position, int rock, FileMoveSt
             if (column<7 && (chessBoard[position-7]==0 || chessBoard[position-7]/8==1))
             {
                 ifSimpleMovePossibleMakeIt(position, position-7, 0, file);
+            }
+        }
+        else if (position==4)
+        {
+            if ((*rock)%2==1)
+            {
+                if (chessBoard[0]==4)
+                {
+                    if (chessBoard[1]==0 && chessBoard[2]==0 && chessBoard[3]==0)
+                        if ((!(caseIsInCheck(0, chessBoard, 2))) && (!(caseIsInCheck(0, chessBoard, 3))) && (!(caseIsInCheck(0, chessBoard, 4))))
+                        {
+                            addMoveIfPossible(0, chessBoard, file, 4, 2)
+                        }
+                }
+                else
+                {
+                    *rock = 0;
+                }
+            }
+            if (((*rock)/2)%2==1)
+            {
+                if (chessBoard[7]==4)
+                {
+                    if (chessBoard[5]==0 && chessBoard[6]==0)
+                    {
+                        if ((!(caseIsInCheck(0, chessBoard, 4))) && (!(caseIsInCheck(0, chessBoard, 5))) && (!(caseIsInCheck(0, chessBoard, 6))))
+                        {
+                            addMoveIfPossible(0, chessBoard, file, 4, 6)
+                        }
+                    }
+                }
+                else
+                {
+                    *rock = 0;
+                }
             }
         }
     }
@@ -529,7 +603,6 @@ void legalMovesRook(unsigned int* chessBoard, int position, FileMoveStructure* f
             i-=1;
         }
     }
-
 }
 
 
@@ -629,7 +702,7 @@ void legalMovesQueen(unsigned int* chessBoard, int position, FileMoveStructure* 
     legalMovesBishop(chessBoard, position, file);
 }
 
-void legalMovePiece(unsigned int* chessBoard, int position, int enPassant, int rock, FileMoveStructure* file)
+void legalMovePiece(unsigned int* chessBoard, int position, int enPassant, int* rock, FileMoveStructure* file)
 {
     if (chessBoard[position]%8==1)
     {
@@ -676,9 +749,8 @@ void functionRunAllMoves(FileMoveStructure* file)
 }
 
 
-int caseIsInCheck(int team, unsigned int* chessBoard)
+int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 {
-    int position = kingPosition(team, chessBoard);
     int cpt;
     if (!(team))
     {
@@ -1414,9 +1486,20 @@ int main(int argc, char* argv[])
     initAllSurfaces()
     initAllTextures() 
 
+    //Opening SQL database
+    sqlite3** sqliteopen;
+    sqlite3_open("bdd.db",sqliteopen);
+
     //Initialisation of the SDL mode(s) that we will use
     SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
     CreateRenderInNewWindow(window, render)
+
+    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 10);
+    SDL_Color color = { 255, 255, 255 };
+    SDL_Surface * surface = TTF_RenderText_Solid(font,"Welcome to Gigi Labs", color);
+    SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
+
 
 
     //Create all images
@@ -1438,10 +1521,13 @@ int main(int argc, char* argv[])
     unsigned int chessBoard[64] = departPosition;
 
     int change = NOTHING;
-    int whiteToPlay = 1;
+    int enPassant = 0;
+    int rock=15;
+    int teamToPlay = 1;
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
+    SDL_RenderCopy(render, texture, NULL, NULL);
     SDL_RenderPresent(render);
 
 
@@ -1464,7 +1550,7 @@ int main(int argc, char* argv[])
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
                     int caseNumber = giveCaseNumber(event.button.x, event.button.y);
-                    if (change==NOTHING && chessBoard[caseNumber]!=0 && chessBoard[caseNumber]/8!=whiteToPlay)
+                    if (change==NOTHING && chessBoard[caseNumber]!=0 && chessBoard[caseNumber]/8!=teamToPlay)
                     {
 
                     }
@@ -1492,7 +1578,7 @@ int main(int argc, char* argv[])
                             SDL_SetRenderDrawColor(render, BLACK);
                             drawSquare(change, render);
                             file = initialise(); 
-                            legalMovePiece(chessBoard, change, 0, 0, file);
+                            legalMovePiece(chessBoard, change, enPassant,  &rock, file);
                             MoveStructure *actualMove= file->firstMove;
                             displayAllpiecesInRender()
                             while (actualMove!=NULL)
@@ -1515,8 +1601,8 @@ int main(int argc, char* argv[])
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
                             drawSquare(change, render);
-                            file = initialise(); \
-                            legalMovePiece(chessBoard, change, 0, 0, file);
+                            file = initialise();
+                            legalMovePiece(chessBoard, change, enPassant, &rock, file);
                             MoveStructure *actualMove= file->firstMove;
                             while (actualMove!=NULL)
                             {
@@ -1532,8 +1618,42 @@ int main(int argc, char* argv[])
                             previousMove[1] = caseNumber;
                             
                             //Change the pieces of position
-                            chessBoard[caseNumber] = chessBoard[change];
-                            chessBoard[change] = 0;
+                            if ((chessBoard[change]==7 || chessBoard[change]==15) && (change-2==caseNumber || change+2==caseNumber))
+                            {
+                                if (change-2==caseNumber)
+                                {
+                                    chessBoard[change-1]=chessBoard[change-4];
+                                    chessBoard[change-4]=0;
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                }
+                                else
+                                {
+                                    chessBoard[change+1]=chessBoard[change+3];
+                                    chessBoard[change+3]=0;
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                }
+                            }
+                            else if ((chessBoard[change]==1 || chessBoard[change]==9))
+                            {
+                                if ((change-9==caseNumber || change+9==caseNumber || change-7==caseNumber || change+7==caseNumber ) && (chessBoard[caseNumber]==0))
+                                {
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                }
+                                else
+                                {
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                }
+                            }
+                            else
+                            {
+                                chessBoard[caseNumber] = chessBoard[change];
+                                chessBoard[change] = 0;
+                            }
+                            
 
                             //Clear the window
                             SDL_RenderClear(render);
@@ -1551,15 +1671,15 @@ int main(int argc, char* argv[])
 
                             //Reset change
                             change = NOTHING;
-                            if (whiteToPlay)
+                            if (teamToPlay)
                             {
-                                whiteToPlay=0;
+                                teamToPlay=0;
                             }
                             else
                             {
-                                whiteToPlay=1;
+                                teamToPlay=1;
                             }
-                            if (isCheckMate(chessBoard, whiteToPlay)==1)
+                            if (isCheckMate(chessBoard, teamToPlay)==1)
                             {
                                 continuer=0;
                             }
@@ -1592,9 +1712,8 @@ int main(int argc, char* argv[])
                     change = NOTHING;
                 }
         }
-        SDL_Delay(5);
+        SDL_Delay(50);
     }
-
 
     //Destroy all textures
     SDL_DestroyTexture(textureBlackPawn);
@@ -1625,6 +1744,7 @@ int main(int argc, char* argv[])
     SDL_FreeSurface(imageWhiteKing);
 
     //Destroy the window
+    TTF_Quit();
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
     return 1;
@@ -1704,7 +1824,4 @@ Initialisation of the game:
 -initialisation of the timer
 -launch the timer for the white
 ----launch the relevant 
-
-
-
 */
