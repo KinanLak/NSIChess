@@ -1379,7 +1379,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
                     DrawImage(dstrect, &dstrect, i, textureBlack)\
                 }\
             }
-#define initAllImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
+#define initAllBoardImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
     ALLImageINIT(imagePoint, texturePoint, PointImageBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
@@ -1411,6 +1411,36 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
             else drawImageColor(dstrect, i, textureBlackKing, textureWhiteKing,7)\
         }\
     }
+
+#define freeAllBoardSurfaces() SDL_FreeSurface(imagePoint); \
+    SDL_FreeSurface(imageBackground);\
+    SDL_FreeSurface(imageBlackPawn);\
+    SDL_FreeSurface(imageBlackRook);\
+    SDL_FreeSurface(imageBlackKnight);\
+    SDL_FreeSurface(imageBlackBishop);\
+    SDL_FreeSurface(imageBlackQueen);\
+    SDL_FreeSurface(imageBlackKing);\
+    SDL_FreeSurface(imageWhitePawn);\
+    SDL_FreeSurface(imageWhiteRook);\
+    SDL_FreeSurface(imageWhiteKnight);\
+    SDL_FreeSurface(imageWhiteBishop);\
+    SDL_FreeSurface(imageWhiteQueen);\
+    SDL_FreeSurface(imageWhiteKing);
+
+#define destroyAllBoardStructures()     SDL_DestroyTexture(textureBackground);\
+    SDL_DestroyTexture(texturePoint);\
+    SDL_DestroyTexture(textureBlackPawn);\
+    SDL_DestroyTexture(textureBlackRook);\
+    SDL_DestroyTexture(textureBlackKnight);\
+    SDL_DestroyTexture(textureBlackBishop);\
+    SDL_DestroyTexture(textureBlackQueen);\
+    SDL_DestroyTexture(textureBlackKing);\
+    SDL_DestroyTexture(textureWhitePawn);\
+    SDL_DestroyTexture(textureWhiteRook);\
+    SDL_DestroyTexture(textureWhiteKnight);\
+    SDL_DestroyTexture(textureWhiteBishop);\
+    SDL_DestroyTexture(textureWhiteQueen);\
+    SDL_DestroyTexture(textureWhiteKing);
 
 /*#define movePosssibles() FileMoveStructure* file = initialise(); \
                             legalMovePiece(chessBoard, change, 0, 0, file);\
@@ -1478,11 +1508,11 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
 }
 
 
-int main(int argc, char* argv[])
+void mainBoard(SDL_Window* window,SDL_Renderer* render)
 {
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "10");
-    SDL_Window* window = NULL;
-    SDL_Renderer* render = NULL;
+
+    CreateRenderInNewWindow(window, render)
+
     initAllSurfaces()
     initAllTextures() 
 
@@ -1490,10 +1520,6 @@ int main(int argc, char* argv[])
     sqlite3** sqliteopen;
     sqlite3_open("bdd.db",sqliteopen);
 
-    //Initialisation of the SDL mode(s) that we will use
-    SDL_Init(SDL_INIT_VIDEO);
-    TTF_Init();
-    CreateRenderInNewWindow(window, render)
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 10);
     SDL_Color color = { 255, 255, 255 };
@@ -1503,7 +1529,7 @@ int main(int argc, char* argv[])
 
 
     //Create all images
-    initAllImages()
+    initAllBoardImages()
 
 
     SDL_Rect dstrect;
@@ -1714,39 +1740,38 @@ int main(int argc, char* argv[])
         }
         SDL_Delay(50);
     }
+    SDL_RenderClear(render);
+    SDL_RenderPresent(render);
 
-    //Destroy all textures
-    SDL_DestroyTexture(textureBlackPawn);
-    SDL_DestroyTexture(textureBlackRook);
-    SDL_DestroyTexture(textureBlackKnight);
-    SDL_DestroyTexture(textureBlackBishop);
-    SDL_DestroyTexture(textureBlackQueen);
-    SDL_DestroyTexture(textureBlackKing);
-    SDL_DestroyTexture(textureWhitePawn);
-    SDL_DestroyTexture(textureWhiteRook);
-    SDL_DestroyTexture(textureWhiteKnight);
-    SDL_DestroyTexture(textureWhiteBishop);
-    SDL_DestroyTexture(textureWhiteQueen);
-    SDL_DestroyTexture(textureWhiteKing);
+    destroyAllBoardStructures()
+    freeAllBoardSurfaces()
+}
+
+
+void puzzleBoard(SDL_Window* window, SDL_Renderer* renderer)
+{
+
+}
+
+int main(int argc, char* argv[])
+{
+    //Initialisation of the window
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "10");
+    SDL_Window* window = NULL;
+    SDL_Renderer* render = NULL;
+    SDL_Init(SDL_INIT_VIDEO);
+    TTF_Init();
+
+    //Launch the mainBoard
+    mainBoard(window, render);
+
+    //puzzleBoard(window, render);
     
-    //Destroy all the images
-    SDL_FreeSurface(imageBlackPawn);
-    SDL_FreeSurface(imageBlackRook);
-    SDL_FreeSurface(imageBlackKnight);
-    SDL_FreeSurface(imageBlackBishop);
-    SDL_FreeSurface(imageBlackQueen);
-    SDL_FreeSurface(imageBlackKing);
-    SDL_FreeSurface(imageWhitePawn);
-    SDL_FreeSurface(imageWhiteRook);
-    SDL_FreeSurface(imageWhiteKnight);
-    SDL_FreeSurface(imageWhiteBishop);
-    SDL_FreeSurface(imageWhiteQueen);
-    SDL_FreeSurface(imageWhiteKing);
-
-    //Destroy the window
+    //Destruction of the window
     TTF_Quit();
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
+
     return 1;
 }
 
@@ -1805,23 +1830,3 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
-
-// Recap of all the things that has to be done
-
-/*
-To Do:
---Change the function give case number, in order to take into account the color of the player
---Create a function that collecte all the legal moves from a case
---Implement a chained list of all legals moves
---Create a function that show all the legals moves
---Create a function that displays all the pieces
---Create a double function that collect the 
-
-Initialisation of the game:
--the computer must choose the white and the black pawn (can be influence be a parameter)
---It has to put a variable which is 1 if the user is white else it's 0 so black
--Display all the pawn
--initialisation of the timer
--launch the timer for the white
-----launch the relevant 
-*/
