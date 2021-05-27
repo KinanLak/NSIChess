@@ -413,11 +413,11 @@ void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveS
             }
             
         }
-        if (column>0 && (chessBoard[position-1]==0 || chessBoard[position-1]/8==0))
+        if (column>0 && chessBoard[position-1]/8==0)
         {
             ifSimpleMovePossibleMakeIt(position, position-1, 1, file);
         }
-        if (column<7 && (chessBoard[position+1]==0 || chessBoard[position+1]/8==0))
+        if (column<7 && chessBoard[position+1]/8==0)
         {
             ifSimpleMovePossibleMakeIt(position, position+1, 1, file);
         }
@@ -1352,9 +1352,10 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_Texture* textureWhiteQueen = NULL; \
     SDL_Texture* textureWhiteKing = NULL;\
     SDL_Texture* textureBackground = NULL;\
-    SDL_Texture* texturePoint = NULL;/*\
+    SDL_Texture* texturePoint = NULL;\
     SDL_Texture* textureWhitePromoteBar = NULL;\
-    SDL_Texture* textureBlackPromoteBar = NULL;    */
+    SDL_Texture* textureBlackPromoteBar = NULL;
+
 
 #define initAllSurfaces() SDL_Surface* imageBlackPawn = NULL; \
     SDL_Surface* imageBlackKnight = NULL; \
@@ -1369,9 +1370,9 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_Surface* imageWhiteQueen = NULL; \
     SDL_Surface* imageWhiteKing = NULL;\
     SDL_Surface* imageBackground = NULL;\
-    SDL_Surface* imagePoint = NULL;/*\
+    SDL_Surface* imagePoint = NULL;\
     SDL_Surface* imageWhitePromoteBar = NULL;\
-    SDL_Surface* imageBlackPromoteBar = NULL;*/
+    SDL_Surface* imageBlackPromoteBar = NULL;
 
 #define drawImageColor(dstrect, i, textureBlack, textureWhite, nb) if (chessBoard[i]%8==nb)\
             {\
@@ -1397,15 +1398,16 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     ALLImageAndTransparencyINIT(imageWhiteBishop ,textureWhiteBishop, WhiteBishopImageBMP, render)\
     ALLImageAndTransparencyINIT(imageWhiteKnight ,textureWhiteKnight, WhiteKnightImageBMP, render)\
     ALLImageAndTransparencyINIT(imageWhiteQueen ,textureWhiteQueen, WhiteQueenImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)
-    /*ALLImageINIT(imageWhitePromoteBar, textureWhitePromoteBar, WhitePromoteBarBMP, render)\
-    ALLImageINIT(imageBlackPromoteBar, textureBlackPromoteBar, BlackPromoteBarBMP, render)\*/
+    ALLImageAndTransparencyINIT(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)\
+    ALLImageINIT(imageWhitePromoteBar, textureWhitePromoteBar, WhitePromoteBarBMP, render)\
+    ALLImageINIT(imageBlackPromoteBar, textureBlackPromoteBar, BlackPromoteBarBMP, render)
 
 #define showPreviousMoves()  if (previousMove[0]!=NOTHING)\
                         {\
                             drawFullSquarePreviousMove(previousMove[0], render);\
                             drawFullSquarePreviousMove(previousMove[1], render);\
                         }
+
 #define displayAllpiecesInRender() for (int i=0; i<64; i++)\
     {\
         if (chessBoard[i]!=0)\
@@ -1450,12 +1452,26 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_DestroyTexture(textureWhiteKing);
 
 
-#define showWhitePromoteBar(caseNumber) SDL_Rect dstrect;\
-    dstrect.x = (xMinBoard+(caseNumber%8)*lenSquare);\
-    dstrect.y = (yMinBoard+(caseNumber/8)*lenSquare);\
-    dstrect.w = lenSquare;\
-    dstrect.h = lenSquare*4+59;\
-    SDL_RenderCopy(render, textureWhitePromoteBar, NULL, &dstrect);
+#define showWhitePromoteBar(rect, rectP, i, texture) rect.x= (xMinBoard+(i%8)*lenSquare);\
+            rect.y= (yMinBoard+(i/8)*lenSquare);\
+            rect.h= lenSquare*4+59;\
+            rect.w= lenSquare;\
+            SDL_RenderCopy(render, texture, NULL, rectP);\
+            DrawImage(rect, &rect, i, textureWhiteQueen)\
+            DrawImage(rect, &rect, (i+8), textureWhiteKnight)\
+            DrawImage(rect, &rect, (i+16), textureWhiteRook)\
+            DrawImage(rect, &rect, (i+24), textureWhiteBishop)
+
+#define showBlackPromoteBar(rect, rectP, i, texture) rect.x= (xMinBoard+(i%8)*lenSquare);\
+            rect.y= (yMinBoard+((i/8)-3)*lenSquare)-59;\
+            rect.h= lenSquare*4+59;\
+            rect.w= lenSquare;\
+            SDL_RenderCopy(render, texture, NULL, rectP);\
+            DrawImage(rect, &rect, i, textureBlackQueen)\
+            DrawImage(rect, &rect, (i-8), textureBlackKnight)\
+            DrawImage(rect, &rect, (i-16), textureBlackRook)\
+            DrawImage(rect, &rect, (i-24), textureBlackBishop)
+            
 
 /*#define movePosssibles() FileMoveStructure* file = initialise(); \
                             legalMovePiece(chessBoard, change, 0, 0, file);\
@@ -1532,8 +1548,8 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     initAllTextures() 
 
     //Opening SQL database
-    sqlite3** sqliteopen;
-    sqlite3_open("bdd.db",sqliteopen);
+    //sqlite3** sqliteopen;
+    //sqlite3_open("bddd.db",sqliteopen);
 
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 10);
@@ -1565,7 +1581,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     int enPassant = 0;
     int rock=15;
     int teamToPlay = 1;
-    int noPromotion = 1;
+    int noPromotion = NOTHING;
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
@@ -1592,7 +1608,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
                     int caseNumber = giveCaseNumber(event.button.x, event.button.y);
-                    if (!noPromotion) // If the pawn is about to be promoted
+                    if (noPromotion!=NOTHING) // If the pawn is about to be promoted
                     {
                         if (teamToPlay)
                         {
@@ -1600,27 +1616,89 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=14;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
                             } 
-                            else if (caseNumber+8==noPromotion)
+                            else if (caseNumber==noPromotion+8)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=10;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
                             }
-                            else if (caseNumber+16==noPromotion)
+                            else if (caseNumber==noPromotion+16)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=12;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
                             }
-                            else if (caseNumber+24==noPromotion)
+                            else if (caseNumber==noPromotion+24)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=11;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
                             }
                             else
                             {
                                 change=NOTHING;
                             }
-                            noPromotion=1;
+                            noPromotion=NOTHING;
+                            teamToPlay=0;
+                            if (isCheckMate(chessBoard, teamToPlay)==1)
+                            {
+                                continuer=0;
+                            }
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                            showPreviousMoves()
+                            displayAllpiecesInRender()
+                            SDL_RenderPresent(render);
+                        } else {
+                            if (caseNumber==noPromotion)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=6;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
+                            } 
+                            else if (caseNumber==noPromotion-8)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=2;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
+                            }
+                            else if (caseNumber==noPromotion-16)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=4;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
+                            }
+                            else if (caseNumber==noPromotion-24)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=3;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
+                            }
+                            else
+                            {
+                                change=NOTHING;
+                            }
+                            noPromotion=NOTHING;
+                            teamToPlay=1;
+                            if (isCheckMate(chessBoard, teamToPlay)==1)
+                            {
+                                continuer=0;
+                            }
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                            showPreviousMoves()
+                            displayAllpiecesInRender()
+                            SDL_RenderPresent(render);
                         }
 
                     }
@@ -1716,13 +1794,15 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                 else if (caseNumber/8==0)//White promotion
                                 {
                                     noPromotion = caseNumber;
-                                    //showWhitePromoteBar(caseNumber)
+                                    showWhitePromoteBar(dstrect, &dstrect, caseNumber, textureWhitePromoteBar)
+                                    SDL_RenderPresent(render);
                                     continue;
                                 }
                                 else if (caseNumber/8==7) //Black promotion
                                 {
                                     noPromotion = caseNumber;
-                                    //Show black promoteBar
+                                    showBlackPromoteBar(dstrect, &dstrect, caseNumber, textureBlackPromoteBar)
+                                    SDL_RenderPresent(render);
                                     continue;
                                 }
                                 else
@@ -1821,11 +1901,9 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
-
+    
     //Launch the mainBoard
     mainBoard(window, render);
-
-    //puzzleBoard(window, render);
     
     //Destruction of the window
     TTF_Quit();
@@ -1892,3 +1970,4 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
 }
 
 
+//Error when pawn can capture the king
