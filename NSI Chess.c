@@ -1798,7 +1798,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                     change = NOTHING;
                 }
         }
-        SDL_Delay(50);
+        SDL_Delay(5);
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
