@@ -134,8 +134,6 @@ void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveS
                                                 chessBoard[enPassant]=save
 
 
-
-
 int Min(int a, int b)
 {
     if (a>b)
@@ -1278,6 +1276,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define lenSquare 118
 #define RED 255, 155, 155, 255
 #define REDLight 255, 200, 200, 255
+#define WHITE 255, 255, 255, 255
 #define BLACK 0, 0, 0, 255
 #define NOTHING -1
 #define transparentColor 239, 239, 239
@@ -1286,6 +1285,8 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 //Definition of images path
 #define BoardBgImageBMP "images/board/bg.bmp"
 #define PointImageBMP "images/board/point.bmp"
+#define WhitePromoteBarBMP "images/board/whitePromoteBar.bmp"
+#define BlackPromoteBarBMP "images/board/blackPromoteBar.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
@@ -1350,8 +1351,10 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_Texture* textureWhiteBishop = NULL;\
     SDL_Texture* textureWhiteQueen = NULL; \
     SDL_Texture* textureWhiteKing = NULL;\
-    SDL_Texture* textureBackground = NULL;
-    SDL_Texture* texturePoint = NULL;    
+    SDL_Texture* textureBackground = NULL;\
+    SDL_Texture* texturePoint = NULL;\
+    SDL_Texture* textureWhitePromoteBar = NULL;\
+    SDL_Texture* textureBlackPromoteBar = NULL;    
 
 #define initAllSurfaces() SDL_Surface* imageBlackPawn = NULL; \
     SDL_Surface* imageBlackKnight = NULL; \
@@ -1365,8 +1368,10 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_Surface* imageWhiteBishop = NULL;\
     SDL_Surface* imageWhiteQueen = NULL; \
     SDL_Surface* imageWhiteKing = NULL;\
-    SDL_Surface* imageBackground = NULL;
-    SDL_Surface* imagePoint = NULL;
+    SDL_Surface* imageBackground = NULL;\
+    SDL_Surface* imagePoint = NULL;\
+    SDL_Surface* imageWhitePromoteBar = NULL;\
+    SDL_Surface* imageBlackPromoteBar = NULL;
 
 #define drawImageColor(dstrect, i, textureBlack, textureWhite, nb) if (chessBoard[i]%8==nb)\
             {\
@@ -1381,6 +1386,8 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
             }
 #define initAllBoardImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
     ALLImageINIT(imagePoint, texturePoint, PointImageBMP, render)\
+    ALLImageINIT(imageWhitePromoteBar, textureWhitePromoteBar, WhitePromoteBarBMP, render)\
+    ALLImageINIT(imageBlackPromoteBar, textureBlackPromoteBar, BlackPromoteBarBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)\
@@ -1441,6 +1448,14 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_DestroyTexture(textureWhiteBishop);\
     SDL_DestroyTexture(textureWhiteQueen);\
     SDL_DestroyTexture(textureWhiteKing);
+
+
+#define showWhitePromoteBar(caseNumber) SDL_Rect dstrect;\
+    dstrect.x = (xMinBoard+(caseNumber%8)*lenSquare);\
+    dstrect.y = (yMinBoard+(caseNumber/8)*lenSquare);\
+    dstrect.w = lenSquare;\
+    dstrect.h = lenSquare*4+59;\
+    SDL_RenderCopy(render, textureWhitePromoteBar, NULL, &dstrect);
 
 /*#define movePosssibles() FileMoveStructure* file = initialise(); \
                             legalMovePiece(chessBoard, change, 0, 0, file);\
@@ -1550,6 +1565,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     int enPassant = 0;
     int rock=15;
     int teamToPlay = 1;
+    int noPromotion = 1;
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
@@ -1576,7 +1592,39 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
                     int caseNumber = giveCaseNumber(event.button.x, event.button.y);
-                    if (change==NOTHING && chessBoard[caseNumber]!=0 && chessBoard[caseNumber]/8!=teamToPlay)
+                    if (!noPromotion) // If the pawn is about to be promoted
+                    {
+                        if (teamToPlay)
+                        {
+                            if (caseNumber==noPromotion)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=14;
+                            } 
+                            else if (caseNumber+8==noPromotion)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=10;
+                            }
+                            else if (caseNumber+16==noPromotion)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=12;
+                            }
+                            else if (caseNumber+24==noPromotion)
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=11;
+                            }
+                            else
+                            {
+                                change=NOTHING;
+                            }
+                            noPromotion=1;
+                        }
+
+                    }
+                    else if (change==NOTHING && chessBoard[caseNumber]!=0 && chessBoard[caseNumber]/8!=teamToPlay)
                     {
 
                     }
@@ -1639,9 +1687,6 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                         }
                         else if (isMovePossible(caseNumber, file))
                         {
-                            //Change the moves in the previousMove array
-                            previousMove[0] = change;
-                            previousMove[1] = caseNumber;
                             
                             //Change the pieces of position
                             if ((chessBoard[change]==7 || chessBoard[change]==15) && (change-2==caseNumber || change+2==caseNumber))
@@ -1668,6 +1713,18 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
                                 }
+                                else if (caseNumber/8==0)//White promotion
+                                {
+                                    noPromotion = caseNumber;
+                                    showWhitePromoteBar(caseNumber)
+                                    continue;
+                                }
+                                else if (caseNumber/8==7) //Black promotion
+                                {
+                                    noPromotion = caseNumber;
+                                    //Show black promoteBar
+                                    continue;
+                                }
                                 else
                                 {
                                     chessBoard[caseNumber] = chessBoard[change];
@@ -1679,6 +1736,9 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                 chessBoard[caseNumber] = chessBoard[change];
                                 chessBoard[change] = 0;
                             }
+                            //Change the moves in the previousMove array
+                            previousMove[0] = change;
+                            previousMove[1] = caseNumber;
                             
 
                             //Clear the window
@@ -1830,3 +1890,5 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
+
+
