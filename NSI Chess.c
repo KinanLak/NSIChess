@@ -1285,8 +1285,8 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 //Definition of images path
 #define BoardBgImageBMP "images/board/bg.bmp"
 #define PointImageBMP "images/board/point.bmp"
-#define WhitePromoteBarBMP "images/board/whitePromoteBar.bmp"
-#define BlackPromoteBarBMP "images/board/blackPromoteBar.bmp"
+#define WhitePromoteBarBMP "images/board/whitePB.bmp"
+#define BlackPromoteBarBMP "images/board/blackPB.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
