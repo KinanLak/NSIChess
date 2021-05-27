@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
-#include "sqlite3.h"
+#include <sqlite3.h>
 
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
