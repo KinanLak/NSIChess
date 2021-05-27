@@ -1352,9 +1352,9 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_Texture* textureWhiteQueen = NULL; \
     SDL_Texture* textureWhiteKing = NULL;\
     SDL_Texture* textureBackground = NULL;\
-    SDL_Texture* texturePoint = NULL;\
+    SDL_Texture* texturePoint = NULL;/*\
     SDL_Texture* textureWhitePromoteBar = NULL;\
-    SDL_Texture* textureBlackPromoteBar = NULL;    
+    SDL_Texture* textureBlackPromoteBar = NULL;    */
 
 #define initAllSurfaces() SDL_Surface* imageBlackPawn = NULL; \
     SDL_Surface* imageBlackKnight = NULL; \
@@ -1369,9 +1369,9 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_Surface* imageWhiteQueen = NULL; \
     SDL_Surface* imageWhiteKing = NULL;\
     SDL_Surface* imageBackground = NULL;\
-    SDL_Surface* imagePoint = NULL;\
+    SDL_Surface* imagePoint = NULL;/*\
     SDL_Surface* imageWhitePromoteBar = NULL;\
-    SDL_Surface* imageBlackPromoteBar = NULL;
+    SDL_Surface* imageBlackPromoteBar = NULL;*/
 
 #define drawImageColor(dstrect, i, textureBlack, textureWhite, nb) if (chessBoard[i]%8==nb)\
             {\
@@ -1386,8 +1386,6 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
             }
 #define initAllBoardImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
     ALLImageINIT(imagePoint, texturePoint, PointImageBMP, render)\
-    ALLImageINIT(imageWhitePromoteBar, textureWhitePromoteBar, WhitePromoteBarBMP, render)\
-    ALLImageINIT(imageBlackPromoteBar, textureBlackPromoteBar, BlackPromoteBarBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
     ALLImageAndTransparencyINIT(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)\
@@ -1400,6 +1398,8 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     ALLImageAndTransparencyINIT(imageWhiteKnight ,textureWhiteKnight, WhiteKnightImageBMP, render)\
     ALLImageAndTransparencyINIT(imageWhiteQueen ,textureWhiteQueen, WhiteQueenImageBMP, render)\
     ALLImageAndTransparencyINIT(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)
+    /*ALLImageINIT(imageWhitePromoteBar, textureWhitePromoteBar, WhitePromoteBarBMP, render)\
+    ALLImageINIT(imageBlackPromoteBar, textureBlackPromoteBar, BlackPromoteBarBMP, render)\*/
 
 #define showPreviousMoves()  if (previousMove[0]!=NOTHING)\
                         {\
@@ -1716,7 +1716,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                 else if (caseNumber/8==0)//White promotion
                                 {
                                     noPromotion = caseNumber;
-                                    showWhitePromoteBar(caseNumber)
+                                    //showWhitePromoteBar(caseNumber)
                                     continue;
                                 }
                                 else if (caseNumber/8==7) //Black promotion
