@@ -1454,7 +1454,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 #define showWhitePromoteBar(rect, rectP, i, texture) rect.x= (xMinBoard+(i%8)*lenSquare);\
             rect.y= (yMinBoard+(i/8)*lenSquare);\
-            rect.h= lenSquare*4+59;\
+            rect.h= (lenSquare*4)+59;\
             rect.w= lenSquare;\
             SDL_RenderCopy(render, texture, NULL, rectP);\
             DrawImage(rect, &rect, i, textureWhiteQueen)\
@@ -1464,7 +1464,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 #define showBlackPromoteBar(rect, rectP, i, texture) rect.x= (xMinBoard+(i%8)*lenSquare);\
             rect.y= (yMinBoard+((i/8)-3)*lenSquare)-59;\
-            rect.h= lenSquare*4+59;\
+            rect.h= (lenSquare*4)+59;\
             rect.w= lenSquare;\
             SDL_RenderCopy(render, texture, NULL, rectP);\
             DrawImage(rect, &rect, i, textureBlackQueen)\
@@ -1616,34 +1616,35 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=14;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             } 
                             else if (caseNumber==noPromotion+8)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=10;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             }
                             else if (caseNumber==noPromotion+16)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=12;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             }
                             else if (caseNumber==noPromotion+24)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=11;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             }
                             else
                             {
                                 change=NOTHING;
+                                noPromotion=NOTHING;
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                                showPreviousMoves()
+                                displayAllpiecesInRender()
+                                SDL_RenderPresent(render);
+                                continue;
                             }
+                            previousMove[0] = change;
+                            previousMove[1] = noPromotion;
                             noPromotion=NOTHING;
                             teamToPlay=0;
                             if (isCheckMate(chessBoard, teamToPlay)==1)
@@ -1660,34 +1661,35 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=6;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             } 
                             else if (caseNumber==noPromotion-8)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=2;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             }
                             else if (caseNumber==noPromotion-16)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=4;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             }
                             else if (caseNumber==noPromotion-24)
                             {
                                 chessBoard[change]=0;
                                 chessBoard[noPromotion]=3;
-                                previousMove[0] = change;
-                                previousMove[1] = noPromotion;
                             }
                             else
                             {
                                 change=NOTHING;
+                                noPromotion=NOTHING;
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                                showPreviousMoves()
+                                displayAllpiecesInRender()
+                                SDL_RenderPresent(render);
+                                continue;
                             }
+                            previousMove[0] = change;
+                            previousMove[1] = noPromotion;
                             noPromotion=NOTHING;
                             teamToPlay=1;
                             if (isCheckMate(chessBoard, teamToPlay)==1)
