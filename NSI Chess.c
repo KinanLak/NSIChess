@@ -1646,6 +1646,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             previousMove[0] = change;
                             previousMove[1] = noPromotion;
                             noPromotion=NOTHING;
+                            change=NOTHING;
                             teamToPlay=0;
                             if (isCheckMate(chessBoard, teamToPlay)==1)
                             {
@@ -1691,6 +1692,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             previousMove[0] = change;
                             previousMove[1] = noPromotion;
                             noPromotion=NOTHING;
+                            change=NOTHING;
                             teamToPlay=1;
                             if (isCheckMate(chessBoard, teamToPlay)==1)
                             {
