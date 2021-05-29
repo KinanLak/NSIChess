@@ -1472,6 +1472,9 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
             DrawImage(rect, &rect, (i-16), textureBlackRook)\
             DrawImage(rect, &rect, (i-24), textureBlackBishop)
             
+#define playSound(sound) SDL_LoadWAV(sound, &wavSpec, &wavBuffer, &wavLength);\
+                    int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);\
+                    SDL_PauseAudioDevice(deviceId, 0);
 
 /*#define movePosssibles() FileMoveStructure* file = initialise(); \
                             legalMovePiece(chessBoard, change, 0, 0, file);\
@@ -1585,7 +1588,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
-    //SDL_RenderCopy(render, texture, NULL, NULL);
+    SDL_RenderCopy(render, texture, NULL, NULL);
     SDL_RenderPresent(render);
 
 
@@ -1811,6 +1814,14 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                 }
                                 else
                                 {
+                                    if (chessBoard[caseNumber]!=0)
+                                    {
+                                        playSound(CaptureSound)
+                                    }
+                                    else
+                                    {
+                                        playSound(MoveSound)
+                                    }
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
                                 }
@@ -1903,7 +1914,7 @@ int main(int argc, char* argv[])
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "10");
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
-    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
     //Launch the mainBoard
