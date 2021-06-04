@@ -3,6 +3,8 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
+#include <winsock2.h>
+#pragma comment(lib, "ws2_32.lib")
 #include "sqlite3.h"
 
 //Creation of the structure for each move
@@ -1557,7 +1559,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 10);
     SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface = TTF_RenderText_Solid(font,"Welcome to Gigi Labs", color);
+    SDL_Surface * surface = TTF_RenderText_Solid(font,"Caca", color);
     SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
 
 
@@ -1910,6 +1912,10 @@ void puzzleBoard(SDL_Window* window, SDL_Renderer* renderer)
 
 int main(int argc, char* argv[])
 {
+    //Initialisation socket and shits
+    WSADATA WSAData;
+    WSAStartup(MAKEWORD(2, 0), &WSAData);
+
     //Initialisation of the window
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "10");
     SDL_Window* window = NULL;
