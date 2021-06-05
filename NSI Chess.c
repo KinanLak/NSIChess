@@ -1546,60 +1546,44 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
 void loginPage(SDL_Window* window, SDL_Renderer* render)
 {
     
-    /*CreateRenderInNewWindow(window, render)
+    CreateRenderInNewWindow(window, render)
+
     //Opening SQL database
-    //sqlite3** sqliteopen;
-    //sqlite3_open("bddd.db",sqliteopen);
+
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 30);
     SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface = TTF_RenderText_Solid(font,"Kinan est un voleur de PC", color);
+    SDL_Surface * surface;
+
+    /*sqlite3 *db;
+    sqlite3_open("bdd.db", &db);
+    if (sqlite3_exec(db, "create table tab(foo, bar, baz)", NULL, NULL, NULL)) {
+        surface = TTF_RenderText_Solid(font,"Error executing sql statement\n", color);
+    }
+    else {
+        surface = TTF_RenderText_Solid(font,"Table created\n", color);
+    }
+
+    sqlite3_close(db);*/
+
+    int num = 321;
+    char snum[5];
+    itoa(num, snum, 10);
+    
+
+    surface = TTF_RenderText_Solid(font,"Vol de Ta mère", color);
+
     SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
     int texW = 0;
     int texH = 0;
     SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
     SDL_Rect test = { 300, 300, texW, texH };
     SDL_RenderCopy(render, texture, NULL, &test);
-    SDL_RenderPresent(render);*/
-
-
-
-
-    CreateRenderInNewWindow(window, render)
-
-    initAllSurfaces()
-    initAllTextures() 
-
-    //Create all images
-    initAllBoardImages()
-
-
-    SDL_Rect dstrect;
-    int previousMove[2]={NOTHING, NOTHING};
-
-    //Initialisation of the audio
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
-    
-
-
-    unsigned int chessBoard[64] = departPosition;
-
-    int change = NOTHING;
-    int enPassant = 0;
-    int rock=15;
-    int teamToPlay = 1;
-    int noPromotion = NOTHING;
-
-    SDL_RenderCopy(render, textureBackground, NULL, NULL);
-    displayAllpiecesInRender()
     SDL_RenderPresent(render);
 
 
+
+
     SDL_Event event;
-    FileMoveStructure* file = NULL;
     int continuer = 1;
     while (continuer)
     {
@@ -1620,9 +1604,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
-
-    destroyAllBoardStructures()
-    freeAllBoardSurfaces()
 
 }
 void mainBoard(SDL_Window* window,SDL_Renderer* render)
@@ -1988,9 +1969,10 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
-    //loginPage(window, render);
+    loginPage(window, render);
     //Launch the mainBoard
-    mainBoard(window, render);
+    //mainBoard(window, render);
+
     
     //Destruction of the window
     TTF_Quit();

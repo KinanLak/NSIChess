@@ -3,6 +3,11 @@
 #include <string.h>
 #include <math.h>
 
+
+unsigned long long int jpow(unsigned long long int x, int n);
+int randomNumberBetweenOneAndTwo(void);
+
+
 unsigned long long int jpow(unsigned long long int x, int n)
 {
     unsigned long long int cpt = 1;
