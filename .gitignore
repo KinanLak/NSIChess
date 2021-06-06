@@ -3,3 +3,5 @@ my.rc
 NSI Chess.exe
 *.db
 Socket.exe
+testsockey.exe
+.gitignore

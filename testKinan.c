@@ -19,7 +19,7 @@ int main()
         int sinsize = sizeof(csin);
         if((csock = accept(sock, (SOCKADDR *)&csin, &sinsize)) != INVALID_SOCKET)
         {
-            send(csock, "Ta mère la pute", 14, 0);
+            send(csock, "Ta mere la pute", 15, 0);
             closesocket(csock);
         }
     }
