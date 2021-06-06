@@ -1545,11 +1545,10 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
     return 0;
 }
 
-#define drawSquareTimer() SDL_Rect rect;\
-    rect.x = 300;\
-    rect.y = 300;\
-    rect.w = 100;\
-    rect.h = 100;\
+#define drawSquareTimer(a,b) rect.x = a;\
+    rect.y = a;\
+    rect.w = b;\
+    rect.h = b;\
     SDL_SetRenderDrawColor(render, WHITE);\
     SDL_RenderFillRect(render, &rect);
 
@@ -1702,13 +1701,21 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     int leftOverTimeWhite = 100;
     int leftOverTimeBlack = 100;
     char stringTimeToShowWhite[6];
+    char stringTimeToShowBlack[6];
     itoa(leftOverTimeWhite, stringTimeToShowWhite, 10);
+    itoa(leftOverTimeBlack, stringTimeToShowBlack, 10);
     SDL_Surface * surfaceTimerWhite = TTF_RenderText_Solid(font,stringTimeToShowWhite, color);
     SDL_Texture * textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
+    SDL_Surface * surfaceTimerBlack = TTF_RenderText_Solid(font,stringTimeToShowBlack, color);
+    SDL_Texture * textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
     int texWWhite = 200;
     int texHWhite = 100;
     SDL_QueryTexture(textureTimerWhite, NULL, NULL, &texWWhite, &texHWhite);
     SDL_Rect sdlRectTimerWhite = {300, 300, texWWhite, texHWhite};
+    int texWBlack = 200;
+    int texHBlack = 100;
+    SDL_QueryTexture(textureTimerBlack, NULL, NULL, &texWBlack, &texHBlack);
+    SDL_Rect sdlRectTimerBlack = {100, 100, texWBlack, texHBlack};
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
@@ -1981,6 +1988,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             if (teamToPlay)
                             {
                                 teamToPlay=0;
+                                endTime=time(NULL)+leftOverTimeBlack;
                             }
                             else
                             {
@@ -2041,10 +2049,36 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                     strcat(stringTimeToShowWhite, stringUnity);
                 }
             }
-            drawSquareTimer()
+            else
+            {
+                leftOverTimeBlack = endTime-time(NULL);
+                if (leftOverTimeBlack<0)
+                {
+                    continuer = 0;
+                }
+                else
+                {
+                    itoa(leftOverTimeBlack/60, stringTimeToShowBlack, 10);
+                    strcat(stringTimeToShowBlack, ":");
+                    char stringTens[1];
+                    itoa((leftOverTimeBlack%60)/10, stringTens, 10);
+                    char stringUnity[2];
+                    itoa((leftOverTimeBlack%60)%10, stringUnity, 10);
+                    strcat(stringTimeToShowBlack, stringTens);
+                    strcat(stringTimeToShowBlack, stringUnity);
+                }
+            }
+            SDL_Rect rect;
+            drawSquareTimer(300, 100)
             surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
             textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
             SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+            SDL_RenderPresent(render);
+            
+            drawSquareTimer(100, 100)
+            surfaceTimerBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
+            textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
+            SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
         }
         SDL_Delay(50);
