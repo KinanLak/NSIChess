@@ -1,6 +1,7 @@
 #include <winsock2.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <time.h>
 #pragma comment(lib, "ws2_32.lib")
 
 int main()
@@ -17,10 +18,11 @@ int main()
     sin.sin_port = htons(6667);
     connect(sock, (SOCKADDR *)&sin, sizeof(sin));
     int caca = 0;
-    while (caca = 0){
-        printf("%d",recv(sock, buffer, sizeof(buffer), 0));
-        };
+    while (caca == 0) {
+        recv(sock, buffer, 1, 0);
+        printf("%c", buffer);
+        }
     closesocket(sock);
     WSACleanup();
-    return 0;
+    return 0;   
 }
