@@ -3,6 +3,8 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
+//#include <winsock2.h>
+//#pragma comment(lib, "ws2_32.lib")
 #include "sqlite3.h"
 
 //Creation of the structure for each move
@@ -558,9 +560,9 @@ void legalMovesRook(unsigned int* chessBoard, int position, FileMoveStructure* f
         i+=8;
     }
 
-    i=position+1;
     if (position%8 != 7)
     {
+        i=position+1;
         while (i%8 != 0)
         {
             if (chessBoard[i]==0)
@@ -580,9 +582,9 @@ void legalMovesRook(unsigned int* chessBoard, int position, FileMoveStructure* f
         }
     }
 
-    i=position-1;
     if (position%8 != 0)
     {
+        i=position-1;
         while (i%8 != 7)
         {
             if (chessBoard[i]==0)
@@ -1284,6 +1286,8 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 //Definition of images path
 #define BoardBgImageBMP "images/board/bg.bmp"
+#define MenuBGImageBMP "images/menu.bmp"
+#define OptionImageBMP "images/option.bmp"
 #define PointImageBMP "images/board/point.bmp"
 #define WhitePromoteBarBMP "images/board/whitePB.bmp"
 #define BlackPromoteBarBMP "images/board/blackPB.bmp"
@@ -1541,7 +1545,17 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
     return 0;
 }
 
+#define drawSquareTimer() SDL_Rect rect;\
+    rect.x = 300;\
+    rect.y = 300;\
+    rect.w = 100;\
+    rect.h = 100;\
+    SDL_SetRenderDrawColor(render, WHITE);\
+    SDL_RenderFillRect(render, &rect);
 
+//---------------------------------------------------------------------------------
+//------------------------------------All Pages------------------------------------
+//---------------------------------------------------------------------------------
 
 void loginPage(SDL_Window* window, SDL_Renderer* render)
 {
@@ -1553,8 +1567,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 30);
     SDL_Color color = { 255, 255, 255 };
     SDL_Surface * surface;
+    
 
-    /*sqlite3 *db;
+    sqlite3 *db;
     sqlite3_open("bdd.db", &db);
     if (sqlite3_exec(db, "create table tab(foo, bar, baz)", NULL, NULL, NULL)) {
         surface = TTF_RenderText_Solid(font,"Error executing sql statement\n", color);
@@ -1563,11 +1578,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
         surface = TTF_RenderText_Solid(font,"Table created\n", color);
     }
 
-    sqlite3_close(db);*/
-
-    int num = 321;
-    char snum[5];
-    itoa(num, snum, 10);
+    sqlite3_close(db);
     
 
     surface = TTF_RenderText_Solid(font,"Vol de Ta mère", color);
@@ -1581,6 +1592,47 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_RenderPresent(render);
 
 
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_PollEvent(&event);
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                continuer = 0;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    continuer=0;
+                }
+            case SDL_KEYDOWN: 
+                break;
+        }
+        SDL_Delay(5);
+    }
+    SDL_RenderClear(render);
+    SDL_RenderPresent(render);
+}
+
+
+void menuPage(SDL_Window* window, SDL_Renderer* render)
+{
+    
+    CreateRenderInNewWindow(window, render)
+
+
+    SDL_Surface* imageBackgroundMenu = NULL;
+    SDL_Texture* textureBackgroundMenu = NULL;
+    ALLImageINIT(imageBackgroundMenu, textureBackgroundMenu, MenuBGImageBMP, render)
+
+    SDL_Surface* imageOption = NULL;
+    SDL_Texture* textureOption = NULL;
+    ALLImageINIT(imageOption, textureOption, OptionImageBMP, render)
+
+    SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
+    SDL_RenderCopy(render, textureOption, NULL, NULL);
+    SDL_RenderPresent(render);
 
 
     SDL_Event event;
@@ -1604,8 +1656,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
-
 }
+
+
 void mainBoard(SDL_Window* window,SDL_Renderer* render)
 {
 
@@ -1638,9 +1691,30 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     int teamToPlay = 1;
     int noPromotion = NOTHING;
 
+    //Initialisation of the timer
+    int timerIsOn=1;
+
+    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 50);
+    SDL_Color color = { 0, 0, 0};
+    time_t endTime;
+    time(&endTime);
+    endTime += 100;
+    int leftOverTimeWhite = 100;
+    int leftOverTimeBlack = 100;
+    char stringTimeToShowWhite[6];
+    itoa(leftOverTimeWhite, stringTimeToShowWhite, 10);
+    SDL_Surface * surfaceTimerWhite = TTF_RenderText_Solid(font,stringTimeToShowWhite, color);
+    SDL_Texture * textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
+    int texWWhite = 200;
+    int texHWhite = 100;
+    SDL_QueryTexture(textureTimerWhite, NULL, NULL, &texWWhite, &texHWhite);
+    SDL_Rect sdlRectTimerWhite = {300, 300, texWWhite, texHWhite};
+
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
     SDL_RenderPresent(render);
+
+
 
 
     SDL_Event event;
@@ -1648,7 +1722,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     int continuer = 1;
     while (continuer)
     {
-        SDL_WaitEvent(&event);
+        SDL_PollEvent(&event);
         switch(event.type)
         {
             case SDL_QUIT:
@@ -1911,6 +1985,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             else
                             {
                                 teamToPlay=1;
+                                endTime=time(NULL)+leftOverTimeWhite;
                             }
                             if (isCheckMate(chessBoard, teamToPlay)==1)
                             {
@@ -1945,7 +2020,36 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                     change = NOTHING;
                 }
         }
-        SDL_Delay(5);
+        if (timerIsOn)
+        {
+            if (teamToPlay)
+            {
+                leftOverTimeWhite = endTime-time(NULL);
+                if (leftOverTimeWhite<0)
+                {
+                    continuer = 0;
+                }
+                else
+                {
+                    itoa(leftOverTimeWhite/60, stringTimeToShowWhite, 10);
+                    strcat(stringTimeToShowWhite, ":");
+                    char stringTens[1];
+                    itoa((leftOverTimeWhite%60)/10, stringTens, 10);
+                    char stringUnity[2];
+                    itoa((leftOverTimeWhite%60)%10, stringUnity, 10);
+                    strcat(stringTimeToShowWhite, stringTens);
+                    strcat(stringTimeToShowWhite, stringUnity);
+                }
+            }
+            drawSquareTimer()
+            surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
+            textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
+            SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimer);
+            SDL_RenderPresent(render);
+        }
+        SDL_Delay(50);
+
+        
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
@@ -1962,6 +2066,10 @@ void puzzleBoard(SDL_Window* window, SDL_Renderer* renderer)
 
 int main(int argc, char* argv[])
 {
+    /*//Initialisation socket and shits
+    WSADATA WSAData;
+    WSAStartup(MAKEWORD(2, 0), &WSAData);*/
+
     //Initialisation of the window
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "10");
     SDL_Window* window = NULL;
@@ -1969,9 +2077,10 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
-    loginPage(window, render);
+    //loginPage(window, render);
     //Launch the mainBoard
-    //mainBoard(window, render);
+    mainBoard(window, render);
+    //menuPage(window, render);
 
     
     //Destruction of the window
@@ -2037,6 +2146,8 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
+
+
 
 
 //Error when pawn can capture the king

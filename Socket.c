@@ -13,7 +13,7 @@ int main()
     WSAStartup(MAKEWORD(2, 0), &WSAData);
     /* Tout est configuré pour se connecter sur IRC, haarlem, Undernet. */
     sock = socket(AF_INET, SOCK_STREAM, 0);
-    sin.sin_addr.s_addr = inet_addr("85.14.144.155");
+    sin.sin_addr.s_addr = inet_addr("90.90.34.8");
     sin.sin_family = AF_INET;
     sin.sin_port = htons(6667);
     connect(sock, (SOCKADDR *)&sin, sizeof(sin));
