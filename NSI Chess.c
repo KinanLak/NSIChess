@@ -2033,7 +2033,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             if (teamToPlay)
             {
                 leftOverTimeWhite = endTime-time(NULL);
-                if (leftOverTimeWhite<0)
+                if (leftOverTimeWhite<=0)
                 {
                     continuer = 0;
                 }
@@ -2052,7 +2052,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             else
             {
                 leftOverTimeBlack = endTime-time(NULL);
-                if (leftOverTimeBlack<0)
+                if (leftOverTimeBlack<=0)
                 {
                     continuer = 0;
                 }
