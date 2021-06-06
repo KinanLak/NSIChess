@@ -2044,7 +2044,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             drawSquareTimer()
             surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
             textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
-            SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimer);
+            SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
             SDL_RenderPresent(render);
         }
         SDL_Delay(50);
