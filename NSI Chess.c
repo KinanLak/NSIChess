@@ -2138,6 +2138,7 @@ void puzzleBoard(SDL_Window* window, SDL_Renderer* renderer)
 
 }
 
+
 int main(int argc, char* argv[])
 {
     /*//Initialisation socket and shits
@@ -2153,7 +2154,7 @@ int main(int argc, char* argv[])
     
     //loginPage(window, render);
     //Launch the mainBoard
-    mainBoard(window, render);
+    //mainBoard(window, render);
     //menuPage(window, render);
 
     
