@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
-//#include <winsock2.h>
+#include <winsock2.h>
 //#pragma comment(lib, "ws2_32.lib")
 #include "sqlite3.h"
 
