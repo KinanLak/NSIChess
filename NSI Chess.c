@@ -1406,13 +1406,28 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     ALLImageINIT(imageWhitePromoteBar, textureWhitePromoteBar, WhitePromoteBarBMP, render)\
     ALLImageINIT(imageBlackPromoteBar, textureBlackPromoteBar, BlackPromoteBarBMP, render)
 
-#define showPreviousMoves()  if (previousMove[0]!=NOTHING)\
+#define showPreviousMovesNonInversed()  if (previousMove[0]!=NOTHING)\
                         {\
                             drawFullSquarePreviousMove(previousMove[0], render);\
                             drawFullSquarePreviousMove(previousMove[1], render);\
                         }
 
-#define displayAllpiecesInRender() for (int i=0; i<64; i++)\
+#define showPreviousMovesInversed()  if (previousMove[0]!=NOTHING)\
+                        {\
+                            drawFullSquarePreviousMove(63-previousMove[0], render);\
+                            drawFullSquarePreviousMove(63-previousMove[1], render);\
+                        }
+
+#define showPreviousMoves() if (inverse==0)\
+    {\
+        showPreviousMovesInversed()\
+    }\
+    else\
+    {\
+        showPreviousMovesNonInversed()\
+    }
+
+#define displayAllpiecesInRenderNonInversed() for (int i=0; i<64; i++)\
     {\
         if (chessBoard[i]!=0)\
         {\
@@ -1423,6 +1438,28 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
             else drawImageColor(dstrect, i, textureBlackQueen, textureWhiteQueen,6)\
             else drawImageColor(dstrect, i, textureBlackKing, textureWhiteKing,7)\
         }\
+    }
+
+#define displayAllpiecesInRenderInversed() for (int i=0; i<64; i++)\
+    {\
+        if (chessBoard[i]!=0)\
+        {\
+            drawImageColor(dstrect, 63-i, textureBlackPawn, textureWhitePawn,1)\
+            else drawImageColor(dstrect, 63-i, textureBlackKnight, textureWhiteKnight,2)\
+            else drawImageColor(dstrect, 63-i, textureBlackBishop, textureWhiteBishop,3)\
+            else drawImageColor(dstrect, 63-i, textureBlackRook, textureWhiteRook,4)\
+            else drawImageColor(dstrect, 63-i, textureBlackQueen, textureWhiteQueen,6)\
+            else drawImageColor(dstrect, 63-i, textureBlackKing, textureWhiteKing,7)\
+        }\
+    }
+
+#define displayAllpiecesInRender() if (inverse)\
+    {\
+        displayAllpiecesInRenderInversed()\
+    }\
+    else\
+    {\
+        displayAllpiecesInRenderNonInversed()\
     }
 
 #define freeAllBoardSurfaces() SDL_FreeSurface(imagePoint); \
@@ -1479,16 +1516,6 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define playSound(sound) SDL_LoadWAV(sound, &wavSpec, &wavBuffer, &wavLength);\
                     int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);\
                     SDL_PauseAudioDevice(deviceId, 0);
-
-/*#define movePosssibles() FileMoveStructure* file = initialise(); \
-                            legalMovePiece(chessBoard, change, 0, 0, file);\
-                            MoveStructure *actualMove= file->firstMove;\
-                            while (actualMove!=NULL)\
-                            {\
-                                drawSquare(actualMove->arrivalCase, render);\
-                                actualMove = actualMove->nextMove;\
-                            };*/
-
 
 //Prototypes
 int giveCaseNumber(int eventX, int eventY);
@@ -1692,6 +1719,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
 
     //Initialisation of the timer
     int timerIsOn=1;
+    int inverse=1;
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 50);
     SDL_Color color = { 0, 0, 0};
@@ -1720,8 +1748,6 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
     SDL_RenderPresent(render);
-
-
 
 
     SDL_Event event;
@@ -2132,6 +2158,7 @@ int giveCaseNumber(int eventX, int eventY)
 {
     return (eventX-xMinBoard)/lenSquare + (((eventY-yMinBoard)/lenSquare)*8);
 }
+
 
 void drawSquare(int squareNumber, SDL_Renderer* render)
 {
