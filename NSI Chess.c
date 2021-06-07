@@ -1520,7 +1520,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 //Prototypes
 int giveCaseNumber(int eventX, int eventY);
-void drawSquare(int squareNumber, SDL_Renderer* render);
+void drawSquare(int squareNumber, SDL_Renderer* render, int inverse);
 void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render);
 
 
@@ -1719,7 +1719,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
 
     //Initialisation of the timer
     int timerIsOn=1;
-    int inverse=0;
+    int inverse=1;
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 50);
     SDL_Color color = { 0, 0, 0};
@@ -1768,7 +1768,16 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             case SDL_KEYDOWN: 
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
-                    int caseNumber = giveCaseNumber(event.button.x, event.button.y);
+                    int caseNumber = 0;
+                    if (inverse)
+                    {
+                        caseNumber = 63-giveCaseNumber(event.button.x, event.button.y);
+                    }
+                    else
+                    {
+                        caseNumber = giveCaseNumber(event.button.x, event.button.y);
+                    }
+
                     if (noPromotion!=NOTHING) // If the pawn is about to be promoted
                     {
                         if (teamToPlay)
@@ -1893,14 +1902,22 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             showPreviousMoves()
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquare(change, render);
+                            drawSquare(change, render, inverse);
                             file = initialise(); 
                             legalMovePiece(chessBoard, change, enPassant,  &rock, file);
                             MoveStructure *actualMove= file->firstMove;
                             displayAllpiecesInRender()
                             while (actualMove!=NULL)
                             {
-                                DrawImage(dstrect, &dstrect, actualMove->arrivalCase, texturePoint)
+                                if (inverse==1)
+                                {
+                                    int a=63 - (actualMove->arrivalCase);
+                                    DrawImage(dstrect, &dstrect, a, texturePoint)
+                                }
+                                else
+                                {
+                                    DrawImage(dstrect, &dstrect, actualMove->arrivalCase, texturePoint)
+                                }
                                 actualMove = actualMove->nextMove;
                             };
                             SDL_RenderPresent(render);
@@ -1917,7 +1934,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             displayAllpiecesInRender()
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquare(change, render);
+                            drawSquare(change, render, inverse);
                             file = initialise();
                             legalMovePiece(chessBoard, change, enPassant, &rock, file);
                             MoveStructure *actualMove= file->firstMove;
@@ -2157,8 +2174,12 @@ int giveCaseNumber(int eventX, int eventY)
 }
 
 
-void drawSquare(int squareNumber, SDL_Renderer* render)
+void drawSquare(int squareNumber, SDL_Renderer* render, int inverse)
 {
+    if (inverse==1)
+    {
+        squareNumber = 63-squareNumber;
+    }
     SDL_Rect rect;
     rect.x = (xMinBoard+(squareNumber%8)*lenSquare);
     rect.y = (yMinBoard+(squareNumber/8)*lenSquare);
