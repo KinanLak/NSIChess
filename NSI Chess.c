@@ -2208,8 +2208,3 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
-
-
-
-
-//Error when pawn can capture the king
