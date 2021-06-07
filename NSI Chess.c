@@ -1418,7 +1418,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
                             drawFullSquarePreviousMove(63-previousMove[1], render);\
                         }
 
-#define showPreviousMoves() if (inverse==0)\
+#define showPreviousMoves() if (inverse==1)\
     {\
         showPreviousMovesInversed()\
     }\
@@ -1720,7 +1720,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
 
     //Initialisation of the timer
     int timerIsOn=1;
-    int inverse=1;
+    int inverse=0;
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 50);
     SDL_Color color = { 0, 0, 0};
@@ -2100,15 +2100,14 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
             textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
             SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
-            SDL_RenderPresent(render);
             
             drawSquareTimer(100, 100)
             surfaceTimerBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
             textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
             SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
+            SDL_Delay(50);
         }
-        SDL_Delay(50);
 
         
     }
