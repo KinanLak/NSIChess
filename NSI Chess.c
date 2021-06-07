@@ -1378,9 +1378,9 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     SDL_Surface* imageWhitePromoteBar = NULL;\
     SDL_Surface* imageBlackPromoteBar = NULL;
 
-#define drawImageColor(dstrect, i, textureBlack, textureWhite, nb) if (chessBoard[i]%8==nb)\
+#define drawImageColor(dstrect, i, ii, textureBlack, textureWhite, nb) if (chessBoard[ii]%8==nb)\
             {\
-                if (chessBoard[i]/8==1)\
+                if (chessBoard[ii]/8==1)\
                 {\
                     DrawImage(dstrect, &dstrect, i, textureWhite)\
                 }\
@@ -1431,12 +1431,12 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     {\
         if (chessBoard[i]!=0)\
         {\
-            drawImageColor(dstrect, i, textureBlackPawn, textureWhitePawn,1)\
-            else drawImageColor(dstrect, i, textureBlackKnight, textureWhiteKnight,2)\
-            else drawImageColor(dstrect, i, textureBlackBishop, textureWhiteBishop,3)\
-            else drawImageColor(dstrect, i, textureBlackRook, textureWhiteRook,4)\
-            else drawImageColor(dstrect, i, textureBlackQueen, textureWhiteQueen,6)\
-            else drawImageColor(dstrect, i, textureBlackKing, textureWhiteKing,7)\
+            drawImageColor(dstrect, i, i, textureBlackPawn, textureWhitePawn,1)\
+            else drawImageColor(dstrect,i, i, textureBlackKnight, textureWhiteKnight,2)\
+            else drawImageColor(dstrect, i,i, textureBlackBishop, textureWhiteBishop,3)\
+            else drawImageColor(dstrect, i, i, textureBlackRook, textureWhiteRook,4)\
+            else drawImageColor(dstrect, i, i, textureBlackQueen, textureWhiteQueen,6)\
+            else drawImageColor(dstrect, i, i, textureBlackKing, textureWhiteKing,7)\
         }\
     }
 
@@ -1444,16 +1444,17 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
     {\
         if (chessBoard[i]!=0)\
         {\
-            drawImageColor(dstrect, 63-i, textureBlackPawn, textureWhitePawn,1)\
-            else drawImageColor(dstrect, 63-i, textureBlackKnight, textureWhiteKnight,2)\
-            else drawImageColor(dstrect, 63-i, textureBlackBishop, textureWhiteBishop,3)\
-            else drawImageColor(dstrect, 63-i, textureBlackRook, textureWhiteRook,4)\
-            else drawImageColor(dstrect, 63-i, textureBlackQueen, textureWhiteQueen,6)\
-            else drawImageColor(dstrect, 63-i, textureBlackKing, textureWhiteKing,7)\
+            int xb=63-i;\
+            drawImageColor(dstrect, xb, i, textureBlackPawn, textureWhitePawn,1)\
+            else drawImageColor(dstrect, xb, i,textureBlackKnight, textureWhiteKnight,2)\
+            else drawImageColor(dstrect, xb, i,textureBlackBishop, textureWhiteBishop,3)\
+            else drawImageColor(dstrect, xb, i,textureBlackRook, textureWhiteRook,4)\
+            else drawImageColor(dstrect, xb, i,textureBlackQueen, textureWhiteQueen,6)\
+            else drawImageColor(dstrect, xb, i,textureBlackKing, textureWhiteKing,7)\
         }\
     }
 
-#define displayAllpiecesInRender() if (inverse)\
+#define displayAllpiecesInRender() if (inverse==1)\
     {\
         displayAllpiecesInRenderInversed()\
     }\
@@ -1871,7 +1872,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                     {
 
                     }
-                    else if (change ==NOTHING || caseNumber==change)
+                    else if (change==NOTHING || caseNumber==change)
                     {
                         if (caseNumber==change)
                         {
