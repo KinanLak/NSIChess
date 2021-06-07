@@ -2107,7 +2107,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
         }
-        SDL_Delay(50);
+        SDL_Delay(5);
 
         
     }
