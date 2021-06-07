@@ -1709,7 +1709,6 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
     
 
-
     unsigned int chessBoard[64] = departPosition;
 
     int change = NOTHING;
@@ -2108,8 +2107,6 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             SDL_RenderPresent(render);
             SDL_Delay(50);
         }
-
-        
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
