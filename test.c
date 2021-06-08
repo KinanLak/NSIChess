@@ -120,6 +120,8 @@ void listMovesToFile(FileMoveStructure* file, char* listMoves)
 
     return 1;
 }*/
+
+
 void FENToList(char* fen, unsigned int* chessBoard)
 {
     int cptStr=0;
@@ -129,15 +131,15 @@ void FENToList(char* fen, unsigned int* chessBoard)
     {
         if (valueStr != 47)
         {
-            if (valueStr > 48 && valueStr <58)
+            if ((valueStr > 48) && (valueStr <58))
             {
-                for (int x=0; x<valueStr; x++)
+                for (int x=0; x<(valueStr-48); x++)
                 {
                     chessBoard[cptChessBoard]=0;
                     cptChessBoard+=1;
                 }
             }
-            /*else if (valueStr<91)
+            else if (valueStr<91)
             {
                 if (valueStr == 80)
                 {
@@ -202,7 +204,7 @@ void FENToList(char* fen, unsigned int* chessBoard)
                     chessBoard[cptChessBoard]=7;
                     cptChessBoard+=1;
                 }
-            }*/
+            }
         }
         cptStr+=1;
         valueStr = fen[cptStr];
@@ -224,9 +226,7 @@ void printBoard(unsigned int* chessBoard)
 
 int main(int argc, char* argv[])
 {
-    printf("1");
     unsigned int chessBoard[64];
-    printf("1");
     /*{
     4,2,3,6,7,3,2,4,
     1,1,1,1,1,1,1,1,
@@ -237,9 +237,7 @@ int main(int argc, char* argv[])
     9,9,9,9,9,9,9,9,
     12,10,11,14,15,11,10,12};*/
 
-    printf("1");
     char fen[] = "r2qkb1r/p2b1ppp/4pn2/1B1p4/8/1Q2P3/PP1N1PPP/R1B1K2R w KQkq - 2 11";
-    printf("1");
     FENToList(fen, chessBoard);
     printf("1");
 
