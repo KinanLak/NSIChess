@@ -19,7 +19,11 @@ int main()
         int sinsize = sizeof(csin);
         if((csock = accept(sock, (SOCKADDR *)&csin, &sinsize)) != INVALID_SOCKET)
         {
+<<<<<<< Updated upstream
             send(csock, "Ta mere la pute", 15, 0);
+=======
+            send(csock, "", 0, 0);
+>>>>>>> Stashed changes
             closesocket(csock);
         }
     }
