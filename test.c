@@ -25,7 +25,7 @@ struct FileMoveStructure
 //Creation of the prototypes
 FileMoveStructure *initialise(void);
 void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase);
-void storeAllMovesSQL(FileMoveStructure *file, int gameId);
+void storeAllMovesSQL(FileMoveStructure *file);
 
 
 FileMoveStructure *initialise()
@@ -64,7 +64,7 @@ void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCa
     }
 }
 
-void storeAllMovesSQL(FileMoveStructure *file, int gameId)
+void storeAllMovesSQL(FileMoveStructure *file)
 {
     if (file == NULL)
     {
@@ -75,11 +75,9 @@ void storeAllMovesSQL(FileMoveStructure *file, int gameId)
 
     //récuperer le plus grand moveId qui existe pour le moment
     // et le rentrer dans la variable en dessous
-    int moveId =12;
 
     while (MoveStructure != NULL)
     {
-        moveId++;
         printf("%d -> %d \n", MoveStructure->departureCase, MoveStructure->arrivalCase);
         //Manque la requête qui ajoute le mouvement
         // INSERT INTO table_name
@@ -110,16 +108,64 @@ void listMovesToFile(FileMoveStructure* file, char* listMoves)
     }
 }
 
-
-/*int main(int argc, char* argv[])
+void fileToListMoves(FileMoveStructure* file, int numberMoves)
 {
-    char listMoves[] = "f2g3 e6e7 b2b1 b3c1 b1c1 h6c1";
+    //
+    //
+    //
+    // Don't work
+    //
+    //
+    //
+    char* listMoves[(numberMoves*5)-1];
+    MoveStructure *MoveStructure = file->firstMove;
+
+    *listMoves[0] = 97 + ((MoveStructure->departureCase)%8);
+    *listMoves[1] = 56 - ((MoveStructure->departureCase)/8);
+    *listMoves[2] = 97 + ((MoveStructure->arrivalCase)%8);
+    *listMoves[3] = 56 - ((MoveStructure->arrivalCase)/8);
+    printf("\n%d", strlen(listMoves));
+
+    MoveStructure = MoveStructure->nextMove;
+    for (int i=1; i<numberMoves; i++)
+    {
+        listMoves[(i*5)-1] = 32;
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)] = 97 + ((MoveStructure->departureCase)%8);
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)+1] = 56 - ((MoveStructure->departureCase)/8);
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)+2] = 97 + ((MoveStructure->arrivalCase)%8);
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)+3] = 56 - ((MoveStructure->arrivalCase)/8);
+        printf("\n%d", strlen(listMoves));
+        MoveStructure = MoveStructure->nextMove;
+    }
+    
+    printf("\n%d ---- %s", strlen(listMoves), listMoves);
+    //
+    //
+    //
+    // Don't work
+    //
+    //
+    //
+}
+
+int main(int argc, char* argv[])
+{
+    char listMoves[] = "g6h4 g6h4";
     FileMoveStructure* file=initialise();
     listMovesToFile(file, listMoves);
-    storeAllMovesSQL(file, 122);
+    storeAllMovesSQL(file);
+    printf("\n\n");
+    fileToListMoves(file, 2);
+
 
     return 1;
-}*/
+}
+
+
 void FENToList(char* fen, unsigned int* chessBoard)
 {
     int cptStr=0;
@@ -129,15 +175,15 @@ void FENToList(char* fen, unsigned int* chessBoard)
     {
         if (valueStr != 47)
         {
-            if (valueStr > 48 && valueStr <58)
+            if ((valueStr > 48) && (valueStr <58))
             {
-                for (int x=0; x<valueStr; x++)
+                for (int x=0; x<(valueStr-48); x++)
                 {
                     chessBoard[cptChessBoard]=0;
                     cptChessBoard+=1;
                 }
             }
-            /*else if (valueStr<91)
+            else if (valueStr<91)
             {
                 if (valueStr == 80)
                 {
@@ -202,7 +248,7 @@ void FENToList(char* fen, unsigned int* chessBoard)
                     chessBoard[cptChessBoard]=7;
                     cptChessBoard+=1;
                 }
-            }*/
+            }
         }
         cptStr+=1;
         valueStr = fen[cptStr];
@@ -222,28 +268,28 @@ void printBoard(unsigned int* chessBoard)
 }
 
 
-int main(int argc, char* argv[])
-{
-    printf("1");
-    unsigned int chessBoard[64];
-    printf("1");
-    /*{
-    4,2,3,6,7,3,2,4,
-    1,1,1,1,1,1,1,1,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    9,9,9,9,9,9,9,9,
-    12,10,11,14,15,11,10,12};*/
 
-    printf("1");
+
+/*int main(int argc, char* argv[])
+{
+    unsigned int chessBoard[64];
+
     char fen[] = "r2qkb1r/p2b1ppp/4pn2/1B1p4/8/1Q2P3/PP1N1PPP/R1B1K2R w KQkq - 2 11";
-    printf("1");
     FENToList(fen, chessBoard);
     printf("1");
 
     printBoard(chessBoard);
 
     return 1;
-}
+}*/
+
+
+/*int main(int argc, char* argv[])
+{
+    sqlite3 *db;
+    sqlite3_open("database.db", &db);
+    sqlite3_exec(db, "INSERT INTO Puzzle_done VALUES (0, 0, 1, '2021-06-08      ', 2000);", NULL, NULL, NULL);
+    sqlite3_close(db);
+
+    return 1;
+}*/
