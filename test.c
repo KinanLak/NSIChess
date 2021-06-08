@@ -25,7 +25,7 @@ struct FileMoveStructure
 //Creation of the prototypes
 FileMoveStructure *initialise(void);
 void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase);
-void storeAllMovesSQL(FileMoveStructure *file, int gameId);
+void storeAllMovesSQL(FileMoveStructure *file);
 
 
 FileMoveStructure *initialise()
@@ -64,7 +64,7 @@ void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCa
     }
 }
 
-void storeAllMovesSQL(FileMoveStructure *file, int gameId)
+void storeAllMovesSQL(FileMoveStructure *file)
 {
     if (file == NULL)
     {
@@ -75,11 +75,9 @@ void storeAllMovesSQL(FileMoveStructure *file, int gameId)
 
     //récuperer le plus grand moveId qui existe pour le moment
     // et le rentrer dans la variable en dessous
-    int moveId =12;
 
     while (MoveStructure != NULL)
     {
-        moveId++;
         printf("%d -> %d \n", MoveStructure->departureCase, MoveStructure->arrivalCase);
         //Manque la requête qui ajoute le mouvement
         // INSERT INTO table_name
@@ -110,16 +108,62 @@ void listMovesToFile(FileMoveStructure* file, char* listMoves)
     }
 }
 
-
-/*int main(int argc, char* argv[])
+void fileToListMoves(FileMoveStructure* file, int numberMoves)
 {
-    char listMoves[] = "f2g3 e6e7 b2b1 b3c1 b1c1 h6c1";
+    //
+    //
+    //
+    // Don't work
+    //
+    //
+    //
+    char* listMoves[(numberMoves*5)-1];
+    MoveStructure *MoveStructure = file->firstMove;
+
+    *listMoves[0] = 97 + ((MoveStructure->departureCase)%8);
+    *listMoves[1] = 56 - ((MoveStructure->departureCase)/8);
+    *listMoves[2] = 97 + ((MoveStructure->arrivalCase)%8);
+    *listMoves[3] = 56 - ((MoveStructure->arrivalCase)/8);
+    printf("\n%d", strlen(listMoves));
+
+    MoveStructure = MoveStructure->nextMove;
+    for (int i=1; i<numberMoves; i++)
+    {
+        listMoves[(i*5)-1] = 32;
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)] = 97 + ((MoveStructure->departureCase)%8);
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)+1] = 56 - ((MoveStructure->departureCase)/8);
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)+2] = 97 + ((MoveStructure->arrivalCase)%8);
+        printf("\n%d", strlen(listMoves));
+        listMoves[(i*5)+3] = 56 - ((MoveStructure->arrivalCase)/8);
+        printf("\n%d", strlen(listMoves));
+        MoveStructure = MoveStructure->nextMove;
+    }
+    
+    printf("\n%d ---- %s", strlen(listMoves), listMoves);
+    //
+    //
+    //
+    // Don't work
+    //
+    //
+    //
+}
+
+int main(int argc, char* argv[])
+{
+    char listMoves[] = "g6h4 g6h4";
     FileMoveStructure* file=initialise();
     listMovesToFile(file, listMoves);
-    storeAllMovesSQL(file, 122);
+    storeAllMovesSQL(file);
+    printf("\n\n");
+    fileToListMoves(file, 2);
+
 
     return 1;
-}*/
+}
 
 
 void FENToList(char* fen, unsigned int* chessBoard)
@@ -240,20 +284,12 @@ void printBoard(unsigned int* chessBoard)
 }*/
 
 
-int main(int argc, char* argv[])
+/*int main(int argc, char* argv[])
 {
     sqlite3 *db;
     sqlite3_open("database.db", &db);
-    if (sqlite3_exec(db, "create table tab(foo, bar, baz)", NULL, NULL, NULL)) 
-    {
-        printf("Error in the connexion to the database. \n");
-    }
-    else 
-    {
-        printf("Connected to the database");
-    }
-
+    sqlite3_exec(db, "INSERT INTO Puzzle_done VALUES (0, 0, 1, '2021-06-08      ', 2000);", NULL, NULL, NULL);
     sqlite3_close(db);
 
     return 1;
-}
+}*/
