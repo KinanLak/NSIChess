@@ -224,24 +224,36 @@ void printBoard(unsigned int* chessBoard)
 }
 
 
-int main(int argc, char* argv[])
+
+
+/*int main(int argc, char* argv[])
 {
     unsigned int chessBoard[64];
-    /*{
-    4,2,3,6,7,3,2,4,
-    1,1,1,1,1,1,1,1,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    0,0,0,0,0,0,0,0,
-    9,9,9,9,9,9,9,9,
-    12,10,11,14,15,11,10,12};*/
 
     char fen[] = "r2qkb1r/p2b1ppp/4pn2/1B1p4/8/1Q2P3/PP1N1PPP/R1B1K2R w KQkq - 2 11";
     FENToList(fen, chessBoard);
     printf("1");
 
     printBoard(chessBoard);
+
+    return 1;
+}*/
+
+
+int main(int argc, char* argv[])
+{
+    sqlite3 *db;
+    sqlite3_open("database.db", &db);
+    if (sqlite3_exec(db, "create table tab(foo, bar, baz)", NULL, NULL, NULL)) 
+    {
+        printf("Error in the connexion to the database. \n");
+    }
+    else 
+    {
+        printf("Connected to the database");
+    }
+
+    sqlite3_close(db);
 
     return 1;
 }
