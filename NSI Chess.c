@@ -1741,10 +1741,17 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     SDL_QueryTexture(textureTimerWhite, NULL, NULL, &texWWhite, &texHWhite);
     SDL_Rect sdlRectTimerWhite = {300, 300, texWWhite, texHWhite};
     int texWBlack = 200;
-    int texHBlack = 100;
+    int texHBlack = 200;
     SDL_QueryTexture(textureTimerBlack, NULL, NULL, &texWBlack, &texHBlack);
-    SDL_Rect sdlRectTimerBlack = {100, 100, texWBlack, texHBlack};
-
+    SDL_Rect sdlRectTimerBlack = {200, 100, texWBlack, texHBlack};
+    itoa(leftOverTimeBlack/60, stringTimeToShowBlack, 10);
+    strcat(stringTimeToShowBlack, ":");
+    char stringTens[1];
+    itoa((leftOverTimeBlack%60)/10, stringTens, 10);
+    char stringUnity[2];
+    itoa((leftOverTimeBlack%60)%10, stringUnity, 10);
+    strcat(stringTimeToShowBlack, stringTens);
+    strcat(stringTimeToShowBlack, stringUnity);
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
     SDL_RenderPresent(render);
@@ -1940,7 +1947,16 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             MoveStructure *actualMove= file->firstMove;
                             while (actualMove!=NULL)
                             {
-                                DrawImage(dstrect, &dstrect, actualMove->arrivalCase, texturePoint)
+
+                                if (inverse==1)
+                                {
+                                    int a=63 - (actualMove->arrivalCase);
+                                    DrawImage(dstrect, &dstrect, a, texturePoint)
+                                }
+                                else
+                                {
+                                    DrawImage(dstrect, &dstrect, actualMove->arrivalCase, texturePoint)
+                                }
                                 actualMove = actualMove->nextMove;
                             };
                             SDL_RenderPresent(render);
@@ -2122,7 +2138,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
             SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
-            SDL_Delay(50);
+            SDL_Delay(100);
         }
     }
     SDL_RenderClear(render);
@@ -2154,7 +2170,7 @@ int main(int argc, char* argv[])
     
     //loginPage(window, render);
     //Launch the mainBoard
-    //mainBoard(window, render);
+    mainBoard(window, render);
     //menuPage(window, render);
 
     
@@ -2226,3 +2242,5 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
+
+//Corrigé pb moves prévisualisés en inversé

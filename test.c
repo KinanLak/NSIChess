@@ -116,7 +116,6 @@ void fileToListMoves(FileMoveStructure* file, int numberMoves)
     // Don't work
     //
     //
-    //
     char* listMoves[(numberMoves*5)-1];
     MoveStructure *MoveStructure = file->firstMove;
 
@@ -143,13 +142,6 @@ void fileToListMoves(FileMoveStructure* file, int numberMoves)
     }
     
     printf("\n%d ---- %s", strlen(listMoves), listMoves);
-    //
-    //
-    //
-    // Don't work
-    //
-    //
-    //
 }
 
 int main(int argc, char* argv[])
