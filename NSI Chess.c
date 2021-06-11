@@ -1759,7 +1759,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
 
     SDL_Surface* imageHoverButtonBackground = NULL;
     SDL_Texture* textureHoverButtonBackground = NULL;
-    ALLImageINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonConnexionBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonConnexionBMP, render)
     SDL_Rect rectButtonHover;
     rectButtonHover.x= 100;
     rectButtonHover.y= 100;
@@ -1786,11 +1786,11 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};
     SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
     
-    char strConnexion1[34]="                                  ";
+    char strConnexion1[50]="                                                  ";
     char* strPointeurConnexion1 = strConnexion1;
-    char strConnexion2[34]="                                  ";
+    char strConnexion2[50]="                                                  ";
     char* strPointeurConnexion2 = strConnexion2;
-    char strConnexion2Hidder[34]="                                  ";
+    char strConnexion2Hidder[50]="                                                  ";
     char* strPointeurConnexion2Hidder = strConnexion2Hidder;
     int cptNumberOfValuesConnexion1 = 0;
     int cptNumberOfValuesConnexion2 = 0;
