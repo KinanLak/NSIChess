@@ -3,9 +3,10 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_image.h>
 #include <winsock2.h>
-//#pragma comment(lib, "ws2_32.lib")
 #include "sqlite3.h"
+#include <mysql.h>
 
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
@@ -2138,7 +2139,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
             SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
-            SDL_Delay(100);
+            SDL_Delay(5);
         }
     }
     SDL_RenderClear(render);
