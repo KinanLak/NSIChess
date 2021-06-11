@@ -1316,6 +1316,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define WhitePromoteBarBMP "images/board/whitePB.bmp"
 #define BlackPromoteBarBMP "images/board/blackPB.bmp"
 #define HoverButtonConnexionBMP "images/hoverButtonConnexion.bmp"
+#define ButtonConnexionBMP "images/buttonConnexion.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
@@ -1744,6 +1745,7 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
                             }\
                         }\
                         break;
+
 //---------------------------------------------------------------------------------
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
@@ -1757,14 +1759,18 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Texture* textureConnexionBackground = NULL;
     ALLImageINIT(imageConnexionBackground, textureConnexionBackground, ConnexionBGImageBMP, render)
 
+    SDL_Surface* imageButtonBackground = NULL;
+    SDL_Texture* textureButtonBackground = NULL;
+    ALLImageAndTransparencyINIT(imageButtonBackground, textureButtonBackground, ButtonConnexionBMP, render)
+
     SDL_Surface* imageHoverButtonBackground = NULL;
     SDL_Texture* textureHoverButtonBackground = NULL;
     ALLImageAndTransparencyINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonConnexionBMP, render)
-    SDL_Rect rectButtonHover;
-    rectButtonHover.x= 798;
-    rectButtonHover.y= 740;
-    rectButtonHover.h= 81;
-    rectButtonHover.w= 323;
+    SDL_Rect rectButton;
+    rectButton.x= 797;
+    rectButton.y= 740;
+    rectButton.h= 81;
+    rectButton.w= 323;
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
@@ -1814,14 +1820,12 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
             case SDL_MOUSEMOTION:
                 if (event.motion.x >799 && event.motion.x <1122 && event.motion.y >739 && event.motion.y <822)
                 {
-                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButtonHover);
+                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
                     SDL_RenderPresent(render);
                 }
                 else
                 {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
-                    showTextes()
+                    SDL_RenderCopy(render, textureButtonBackground, NULL, &rectButton);
                     SDL_RenderPresent(render);
                 }
                 break;
@@ -1905,6 +1909,12 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                             SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                             changeValueConnexion1()
                             focusConnexion1()
+                            int x,y;
+                            SDL_GetGlobalMouseState(&x, &y);
+                            if (x >799 && x <1122 && y >739 && y <822)
+                            {
+                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                            }
                             SDL_RenderPresent(render);
                         }
                         else if (focus==1)
@@ -1913,6 +1923,12 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                             SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                             changeValueConnexion2()
                             focusConnexion2()
+                            int x,y;
+                            SDL_GetGlobalMouseState(&x, &y);
+                            if (x >799 && x <1122 && y >739 && y <822)
+                            {
+                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                            }
                             SDL_RenderPresent(render);
                         }
                         break;
