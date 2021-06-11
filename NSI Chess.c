@@ -1315,6 +1315,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define PointImageBMP "images/board/point.bmp"
 #define WhitePromoteBarBMP "images/board/whitePB.bmp"
 #define BlackPromoteBarBMP "images/board/blackPB.bmp"
+#define HoverButtonConnexionBMP "images/hoverButtonConnexion.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
@@ -1755,7 +1756,16 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Surface* imageConnexionBackground = NULL;
     SDL_Texture* textureConnexionBackground = NULL;
     ALLImageINIT(imageConnexionBackground, textureConnexionBackground, ConnexionBGImageBMP, render)
-    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+
+    SDL_Surface* imageHoverButtonBackground = NULL;
+    SDL_Texture* textureHoverButtonBackground = NULL;
+    ALLImageINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonConnexionBMP, render)
+    SDL_Rect rectButtonHover;
+    rectButtonHover.x= 100;
+    rectButtonHover.y= 100;
+    rectButtonHover.h= 81;
+    rectButtonHover.w= 323;
+    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButtonHover);
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
