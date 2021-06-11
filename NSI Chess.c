@@ -210,11 +210,11 @@ void legalMovesPawn(unsigned int* chessBoard, int position, int enPassant, FileM
         {
             ifSimpleMovePossibleMakeIt(position, position-7, 1, file);
         }
-        if (position/8==3 && position-1==enPassant/64)
+        if (position/8==3 && position-1==enPassant)
         {
             ifEnPassantMovePossibleMakeIt(position, position-9, 1, file, enPassant/64);
         }
-        else if (position/8==3 && position+1==enPassant/64)
+        else if (position/8==3 && position+1==enPassant)
         {
             ifEnPassantMovePossibleMakeIt(position, position-7, 1, file, enPassant/64);
         }
@@ -237,11 +237,11 @@ void legalMovesPawn(unsigned int* chessBoard, int position, int enPassant, FileM
         {
             ifSimpleMovePossibleMakeIt(position, position+9, 0, file);
         }
-        if (position/8==4 && position+1==enPassant%64)
+        if (position/8==4 && position+1==enPassant)
         {
             ifEnPassantMovePossibleMakeIt(position, position+9, 0, file, enPassant%64);
         }
-        else if (position/8==4 && position-1==enPassant%64)
+        else if (position/8==4 && position-1==enPassant)
         {
             ifEnPassantMovePossibleMakeIt(position, position+7, 0, file, enPassant%64);
         }
@@ -393,7 +393,7 @@ void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveS
                 }
                 else
                 {
-                    *rock = 0;
+                    *rock -= 4;
                 }
             }
             if (((*rock)/8)%2==1)
@@ -410,10 +410,20 @@ void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveS
                 }
                 else
                 {
-                    *rock = 0;
+                    *rock -= 8;
                 }
             }
-            
+        }
+        else
+        {
+            if (((*rock)/4)%2==1)
+            {
+                *rock -= 4;
+            }
+            if (((*rock)/8)%2==1)
+            {
+                *rock -= 8;
+            }
         }
         if (column>0 && chessBoard[position-1]/8==0)
         {
@@ -493,7 +503,7 @@ void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveS
                 }
                 else
                 {
-                    *rock = 0;
+                    *rock -= 1;
                 }
             }
             if (((*rock)/2)%2==1)
@@ -510,8 +520,19 @@ void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveS
                 }
                 else
                 {
-                    *rock = 0;
+                    *rock -= 2;
                 }
+            }
+        }
+        else
+        {
+            if (((*rock))%2==1)
+            {
+                *rock -= 1;
+            }
+            if (((*rock)/2)%2==1)
+            {
+                *rock -= 2;
             }
         }
     }
@@ -1280,6 +1301,8 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define REDLight 255, 200, 200, 255
 #define WHITE 255, 255, 255, 255
 #define BLACK 0, 0, 0, 255
+#define GREYINPUT 211, 209, 209, 255
+
 #define NOTHING -1
 #define transparentColor 239, 239, 239
 
@@ -1287,6 +1310,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 //Definition of images path
 #define BoardBgImageBMP "images/board/bg.bmp"
 #define MenuBGImageBMP "images/menu.bmp"
+#define ConnexionBGImageBMP "images/connexionBG.bmp"
 #define OptionImageBMP "images/option.bmp"
 #define PointImageBMP "images/board/point.bmp"
 #define WhitePromoteBarBMP "images/board/whitePB.bmp"
@@ -1533,7 +1557,7 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render);
 
 
 
-int isCheckMate(unsigned int* chessBoard, int team)
+int isCheckMate(unsigned int* chessBoard, int team, int* rock, int enPassant)
 {
     FileMoveStructure* file = NULL;
     for (int i=0; i<64; i++)
@@ -1543,17 +1567,24 @@ int isCheckMate(unsigned int* chessBoard, int team)
             if (chessBoard[i]/8==team)
             {
                 file = initialise();
-                legalMovePiece(chessBoard, i, 0, 0, file);
+                legalMovePiece(chessBoard, i, enPassant, rock, file);
                 MoveStructure *actualMove= file->firstMove;
                 while (actualMove!=NULL)
                 {
                     return 0;
-                    actualMove = actualMove->nextMove;
                 };
             }
         }
     }
     return 1;
+}
+
+void updateRock(unsigned int* chessBoard, int team, int* rock)
+{
+    int posKing=kingPosition(team, chessBoard);
+    FileMoveStructure* file = initialise();
+    legalMovesKing(chessBoard, posKing, rock, file);
+    MoveStructure *actualMove= file->firstMove;
 }
 
 int isMovePossible(int moveCandidat, FileMoveStructure* file)
@@ -1573,6 +1604,21 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
     return 0;
 }
 
+#define showTextes() changeValueConnexion1()\
+                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);\
+                surfaceConnexion1 = TTF_RenderText_Solid(font, strConnexion1, color);\
+                textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);\
+                SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1);\
+                SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};\
+                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);\
+                changeValueConnexion2()\
+                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);\
+                surfaceConnexion2 = TTF_RenderText_Solid(fontPassword, strConnexion2Hidder, color);\
+                textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);\
+                SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);\
+                SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};\
+                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
+
 #define drawSquareTimer(a,b) rect.x = a;\
     rect.y = a;\
     rect.w = b;\
@@ -1580,6 +1626,123 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
     SDL_SetRenderDrawColor(render, WHITE);\
     SDL_RenderFillRect(render, &rect);
 
+#define focusConnexion1() focus=1;\
+    SDL_SetRenderDrawColor(render, WHITE);\
+    SDL_Rect rect;\
+    rect.x = 593;\
+    rect.y = 529;\
+    rect.w = 731;\
+    rect.h = 40;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = 592;\
+    rect.y = 528;\
+    rect.w = 733;\
+    rect.h = 42;\
+    SDL_RenderDrawRect(render, &rect);
+
+#define focusConnexion2() focus=2;\
+    SDL_SetRenderDrawColor(render, WHITE);\
+    SDL_Rect rect;\
+    rect.x = 591;\
+    rect.y = 644;\
+    rect.w = 734;\
+    rect.h = 40;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = 590;\
+    rect.y = 643;\
+    rect.w = 736;\
+    rect.h = 42;\
+    SDL_RenderDrawRect(render, &rect);
+
+#define changeValueConnexion1() SDL_SetRenderDrawColor(render, GREYINPUT);\
+    SDL_Rect rectFill1;\
+    rectFill1.x = 594;\
+    rectFill1.y = 530;\
+    rectFill1.w = 729;\
+    rectFill1.h = 38;\
+    SDL_RenderFillRect(render, &rectFill1);
+
+#define changeValueConnexion2() SDL_SetRenderDrawColor(render, GREYINPUT);\
+    SDL_Rect rectFill2;\
+    rectFill2.x = 592;\
+    rectFill2.y = 645;\
+    rectFill2.w = 732;\
+    rectFill2.h = 38;\
+    SDL_RenderFillRect(render, &rectFill2);
+
+
+
+#define keyPressedConnexion(key, valueKey, valueKeyShift, valueKeyAlt, valueMax) case key:\
+                        if (focus==1)\
+                        {\
+                            if (cptNumberOfValuesConnexion1<valueMax)\
+                            {\
+                                if ((rightAlt==1 || leftAlt==1) && (leftShift==1 || rightShift==1))\
+                                {\
+                                }\
+                                else if (rightAlt==1 || leftAlt==1)\
+                                {\
+                                    if (valueKeyAlt!=-1)\
+                                    {\
+                                        strPointeurConnexion1[cptNumberOfValuesConnexion1]= valueKeyAlt;\
+                                        cptNumberOfValuesConnexion1+=1;\
+                                    }\
+                                }\
+                                else if (leftShift==1 || rightShift==1)\
+                                {\
+                                    if (valueKeyShift!=-1)\
+                                    {\
+                                        strPointeurConnexion1[cptNumberOfValuesConnexion1]= valueKeyShift;\
+                                        cptNumberOfValuesConnexion1+=1;\
+                                    }\
+                                }\
+                                else\
+                                {\
+                                    if (valueKey!=-1)\
+                                    {\
+                                        strPointeurConnexion1[cptNumberOfValuesConnexion1]= valueKey;\
+                                        cptNumberOfValuesConnexion1+=1;\
+                                    }\
+                                }\
+                            }\
+                        }\
+                        else if (focus==2)\
+                        {\
+                            if (cptNumberOfValuesConnexion2<valueMax)\
+                            {\
+                                if ((rightAlt==1 || leftAlt==1) && (leftShift==1 || rightShift==1))\
+                                {\
+                                }\
+                                else if (rightAlt==1 || leftAlt==1)\
+                                {\
+                                    if (valueKeyAlt!=-1)\
+                                    {\
+                                        strPointeurConnexion2[cptNumberOfValuesConnexion2]= valueKeyAlt;\
+                                        strPointeurConnexion2Hidder[cptNumberOfValuesConnexion2]=charhidder;\
+                                        cptNumberOfValuesConnexion2+=1;\
+                                    }\
+                                }\
+                                else if (leftShift==1 || rightShift==1)\
+                                {\
+                                    if (valueKeyShift!=-1)\
+                                    {\
+                                        strPointeurConnexion2[cptNumberOfValuesConnexion2]= valueKeyShift;\
+                                        strPointeurConnexion2Hidder[cptNumberOfValuesConnexion2]=charhidder;\
+                                        cptNumberOfValuesConnexion2+=1;\
+                                    }\
+                                }\
+                                else\
+                                {\
+                                    if (valueKey!=-1)\
+                                    {\
+                                        strPointeurConnexion2[cptNumberOfValuesConnexion2]= valueKey;\
+                                        strPointeurConnexion2Hidder[cptNumberOfValuesConnexion2]=charhidder;\
+                                        cptNumberOfValuesConnexion2+=1;\
+                                    }\
+                                }\
+                            }\
+                        }\
+                        break;
 //---------------------------------------------------------------------------------
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
@@ -1589,52 +1752,209 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     
     CreateRenderInNewWindow(window, render)
 
-    //Opening SQL database
+    SDL_Surface* imageConnexionBackground = NULL;
+    SDL_Texture* textureConnexionBackground = NULL;
+    ALLImageINIT(imageConnexionBackground, textureConnexionBackground, ConnexionBGImageBMP, render)
+    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
 
-    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 30);
-    SDL_Color color = { 255, 255, 255 };
-    SDL_Surface * surface;
+    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
+    TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+    SDL_Color color = { 0, 0, 0};
+    SDL_Surface * surfaceConnexion1 = TTF_RenderText_Solid(font,"", color);
+    SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);    
+    int texWConnexion1 = 729;
+    int texHConnexion1 = 38;
+    SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1);
+    SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};
+    SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);
     
-
-    sqlite3 *db;
-    sqlite3_open("bdd.db", &db);
-    if (sqlite3_exec(db, "create table tab(foo, bar, baz)", NULL, NULL, NULL)) {
-        surface = TTF_RenderText_Solid(font,"Error executing sql statement\n", color);
-    }
-    else {
-        surface = TTF_RenderText_Solid(font,"Table created\n", color);
-    }
-
-    sqlite3_close(db);
+    SDL_Surface * surfaceConnexion2 = TTF_RenderText_Solid(fontPassword,"", color);
+    SDL_Texture * textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);    
+    int texWConnexion2 = 729;
+    int texHConnexion2 = 38;
+    SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);
+    SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};
+    SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
     
+    char strConnexion1[34]="                                  ";
+    char* strPointeurConnexion1 = strConnexion1;
+    char strConnexion2[34]="                                  ";
+    char* strPointeurConnexion2 = strConnexion2;
+    char strConnexion2Hidder[34]="                                  ";
+    char* strPointeurConnexion2Hidder = strConnexion2Hidder;
+    int cptNumberOfValuesConnexion1 = 0;
+    int cptNumberOfValuesConnexion2 = 0;
+    int focus = 0;
+    int leftShift=0;
+    int rightShift=0;
+    int leftAlt=0;
+    int rightAlt=0;
+    int charhidder=42;
+    int limitChar=30;
 
-    surface = TTF_RenderText_Solid(font,"Vol de Ta mère", color);
 
-    SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
-    int texW = 0;
-    int texH = 0;
-    SDL_QueryTexture(texture, NULL, NULL, &texW, &texH);
-    SDL_Rect test = { 300, 300, texW, texH };
-    SDL_RenderCopy(render, texture, NULL, &test);
+    
     SDL_RenderPresent(render);
-
 
     SDL_Event event;
     int continuer = 1;
     while (continuer)
     {
-        SDL_PollEvent(&event);
+        SDL_WaitEvent(&event);
         switch(event.type)
         {
             case SDL_QUIT:
                 continuer = 0;
+                break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
                     continuer=0;
                 }
-            case SDL_KEYDOWN: 
+                if (event.button.x >593 && event.button.y > 529 && event.button.x <1324 && event.button.y < 569)
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                    focusConnexion1()
+                    showTextes()
+                    SDL_RenderPresent(render);
+                }
+                else if (event.button.x >591 && event.button.y > 644 && event.button.x <1325 && event.button.y < 684)
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                    focusConnexion2()
+                    showTextes()
+                    SDL_RenderPresent(render);
+                }
+                else if (event.button.x>797 && event.button.y>740 && event.button.x <1120 && event.button.y<821)
+                {
+                    //Send request
+                }
+                else
+                {
+                    focus=0;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                    showTextes()
+                    SDL_RenderPresent(render);
+                }
                 break;
+//----------------------------------------------
+//---Have to take into account the 'lock' key---
+//----------------------------------------------
+            case SDL_KEYDOWN: 
+                switch( event.key.keysym.sym ){
+                    case SDLK_LSHIFT:
+                        leftShift=1;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=1;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=1;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=1;
+                        break;
+                    case SDLK_BACKSPACE:
+                        if (focus==1)
+                        {
+                            if (cptNumberOfValuesConnexion1>0)
+                            {
+                                cptNumberOfValuesConnexion1-=1;
+                                strPointeurConnexion1[cptNumberOfValuesConnexion1]=32;
+                            }
+                        }
+                        else if (focus==2)
+                        {
+                            if (cptNumberOfValuesConnexion1>0)
+                            {
+                                cptNumberOfValuesConnexion2-=1;
+                                strPointeurConnexion2[cptNumberOfValuesConnexion2]=32;
+                                strPointeurConnexion2Hidder[cptNumberOfValuesConnexion2]=32;
+                            }
+                        }
+                        break;
+                    case SDLK_TAB:
+                        if (focus==0)
+                        {
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                            changeValueConnexion1()
+                            focusConnexion1()
+                            SDL_RenderPresent(render);
+                        }
+                        else if (focus==1)
+                        {
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                            changeValueConnexion2()
+                            focusConnexion2()
+                            SDL_RenderPresent(render);
+                        }
+                        break;
+                    keyPressedConnexion(SDLK_a, 97, 65, -1, limitChar)
+                    keyPressedConnexion(SDLK_b, 98, 66, -1, limitChar)
+                    keyPressedConnexion(SDLK_c, 99, 67, -1, limitChar)
+                    keyPressedConnexion(SDLK_d, 100, 68, -1, limitChar)
+                    keyPressedConnexion(SDLK_e, 101, 69, -1, limitChar)
+                    keyPressedConnexion(SDLK_f, 102, 70, -1, limitChar)
+                    keyPressedConnexion(SDLK_g, 103, 71, -1, limitChar)
+                    keyPressedConnexion(SDLK_h, 104, 72, -1, limitChar)
+                    keyPressedConnexion(SDLK_i, 105, 73, -1, limitChar)
+                    keyPressedConnexion(SDLK_j, 106, 74, -1, limitChar)
+                    keyPressedConnexion(SDLK_k, 107, 75, -1, limitChar)
+                    keyPressedConnexion(SDLK_l, 108, 76, -1, limitChar)
+                    keyPressedConnexion(SDLK_m, 109, 77, -1, limitChar)
+                    keyPressedConnexion(SDLK_n, 110, 78, -1, limitChar)
+                    keyPressedConnexion(SDLK_o, 111, 79, -1, limitChar)
+                    keyPressedConnexion(SDLK_p, 112, 80, -1, limitChar)
+                    keyPressedConnexion(SDLK_q, 113, 81, -1, limitChar)
+                    keyPressedConnexion(SDLK_r, 114, 82, -1, limitChar)
+                    keyPressedConnexion(SDLK_s, 115, 83, -1, limitChar)
+                    keyPressedConnexion(SDLK_t, 116, 84, -1, limitChar)
+                    keyPressedConnexion(SDLK_u, 117, 85, -1, limitChar)
+                    keyPressedConnexion(SDLK_v, 118, 86, -1, limitChar)
+                    keyPressedConnexion(SDLK_w, 119, 87, -1, limitChar)
+                    keyPressedConnexion(SDLK_x, 120, 88, -1, limitChar)
+                    keyPressedConnexion(SDLK_y, 121, 89, -1, limitChar)
+                    keyPressedConnexion(SDLK_z, 122, 90, -1, limitChar)
+                    keyPressedConnexion(SDLK_1, 38, 49, -1, limitChar)
+                    keyPressedConnexion(SDLK_2, 233, 50, -1, limitChar)
+                    keyPressedConnexion(SDLK_3, -1, 51, 35, limitChar)
+                    keyPressedConnexion(SDLK_4, -1, 52, -1, limitChar)
+                    keyPressedConnexion(SDLK_5, -1, 53, -1, limitChar)
+                    keyPressedConnexion(SDLK_6, 45, 54, -1, limitChar)
+                    keyPressedConnexion(SDLK_7, 232, 55, -1, limitChar)
+                    keyPressedConnexion(SDLK_8, 95, 56, -1, limitChar)
+                    keyPressedConnexion(SDLK_9, 231, 57, -1, limitChar)
+                    keyPressedConnexion(SDLK_0, 224, 48, 64, limitChar)
+                    
+                    keyPressedConnexion(SDLK_COMMA, -1, 63, -1, limitChar)
+                    keyPressedConnexion(SDLK_EXCLAIM, 33, -1, -1, limitChar)
+                    keyPressedConnexion(SDLK_SEMICOLON, -1, 46, -1, limitChar)
+                    
+                }
+                showTextes()
+                SDL_RenderPresent(render);
+                
+                break;
+            case SDL_KEYUP:
+                switch( event.key.keysym.sym ){
+                    case SDLK_LSHIFT:
+                        leftShift=0;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=0;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=0;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=0;
+                        break;
+                }
         }
         SDL_Delay(5);
     }
@@ -1661,7 +1981,6 @@ void menuPage(SDL_Window* window, SDL_Renderer* render)
     SDL_RenderCopy(render, textureOption, NULL, NULL);
     SDL_RenderPresent(render);
 
-
     SDL_Event event;
     int continuer = 1;
     while (continuer)
@@ -1671,11 +1990,13 @@ void menuPage(SDL_Window* window, SDL_Renderer* render)
         {
             case SDL_QUIT:
                 continuer = 0;
+                break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
                     continuer=0;
                 }
+                break;
             case SDL_KEYDOWN: 
                 break;
         }
@@ -1720,18 +2041,19 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     //Initialisation of the timer
     int timerIsOn=1;
     int inverse=1;
+    int add_time=2;
+
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 50);
     SDL_Color color = { 0, 0, 0};
     time_t endTime;
     time(&endTime);
     endTime += 100;
+    
     int leftOverTimeWhite = 100;
     int leftOverTimeBlack = 100;
-    char stringTimeToShowWhite[6];
-    char stringTimeToShowBlack[6];
-    itoa(leftOverTimeWhite, stringTimeToShowWhite, 10);
-    itoa(leftOverTimeBlack, stringTimeToShowBlack, 10);
+    char stringTimeToShowWhite[6]="1:40";
+    char stringTimeToShowBlack[6]="1:40";
     SDL_Surface * surfaceTimerWhite = TTF_RenderText_Solid(font,stringTimeToShowWhite, color);
     SDL_Texture * textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
     SDL_Surface * surfaceTimerBlack = TTF_RenderText_Solid(font,stringTimeToShowBlack, color);
@@ -1741,17 +2063,9 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     SDL_QueryTexture(textureTimerWhite, NULL, NULL, &texWWhite, &texHWhite);
     SDL_Rect sdlRectTimerWhite = {300, 300, texWWhite, texHWhite};
     int texWBlack = 200;
-    int texHBlack = 200;
+    int texHBlack = 100;
     SDL_QueryTexture(textureTimerBlack, NULL, NULL, &texWBlack, &texHBlack);
-    SDL_Rect sdlRectTimerBlack = {200, 100, texWBlack, texHBlack};
-    itoa(leftOverTimeBlack/60, stringTimeToShowBlack, 10);
-    strcat(stringTimeToShowBlack, ":");
-    char stringTens[1];
-    itoa((leftOverTimeBlack%60)/10, stringTens, 10);
-    char stringUnity[2];
-    itoa((leftOverTimeBlack%60)%10, stringUnity, 10);
-    strcat(stringTimeToShowBlack, stringTens);
-    strcat(stringTimeToShowBlack, stringUnity);
+    SDL_Rect sdlRectTimerBlack = {200, 200, texWBlack, texHBlack};
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
     SDL_RenderPresent(render);
@@ -1767,12 +2081,12 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
         {
             case SDL_QUIT:
                 continuer = 0;
+                break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
                     continuer=0;
                 }
-            case SDL_KEYDOWN: 
                 if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
                     int caseNumber = 0;
@@ -1825,10 +2139,12 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             noPromotion=NOTHING;
                             change=NOTHING;
                             teamToPlay=0;
-                            if (isCheckMate(chessBoard, teamToPlay)==1)
+                            if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
                                 continuer=0;
                             }
+                            enPassant=0;
+                            updateRock(chessBoard, teamToPlay, &rock);
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureBackground, NULL, NULL);
                             showPreviousMoves()
@@ -1871,10 +2187,12 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             noPromotion=NOTHING;
                             change=NOTHING;
                             teamToPlay=1;
-                            if (isCheckMate(chessBoard, teamToPlay)==1)
+                            if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
                                 continuer=0;
                             }
+                            enPassant=0;
+                            updateRock(chessBoard, teamToPlay, &rock);
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureBackground, NULL, NULL);
                             showPreviousMoves()
@@ -1981,13 +2299,23 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
                                 }
+                                enPassant=0;
                             }
-                            else if ((chessBoard[change]==1 || chessBoard[change]==9))
+                            else if (chessBoard[change]==1 || chessBoard[change]==9)
                             {
-                                if ((change-9==caseNumber || change+9==caseNumber || change-7==caseNumber || change+7==caseNumber ) && (chessBoard[caseNumber]==0))
+                                if (change+16==caseNumber || change==caseNumber+16)
                                 {
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
+                                    enPassant=caseNumber;
+                                    playSound(MoveSound)
+                                }
+                                else if ((change-9==caseNumber || change+9==caseNumber || change-7==caseNumber || change+7==caseNumber ) && (chessBoard[caseNumber]==0))
+                                {
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                    chessBoard[enPassant]=0;
+                                    playSound(CaptureSound)
                                 }
                                 else if (caseNumber/8==0)//White promotion
                                 {
@@ -2015,6 +2343,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                     }
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
+                                    enPassant=0;
                                 }
                             }
                             else
@@ -2022,6 +2351,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                                 chessBoard[caseNumber] = chessBoard[change];
                                 chessBoard[change] = 0;
                                 playSound(MoveSound)
+                                enPassant=0;
                             }
                             //Change the moves in the previousMove array
                             previousMove[0] = change;
@@ -2047,17 +2377,18 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                             if (teamToPlay)
                             {
                                 teamToPlay=0;
-                                endTime=time(NULL)+leftOverTimeBlack;
+                                endTime=time(NULL)+leftOverTimeBlack+add_time;
                             }
                             else
                             {
                                 teamToPlay=1;
-                                endTime=time(NULL)+leftOverTimeWhite;
+                                endTime=time(NULL)+leftOverTimeWhite+add_time;
                             }
-                            if (isCheckMate(chessBoard, teamToPlay)==1)
+                            if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
                                 continuer=0;
                             }
+                            updateRock(chessBoard, teamToPlay, &rock);
 
                         }
                         else
@@ -2086,6 +2417,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
                     //Reset change
                     change = NOTHING;
                 }
+                break;
         }
         if (timerIsOn)
         {
@@ -2133,12 +2465,12 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
             SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
             
-            drawSquareTimer(100, 100)
+            drawSquareTimer(200, 100)
             surfaceTimerBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
             textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
             SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
-            SDL_Delay(100);
+            SDL_Delay(50);
         }
     }
     SDL_RenderClear(render);
@@ -2168,9 +2500,9 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
-    //loginPage(window, render);
+    loginPage(window, render);
     //Launch the mainBoard
-    mainBoard(window, render);
+    //mainBoard(window, render);
     //menuPage(window, render);
 
     
@@ -2242,5 +2574,3 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
-
-//Corrigé pb moves prévisualisés en inversé
