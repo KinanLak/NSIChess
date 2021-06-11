@@ -90,7 +90,7 @@ void storeAllMovesSQL(FileMoveStructure *file)
 
 
 
-void listMovesToFile(FileMoveStructure* file, char* listMoves)
+/*void listMovesToFile(FileMoveStructure* file, char* listMoves)
 {
     int cpt=0;
     int departure=0;
@@ -155,54 +155,56 @@ int main(int argc, char* argv[])
 
 
     return 1;
-}
+}*/
 
 
 void FENToList(char* fen, unsigned int* chessBoard)
 {
     int cptStr=0;
     int cptChessBoard=0;
-    int valueStr = fen[cptStr];
-    while (valueStr != 32)
+    int teamToPlay;
+    int enPassant;
+    int rock=0;
+    while (fen[cptStr] != 32)
     {
-        if (valueStr != 47)
+        if (fen[cptStr] != 47)
         {
-            if ((valueStr > 48) && (valueStr <58))
+            if ((fen[cptStr] > 48) && (fen[cptStr] <58))
             {
-                for (int x=0; x<(valueStr-48); x++)
+                for (int x=0; x<(fen[cptStr]-48); x++)
                 {
                     chessBoard[cptChessBoard]=0;
                     cptChessBoard+=1;
                 }
             }
-            else if (valueStr<91)
+            else if (fen[cptStr]<91)
             {
-                if (valueStr == 80)
+                if (fen[cptStr] == 80)
                 {
                     chessBoard[cptChessBoard]=9;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 78)
+                else if (fen[cptStr] == 78)
                 {
                     chessBoard[cptChessBoard]=10;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 66)
+                else if (fen[cptStr] == 66)
                 {
                     chessBoard[cptChessBoard]=11;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 82)
+                else if (fen[cptStr] == 82)
                 {
                     chessBoard[cptChessBoard]=12;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 81)
+                else if (fen[cptStr] == 81)
                 {
                     chessBoard[cptChessBoard]=14;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 75)
+                else if (fen[cptStr] == 75)
                 {
                     chessBoard[cptChessBoard]=15;
                     cptChessBoard+=1;
@@ -210,32 +212,32 @@ void FENToList(char* fen, unsigned int* chessBoard)
             }
             else
             {
-                if (valueStr == 112)
+                if (fen[cptStr] == 112)
                 {
                     chessBoard[cptChessBoard]=1;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 110)
+                else if (fen[cptStr] == 110)
                 {
                     chessBoard[cptChessBoard]=2;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 98)
+                else if (fen[cptStr] == 98)
                 {
                     chessBoard[cptChessBoard]=3;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 114)
+                else if (fen[cptStr] == 114)
                 {
                     chessBoard[cptChessBoard]=4;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 113)
+                else if (fen[cptStr] == 113)
                 {
                     chessBoard[cptChessBoard]=6;
                     cptChessBoard+=1;
                 }
-                else if (valueStr == 107)
+                else if (fen[cptStr] == 107)
                 {
                     chessBoard[cptChessBoard]=7;
                     cptChessBoard+=1;
@@ -243,8 +245,63 @@ void FENToList(char* fen, unsigned int* chessBoard)
             }
         }
         cptStr+=1;
-        valueStr = fen[cptStr];
     }
+    cptStr+=1;
+    if (fen[cptStr]==119)
+    {
+        teamToPlay=1;
+    }
+    else
+    {
+        teamToPlay=0;
+    }
+    cptStr+=2;
+    if (fen[cptStr]==45)
+    {
+        cptStr+=1;
+    }
+    else
+    {
+        while (fen[cptStr] != 32)
+        {
+            if (fen[cptStr]==113)
+            {
+                rock+=1;
+            }
+            else if (fen[cptStr]==107)
+            {
+                rock+=2;
+            }
+            else if (fen[cptStr]==81)
+            {
+                rock+=4;
+            }
+            else if (fen[cptStr]==75)
+            {
+                rock+=8;
+            }
+            cptStr+=1;
+        }
+    }
+    cptStr+=1;
+    if (fen[cptStr]==45)
+    {
+        cptStr+=1;
+    }
+    else
+    {
+        enPassant = fen[cptStr]-97 + (56-fen[cptStr+1])*8;
+        if (teamToPlay==1)
+        {
+            enPassant+=8;
+        }
+        else
+        {
+            enPassant-=8;
+        }
+        cptStr+=2;
+    }
+    printf("\nwho to play -> %d \nrock -> %d \nenPassant -> %d\n\n", teamToPlay, rock, enPassant);
 }
 
 void printBoard(unsigned int* chessBoard)
@@ -260,20 +317,29 @@ void printBoard(unsigned int* chessBoard)
 }
 
 
+void shrinkChar(char* longChar, int sizeNewChar)
+{
+    char newChar[sizeNewChar];
+    for (int i=0; i<sizeNewChar; i++)
+    {
+        newChar[i] = longChar[i];
+    }
+    printf("%s", newChar);
+}
 
-
-/*int main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     unsigned int chessBoard[64];
 
-    char fen[] = "r2qkb1r/p2b1ppp/4pn2/1B1p4/8/1Q2P3/PP1N1PPP/R1B1K2R w KQkq - 2 11";
-    FENToList(fen, chessBoard);
-    printf("1");
-
-    printBoard(chessBoard);
+    char fen[] = "rnbqkbn1/pppp1pp1/7r/4p2p/5P2/4P1P1/PPPP3P/RNBQKBNR w KQq e6 0 4     ";
+    //FENToList(fen, chessBoard);
+    //printBoard(chessBoard);
+    char b[]="⬤";
+    char* a= b;
+    printf("%d", a[0]);
 
     return 1;
-}*/
+}
 
 
 /*int main(int argc, char* argv[])
