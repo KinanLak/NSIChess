@@ -1761,11 +1761,10 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Texture* textureHoverButtonBackground = NULL;
     ALLImageAndTransparencyINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonConnexionBMP, render)
     SDL_Rect rectButtonHover;
-    rectButtonHover.x= 100;
-    rectButtonHover.y= 100;
+    rectButtonHover.x= 798;
+    rectButtonHover.y= 740;
     rectButtonHover.h= 81;
     rectButtonHover.w= 323;
-    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButtonHover);
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
@@ -1786,11 +1785,11 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};
     SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
     
-    char strConnexion1[50]="                                                  ";
+    char strConnexion1[38]="                                      ";
     char* strPointeurConnexion1 = strConnexion1;
-    char strConnexion2[50]="                                                  ";
+    char strConnexion2[38]="                                      ";
     char* strPointeurConnexion2 = strConnexion2;
-    char strConnexion2Hidder[50]="                                                  ";
+    char strConnexion2Hidder[38]="                                      ";
     char* strPointeurConnexion2Hidder = strConnexion2Hidder;
     int cptNumberOfValuesConnexion1 = 0;
     int cptNumberOfValuesConnexion2 = 0;
@@ -1801,10 +1800,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     int rightAlt=0;
     int charhidder=42;
     int limitChar=30;
-
-
-    
+    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
     SDL_RenderPresent(render);
+    SDL_Delay(1000);
 
     SDL_Event event;
     int continuer = 1;
@@ -1813,6 +1811,20 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
         SDL_WaitEvent(&event);
         switch(event.type)
         {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x >799 && event.motion.x <1122 && event.motion.y >739 && event.motion.y <822)
+                {
+                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButtonHover);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                    showTextes()
+                    SDL_RenderPresent(render);
+                }
+                break;
             case SDL_QUIT:
                 continuer = 0;
                 break;
