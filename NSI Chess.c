@@ -1323,6 +1323,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define ModeSelectionBGImageBMP "images/main_menu/gameModeBG.bmp"
 #define TempsPartieBGImageBMP "images/main_menu/tempsPartieBG.bmp"
 #define MenuBGImageBMP "images/main_menu/menu.bmp"
+#define WhiteBorderBGImageBMP "images/main_menu/whiteBorder.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
@@ -1875,7 +1876,11 @@ int dayCorrectInThisMonth(int day,int month, int year)
     rectFill6.h = 38;\
     SDL_RenderFillRect(render, &rectFill6);
 
-
+#define createRectTimeChoice(x1, y1, w1, h1) SDL_Rect rectTimeChoice;\
+    rectTimeChoice.x= x1;\
+    rectTimeChoice.y= y1;\
+    rectTimeChoice.w= w1;\
+    rectTimeChoice.h= h1;\
 
 #define keyPressedConnexion(key, valueKey, valueKeyShift, valueKeyAlt, valueMax) case key:\
                         if (focus==1)\
@@ -2513,8 +2518,6 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Rect sdlRectInscription6 = {593, 804, texWInscription6, texHInscription6};
     SDL_RenderCopy(render, textureInscription6, NULL, &sdlRectInscription6);
     
-
-    
     char strInscription1[38]="                                      ";
     char* strPointeurInscription1 = strInscription1;
     char strInscription2[38]="                                      ";
@@ -3030,7 +3033,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
 
     SDL_Surface* imageContourBlancBackground = NULL;
     SDL_Texture* textureContourBlancBackground = NULL;
-    ALLImageINIT(imageContourBlancBackground, textureContourBlancBackground, ///////, render)
+    ALLImageAndTransparencyINIT(imageContourBlancBackground, textureContourBlancBackground, WhiteBorderBGImageBMP, render)
     
     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
     SDL_RenderPresent(render);
@@ -3043,48 +3046,83 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
         switch(event.type)
         {
             case SDL_MOUSEMOTION:
-                if (event.motion.x >514 && event.motion.x <766 && event.motion.y >552 && event.motion.y <759)
+                if (event.motion.x>688 && event.motion.x<834 && event.motion.y>403 && event.motion.y<475)
                 {
                     SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
-                    SDL_RenderCopy(render, textureSelectionLocal, NULL, &sdlRectSelectionLocal);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(688, 403, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>403 && event.motion.y<475)
-                {
-                    //1, 1
                 }
                 else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>403 && event.motion.y<474)
                 {
-                    //1, 2
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(887, 403, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>403 && event.motion.y<474)
                 {
-                    //1, 3
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(1086, 403, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>516 && event.motion.y<587)
                 {
-                    //2, 1
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(688, 516, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>516 && event.motion.y<587)
                 {
-                    //2, 2
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(887, 516, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>516 && event.motion.y<587)
                 {
-                    //2, 3
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(1086, 516, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>628 && event.motion.y<699)
                 {
-                    //3, 1
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(688, 628, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>628 && event.motion.y<699)
                 {
-                    //3, 2
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(887, 628, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>628 && event.motion.y<699)
                 {
-                    //3, 3
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(1086, 628, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    SDL_RenderPresent(render);
                 }
                 break;
             case SDL_QUIT:
@@ -3682,7 +3720,8 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
-    modeSelectionPage(window, render);
+    timeSelectionPage(window, render);
+    //modeSelectionPage(window, render);
     //inscriptionPage(window, render);
     //loginPage(window, render);
     //Launch the mainBoard
