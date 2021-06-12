@@ -3043,14 +3043,27 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Texture* textureHoverRetourBackground = NULL;
     ALLImageAndTransparencyINIT(imageHoverRetourBackground, textureHoverRetourBackground, HoverRetourTimeBMP, render)
     SDL_Rect rectButtonRetour;
-    rectButtonRetour.x= 798;
-    rectButtonRetour.y= 882;
-    rectButtonRetour.w= 323;
-    rectButtonRetour.h= 81;
+    rectButtonRetour.x= 640;
+    rectButtonRetour.y= 778;
+    rectButtonRetour.w= 304;
+    rectButtonRetour.h= 92;
     
     SDL_Surface* imageRetourBackground = NULL;
     SDL_Texture* textureRetourBackground = NULL;
     ALLImageAndTransparencyINIT(imageRetourBackground, textureRetourBackground, RetourTimeBMP, render)
+
+    SDL_Surface* imageHoverLancerBackground = NULL;
+    SDL_Texture* textureHoverLancerBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverLancerBackground, textureHoverLancerBackground, HoverLancerTimeBMP, render)
+    SDL_Rect rectButtonLancer;
+    rectButtonLancer.x= 976;
+    rectButtonLancer.y= 778;
+    rectButtonLancer.w= 304;
+    rectButtonLancer.h= 92;
+    
+    SDL_Surface* imageLancerBackground = NULL;
+    SDL_Texture* textureLancerBackground = NULL;
+    ALLImageAndTransparencyINIT(imageLancerBackground, textureLancerBackground, LancerTimeBMP, render)
 
 
     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
@@ -3064,7 +3077,26 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
         switch(event.type)
         {
             case SDL_MOUSEMOTION:
-
+                if (event.button.x>639 && event.button.x<944 && event.button.y>777 && event.button.y<870)
+                {
+                    SDL_RenderCopy(render, textureHoverRetourBackground, NULL, &rectButtonRetour);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureRetourBackground, NULL, &rectButtonRetour);
+                    SDL_RenderPresent(render);
+                }
+                if (event.button.x>976 && event.button.x<1280 && event.button.y>777 && event.button.y<870)
+                {
+                    SDL_RenderCopy(render, textureHoverLancerBackground, NULL, &rectButtonLancer);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureLancerBackground, NULL, &rectButtonLancer);
+                    SDL_RenderPresent(render);
+                }
                 break;
             case SDL_QUIT:
                 continuer = 0;
@@ -3074,7 +3106,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                 {
                     continuer=0;
                 }
-                else if (event.button.x>688 && event.button.x<834 && event.button.y>403 && event.button.y<475)
+                else if (event.button.x>688 && event.button.x<834 && event.button.y>403 && event.button.y<475 && focus!=1)
                 {
                     focus=1;
                     SDL_RenderClear(render);
@@ -3083,7 +3115,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>887 && event.button.x<1033 && event.button.y>403 && event.button.y<474)
+                else if (event.button.x>887 && event.button.x<1033 && event.button.y>403 && event.button.y<474 && focus!=2)
                 {
                     focus=2;
                     SDL_RenderClear(render);
@@ -3092,7 +3124,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>403 && event.button.y<474)
+                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>403 && event.button.y<474 && focus!=3)
                 {
                     focus=3;
                     SDL_RenderClear(render);
@@ -3101,7 +3133,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>688 && event.button.x<834 && event.button.y>516 && event.button.y<587)
+                else if (event.button.x>688 && event.button.x<834 && event.button.y>516 && event.button.y<587 && focus!=4)
                 {
                     focus=4;
                     SDL_RenderClear(render);
@@ -3110,7 +3142,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>887 && event.button.x<1033 && event.button.y>516 && event.button.y<587)
+                else if (event.button.x>887 && event.button.x<1033 && event.button.y>516 && event.button.y<587 && focus!=5)
                 {
                     focus=5;
                     SDL_RenderClear(render);
@@ -3119,7 +3151,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>516 && event.button.y<587)
+                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>516 && event.button.y<587 && focus!=6)
                 {
                     focus=6;
                     SDL_RenderClear(render);
@@ -3128,7 +3160,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>688 && event.button.x<834 && event.button.y>628 && event.button.y<699)
+                else if (event.button.x>688 && event.button.x<834 && event.button.y>628 && event.button.y<699 && focus!=7)
                 {
                     focus=7;
                     SDL_RenderClear(render);
@@ -3137,7 +3169,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>887 && event.button.x<1033 && event.button.y>628 && event.button.y<699)
+                else if (event.button.x>887 && event.button.x<1033 && event.button.y>628 && event.button.y<699 && focus!=8)
                 {
                     focus=8;
                     SDL_RenderClear(render);
@@ -3146,7 +3178,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
                     SDL_RenderPresent(render);
                 }
-                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>628 && event.button.y<699)
+                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>628 && event.button.y<699 && focus!=9)
                 {
                     focus=9;
                     SDL_RenderClear(render);
@@ -3179,7 +3211,6 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                 break;
         }
     }
-
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
 }
