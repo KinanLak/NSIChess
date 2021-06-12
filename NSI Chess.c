@@ -1320,7 +1320,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define ButtonConnexionBMP "images/connexion/buttonConnexion.bmp"
 #define HoverButtonInscriptionBMP "images/inscription/hoverButtonInscription.bmp"
 #define ButtonInscriptionBMP "images/inscription/buttonInscription.bmp"
-#define ModeSelectionBGImageBMP "images/main_menu/gameMoveBG.bmp"
+#define ModeSelectionBGImageBMP "images/main_menu/gameModeBG.bmp"
 #define TempsPartieBGImageBMP "images/main_menu/tempsPartieBG.bmp"
 #define MenuBGImageBMP "images/main_menu/menu.bmp"
 
@@ -2416,8 +2416,21 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                 }
         }
     }
+    SDL_FreeSurface(imageConnexionBackground);
+    SDL_FreeSurface(imageButtonBackground);
+    SDL_FreeSurface(imageHoverButtonBackground);
+    SDL_FreeSurface(surfaceConnexion1);
+    SDL_FreeSurface(surfaceConnexion1);
+
+    SDL_DestroyTexture(textureConnexionBackground);
+    SDL_DestroyTexture(textureButtonBackground);
+    SDL_DestroyTexture(textureHoverButtonBackground);
+    SDL_DestroyTexture(textureConnexion1);
+    SDL_DestroyTexture(textureConnexion2);
+    
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
+
 }
 
 
@@ -2862,6 +2875,26 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
                 }
         }
     }
+    SDL_FreeSurface(imageInscriptionBackground);
+    SDL_FreeSurface(imageButtonBackground);
+    SDL_FreeSurface(imageHoverButtonBackground);
+    SDL_FreeSurface(surfaceInscription1);
+    SDL_FreeSurface(surfaceInscription2);
+    SDL_FreeSurface(surfaceInscription3);
+    SDL_FreeSurface(surfaceInscription4);
+    SDL_FreeSurface(surfaceInscription5);
+    SDL_FreeSurface(surfaceInscription6);
+
+    SDL_DestroyTexture(textureButtonBackground);
+    SDL_DestroyTexture(textureInscriptionBackground);
+    SDL_DestroyTexture(textureHoverButtonBackground);
+    SDL_DestroyTexture(textureInscription1);
+    SDL_DestroyTexture(textureInscription2);
+    SDL_DestroyTexture(textureInscription3);
+    SDL_DestroyTexture(textureInscription4);
+    SDL_DestroyTexture(textureInscription5);
+    SDL_DestroyTexture(textureInscription6);
+
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
 }
@@ -2877,31 +2910,32 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Texture* textureModeSelectionBackground = NULL;
     ALLImageINIT(imageModeSelectionBackground, textureModeSelectionBackground, ModeSelectionBGImageBMP, render)
 
-    SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
-
-    SDL_Surface* imageHoverButtonBackground = NULL;
-    SDL_Texture* textureHoverButtonBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonInscriptionBMP, render)
-    SDL_Rect rectButton;
-    rectButton.x= 798;
-    rectButton.y= 882;
-    rectButton.h= 81;
-    rectButton.w= 323;
-
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
-    SDL_Color color = { 0, 0, 0};
+    SDL_Color color = {255, 255, 255};
 
+    SDL_Surface * surfaceSelectionLocal = TTF_RenderText_Solid(font,"Local", color);
+    SDL_Texture * textureSelectionLocal = SDL_CreateTextureFromSurface(render, surfaceSelectionLocal);    
+    int texWSelectionLocal = 729;
+    int texHSelectionLocal = 38;
+    SDL_QueryTexture(textureSelectionLocal, NULL, NULL, &texWSelectionLocal, &texHSelectionLocal);
+    SDL_Rect sdlRectSelectionLocal = {596, 772, texWSelectionLocal, texHSelectionLocal};
 
-    SDL_Surface * surfaceInscription1 = TTF_RenderText_Solid(font,"", color);
-    SDL_Texture * textureInscription1 = SDL_CreateTextureFromSurface(render, surfaceInscription1);    
-    int texWInscription1 = 729;
-    int texHInscription1 = 38;
-    SDL_QueryTexture(textureInscription1, NULL, NULL, &texWInscription1, &texHInscription1);
-    SDL_Rect sdlRectInscription1 = {595, 349, texWInscription1, texHInscription1};
-    SDL_RenderCopy(render, textureInscription1, NULL, &sdlRectInscription1);
+    SDL_Surface * surfaceMultijoueur = TTF_RenderText_Solid(font,"Multijoueur", color);
+    SDL_Texture * textureMultijoueur = SDL_CreateTextureFromSurface(render, surfaceMultijoueur);    
+    int texWMultijoueur = 729;
+    int texHMultijoueur = 38;
+    SDL_QueryTexture(textureMultijoueur, NULL, NULL, &texWMultijoueur, &texHMultijoueur);
+    SDL_Rect sdlRectMultijoueur = {878, 772, texWMultijoueur, texHMultijoueur};
 
+    SDL_Surface * surfaceOrdinateur = TTF_RenderText_Solid(font,"Ordinateur", color);
+    SDL_Texture * textureOrdinateur = SDL_CreateTextureFromSurface(render, surfaceOrdinateur);    
+    int texWOrdinateur = 729;
+    int texHOrdinateur = 38;
+    SDL_QueryTexture(textureOrdinateur, NULL, NULL, &texWOrdinateur, &texHOrdinateur);
+    SDL_Rect sdlRectOrdinateur = {1215, 772, texWOrdinateur, texHOrdinateur};
 
+    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
     SDL_RenderPresent(render);
 
     SDL_Event event;
@@ -2912,14 +2946,31 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
         switch(event.type)
         {
             case SDL_MOUSEMOTION:
-                if (event.motion.x >798 && event.motion.x <1121 && event.motion.y >881 && event.motion.y <963)
+                if (event.motion.x >514 && event.motion.x <766 && event.motion.y >552 && event.motion.y <759)
                 {
-                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
+                    SDL_RenderCopy(render, textureSelectionLocal, NULL, &sdlRectSelectionLocal);
+                    SDL_RenderPresent(render);
+                }
+                else if (event.motion.x >845 && event.motion.x <1082 && event.motion.y >551 && event.motion.y <763)
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
+                    SDL_RenderCopy(render, textureMultijoueur, NULL, &sdlRectMultijoueur);
+                    SDL_RenderPresent(render);
+                }
+                else if (event.motion.x >1187 && event.motion.x <1405 && event.motion.y >545 && event.motion.y <774)
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
+                    SDL_RenderCopy(render, textureOrdinateur, NULL, &sdlRectOrdinateur);
                     SDL_RenderPresent(render);
                 }
                 else
                 {
-                    SDL_RenderCopy(render, textureButtonBackground, NULL, &rectButton);
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
                     SDL_RenderPresent(render);
                 }
                 break;
@@ -2927,7 +2978,6 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
-            446, 370
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
                     continuer=0;
@@ -2936,11 +2986,31 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                 {
                     continuer=0;
                 }
+                else if (event.button.x >514 && event.button.x <766 && event.button.y >552 && event.button.y <759)
+                {
+                    //1
+                }
+                else if (event.button.x >845 && event.button.x <1082 && event.button.y >551 && event.button.y <763)
+                {
+                    //2
+                }
+                else if (event.button.x >1187 && event.button.x <1405 && event.button.y >545 && event.button.y <774)
+                {
+                    //3
+                }
                 break;
             case SDL_KEYDOWN:
                 break;
         }
     }
+    SDL_FreeSurface(surfaceOrdinateur);
+    SDL_FreeSurface(surfaceSelectionLocal);
+    SDL_FreeSurface(surfaceMultijoueur);
+
+    SDL_DestroyTexture(textureOrdinateur);
+    SDL_DestroyTexture(textureSelectionLocal);
+    SDL_DestroyTexture(textureMultijoueur);
+
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
 }
@@ -2950,7 +3020,6 @@ void menuPage(SDL_Window* window, SDL_Renderer* render)
 {
     
     CreateRenderInNewWindow(window, render)
-
 
     SDL_Surface* imageBackgroundMenu = NULL;
     SDL_Texture* textureBackgroundMenu = NULL;
