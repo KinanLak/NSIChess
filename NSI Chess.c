@@ -2427,7 +2427,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_DestroyTexture(textureHoverButtonBackground);
     SDL_DestroyTexture(textureConnexion1);
     SDL_DestroyTexture(textureConnexion2);
-    
+
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
 
@@ -2911,7 +2911,6 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
     ALLImageINIT(imageModeSelectionBackground, textureModeSelectionBackground, ModeSelectionBGImageBMP, render)
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
-    TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
     SDL_Color color = {255, 255, 255};
 
     SDL_Surface * surfaceSelectionLocal = TTF_RenderText_Solid(font,"Local", color);
@@ -3010,6 +3009,133 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_DestroyTexture(textureOrdinateur);
     SDL_DestroyTexture(textureSelectionLocal);
     SDL_DestroyTexture(textureMultijoueur);
+
+    SDL_RenderClear(render);
+    SDL_RenderPresent(render);
+}
+
+
+
+void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
+{
+    
+    CreateRenderInNewWindow(window, render)
+
+    SDL_Surface* imageTempsPartieBackground = NULL;
+    SDL_Texture* textureTempsPartieBackground = NULL;
+    ALLImageINIT(imageTempsPartieBackground, textureTempsPartieBackground, TempsPartieBGImageBMP, render)
+
+    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
+    SDL_Color color = {255, 255, 255};
+
+    SDL_Surface* imageContourBlancBackground = NULL;
+    SDL_Texture* textureContourBlancBackground = NULL;
+    ALLImageINIT(imageContourBlancBackground, textureContourBlancBackground, ///////, render)
+    
+    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x >514 && event.motion.x <766 && event.motion.y >552 && event.motion.y <759)
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
+                    SDL_RenderCopy(render, textureSelectionLocal, NULL, &sdlRectSelectionLocal);
+                    SDL_RenderPresent(render);
+                }
+                else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>403 && event.motion.y<475)
+                {
+                    //1, 1
+                }
+                else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>403 && event.motion.y<474)
+                {
+                    //1, 2
+                }
+                else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>403 && event.motion.y<474)
+                {
+                    //1, 3
+                }
+                else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>516 && event.motion.y<587)
+                {
+                    //2, 1
+                }
+                else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>516 && event.motion.y<587)
+                {
+                    //2, 2
+                }
+                else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>516 && event.motion.y<587)
+                {
+                    //2, 3
+                }
+                else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>628 && event.motion.y<699)
+                {
+                    //3, 1
+                }
+                else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>628 && event.motion.y<699)
+                {
+                    //3, 2
+                }
+                else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>628 && event.motion.y<699)
+                {
+                    //3, 3
+                }
+                break;
+            case SDL_QUIT:
+                continuer = 0;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    continuer=0;
+                }
+                else if (event.button.x>688 && event.button.x<834 && event.button.y>403 && event.button.y<475)
+                {
+                    //1, 1
+                }
+                else if (event.button.x>887 && event.button.x<1033 && event.button.y>403 && event.button.y<474)
+                {
+                    //1, 2
+                }
+                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>403 && event.button.y<474)
+                {
+                    //1, 3
+                }
+                else if (event.button.x>688 && event.button.x<834 && event.button.y>516 && event.button.y<587)
+                {
+                    //2, 1
+                }
+                else if (event.button.x>887 && event.button.x<1033 && event.button.y>516 && event.button.y<587)
+                {
+                    //2, 2
+                }
+                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>516 && event.button.y<587)
+                {
+                    //2, 3
+                }
+                else if (event.button.x>688 && event.button.x<834 && event.button.y>628 && event.button.y<699)
+                {
+                    //3, 1
+                }
+                else if (event.button.x>887 && event.button.x<1033 && event.button.y>628 && event.button.y<699)
+                {
+                    //3, 2
+                }
+                else if (event.button.x>1086 && event.button.x<1232 && event.button.y>628 && event.button.y<699)
+                {
+                    //3, 3
+                }
+                break;
+            case SDL_KEYDOWN:
+                break;
+        }
+    }
 
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
