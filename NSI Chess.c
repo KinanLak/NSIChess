@@ -1322,7 +1322,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define ButtonInscriptionBMP "images/inscription/buttonInscription.bmp"
 #define ModeSelectionBGImageBMP "images/main_menu/gameModeBG.bmp"
 #define TempsPartieBGImageBMP "images/main_menu/tempsPartieBG.bmp"
-#define MenuBGImageBMP "images/main_menu/menu.bmp"
+#define MenuBGImageBMP "images/main_menu/menuBG.bmp"
 #define WhiteBorderBGImageBMP "images/main_menu/whiteBorder.bmp"
 #define HoverRetourTimeBMP "images/main_menu/hoverRetour.bmp"
 #define RetourTimeBMP "images/main_menu/retour.bmp"
@@ -3216,7 +3216,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
 }
 
 
-void menuPage(SDL_Window* window, SDL_Renderer* render)
+void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
 {
     
     CreateRenderInNewWindow(window, render)
@@ -3225,13 +3225,83 @@ void menuPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Texture* textureBackgroundMenu = NULL;
     ALLImageINIT(imageBackgroundMenu, textureBackgroundMenu, MenuBGImageBMP, render)
 
-    SDL_Surface* imageOption = NULL;
-    SDL_Texture* textureOption = NULL;
-    ALLImageINIT(imageOption, textureOption, OptionImageBMP, render)
-
     SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
-    SDL_RenderCopy(render, textureOption, NULL, NULL);
     SDL_RenderPresent(render);
+
+
+    //Puzzle
+    SDL_Surface* imageHoverPuzzleBackground = NULL;
+    SDL_Texture* textureHoverPuzzleBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverPuzzleBackground, textureHoverPuzzleBackground, /////, render)
+    SDL_Rect rectButtonPuzzle;
+    rectButtonPuzzle.x= 1044;
+    rectButtonPuzzle.y= 340;
+    rectButtonPuzzle.w= 0;//Checker images
+    rectButtonPuzzle.h= 0;//Checker images
+    
+    SDL_Surface* imagePuzzleBackground = NULL;
+    SDL_Texture* texturePuzzleBackground = NULL;
+    ALLImageAndTransparencyINIT(imagePuzzleBackground, texturePuzzleBackground, /////, render)
+
+
+    //Jouer
+    SDL_Surface* imageHoverJouerBackground = NULL;
+    SDL_Texture* textureHoverJouerBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverJouerBackground, textureHoverJouerBackground, /////, render)
+    SDL_Rect rectButtonJouer;
+    rectButtonJouer.x= 452;
+    rectButtonJouer.y= 430;
+    rectButtonJouer.w= 0;//Checker images
+    rectButtonJouer.h= 0;//Checker images
+    
+    SDL_Surface* imageJouerBackground = NULL;
+    SDL_Texture* textureJouerBackground = NULL;
+    ALLImageAndTransparencyINIT(imageJouerBackground, textureJouerBackground, /////, render)
+
+
+    //Amis
+    SDL_Surface* imageHoverAmisBackground = NULL;
+    SDL_Texture* textureHoverAmisBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverAmisBackground, textureHoverAmisBackground, /////, render)
+    SDL_Rect rectButtonAmis;
+    rectButtonAmis.x= 452;
+    rectButtonAmis.y= 545;
+    rectButtonAmis.w= 0;//Checker images
+    rectButtonAmis.h= 0;//Checker images
+    
+    SDL_Surface* imageAmisBackground = NULL;
+    SDL_Texture* textureAmisBackground = NULL;
+    ALLImageAndTransparencyINIT(imageAmisBackground, textureAmisBackground, /////, render)
+
+
+    //Options
+    SDL_Surface* imageHoverOptionsBackground = NULL;
+    SDL_Texture* textureHoverOptionsBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverOptionsBackground, textureHoverOptionsBackground, /////, render)
+    SDL_Rect rectButtonOptions;
+    rectButtonOptions.x= 452;
+    rectButtonOptions.y= 660;
+    rectButtonOptions.w= 0;//Checker images
+    rectButtonOptions.h= 0;//Checker images
+    
+    SDL_Surface* imageOptionsBackground = NULL;
+    SDL_Texture* textureOptionsBackground = NULL;
+    ALLImageAndTransparencyINIT(imageOptionsBackground, textureOptionsBackground, /////, render)
+
+
+    //Quitter
+    SDL_Surface* imageHoverQuitterBackground = NULL;
+    SDL_Texture* textureHoverQuitterBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverQuitterBackground, textureHoverQuitterBackground, /////, render)
+    SDL_Rect rectButtonQuitter;
+    rectButtonQuitter.x= 452;
+    rectButtonQuitter.y= 774;
+    rectButtonQuitter.w= 0;//Checker images
+    rectButtonQuitter.h= 0;//Checker images
+    
+    SDL_Surface* imageQuitterBackground = NULL;
+    SDL_Texture* textureQuitterBackground = NULL;
+    ALLImageAndTransparencyINIT(imageQuitterBackground, textureQuitterBackground, /////, render)
 
     SDL_Event event;
     int continuer = 1;
@@ -3296,7 +3366,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
 
     //Initialisation of the timer
     int timerIsOn=1;
-    int inverse=1;
+    int inverse=0;
     int add_time=2;
 
 
@@ -3756,13 +3826,13 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
-    timeSelectionPage(window, render);
+    //timeSelectionPage(window, render);
     //modeSelectionPage(window, render);
     //inscriptionPage(window, render);
     //loginPage(window, render);
     //Launch the mainBoard
     //mainBoard(window, render);
-    //menuPage(window, render);
+    mainMenuPage(window, render);
 
     
     //Destruction of the window
@@ -3833,3 +3903,6 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
+
+//#undef NUM
+//#define NUM 200
