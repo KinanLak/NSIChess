@@ -1324,6 +1324,10 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define TempsPartieBGImageBMP "images/main_menu/tempsPartieBG.bmp"
 #define MenuBGImageBMP "images/main_menu/menu.bmp"
 #define WhiteBorderBGImageBMP "images/main_menu/whiteBorder.bmp"
+#define HoverRetourTimeBMP "images/main_menu/hoverRetour.bmp"
+#define RetourTimeBMP "images/main_menu/retour.bmp"
+#define LancerTimeBMP "images/main_menu/lancer.bmp"
+#define HoverLancerTimeBMP "images/main_menu/hoverLancer.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
@@ -3035,95 +3039,32 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Texture* textureContourBlancBackground = NULL;
     ALLImageAndTransparencyINIT(imageContourBlancBackground, textureContourBlancBackground, WhiteBorderBGImageBMP, render)
     
+    SDL_Surface* imageHoverRetourBackground = NULL;
+    SDL_Texture* textureHoverRetourBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverRetourBackground, textureHoverRetourBackground, HoverRetourTimeBMP, render)
+    SDL_Rect rectButtonRetour;
+    rectButtonRetour.x= 798;
+    rectButtonRetour.y= 882;
+    rectButtonRetour.w= 323;
+    rectButtonRetour.h= 81;
+    
+    SDL_Surface* imageRetourBackground = NULL;
+    SDL_Texture* textureRetourBackground = NULL;
+    ALLImageAndTransparencyINIT(imageRetourBackground, textureRetourBackground, RetourTimeBMP, render)
+
+
     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
     SDL_RenderPresent(render);
 
     SDL_Event event;
-    int continuer = 1;
+    int continuer=1, focus=0;
     while (continuer)
     {
         SDL_WaitEvent(&event);
         switch(event.type)
         {
             case SDL_MOUSEMOTION:
-                if (event.motion.x>688 && event.motion.x<834 && event.motion.y>403 && event.motion.y<475)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(688, 403, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>403 && event.motion.y<474)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(887, 403, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>403 && event.motion.y<474)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(1086, 403, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>516 && event.motion.y<587)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(688, 516, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>516 && event.motion.y<587)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(887, 516, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>516 && event.motion.y<587)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(1086, 516, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>688 && event.motion.x<834 && event.motion.y>628 && event.motion.y<699)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(688, 628, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>887 && event.motion.x<1033 && event.motion.y>628 && event.motion.y<699)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(887, 628, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else if (event.motion.x>1086 && event.motion.x<1232 && event.motion.y>628 && event.motion.y<699)
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    createRectTimeChoice(1086, 628, 146, 71)
-                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
-                    SDL_RenderPresent(render);
-                }
-                else
-                {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
-                    SDL_RenderPresent(render);
-                }
+
                 break;
             case SDL_QUIT:
                 continuer = 0;
@@ -3135,39 +3076,103 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x>688 && event.button.x<834 && event.button.y>403 && event.button.y<475)
                 {
-                    //1, 1
+                    focus=1;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(688, 403, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>887 && event.button.x<1033 && event.button.y>403 && event.button.y<474)
                 {
-                    //1, 2
+                    focus=2;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(887, 403, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>1086 && event.button.x<1232 && event.button.y>403 && event.button.y<474)
                 {
-                    //1, 3
+                    focus=3;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(1086, 403, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>688 && event.button.x<834 && event.button.y>516 && event.button.y<587)
                 {
-                    //2, 1
+                    focus=4;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(688, 516, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>887 && event.button.x<1033 && event.button.y>516 && event.button.y<587)
                 {
-                    //2, 2
+                    focus=5;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(887, 516, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>1086 && event.button.x<1232 && event.button.y>516 && event.button.y<587)
                 {
-                    //2, 3
+                    focus=6;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(1086, 516, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>688 && event.button.x<834 && event.button.y>628 && event.button.y<699)
                 {
-                    //3, 1
+                    focus=7;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(688, 628, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>887 && event.button.x<1033 && event.button.y>628 && event.button.y<699)
                 {
-                    //3, 2
+                    focus=8;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(887, 628, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x>1086 && event.button.x<1232 && event.button.y>628 && event.button.y<699)
                 {
-                    //3, 3
+                    focus=9;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    createRectTimeChoice(1086, 628, 146, 71)
+                    SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    SDL_RenderPresent(render);
+                }
+                else if (event.button.x>639 && event.button.x<944 && event.button.y>777 && event.button.y<870)
+                {
+                    //Previous Page
+                }
+                else if (event.button.x>976 && event.button.x<1280 && event.button.y>777 && event.button.y<870)
+                {
+                    if (focus!=0)
+                    {
+                        continuer=0;
+                    }
+                    //Validation
+                }
+                else
+                {
+                    focus=0;
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    SDL_RenderPresent(render);
                 }
                 break;
             case SDL_KEYDOWN:
