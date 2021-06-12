@@ -2437,6 +2437,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Surface* imageButtonBackground = NULL;
     SDL_Texture* textureButtonBackground = NULL;
     ALLImageAndTransparencyINIT(imageButtonBackground, textureButtonBackground, ButtonInscriptionBMP, render)
+    //Issue above
 
     SDL_Surface* imageHoverButtonBackground = NULL;
     SDL_Texture* textureHoverButtonBackground = NULL;
@@ -3405,8 +3406,8 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
-    inscriptionPage(window, render);
-    //loginPage(window, render);
+    //inscriptionPage(window, render);
+    loginPage(window, render);
     //Launch the mainBoard
     //mainBoard(window, render);
     //menuPage(window, render);
