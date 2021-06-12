@@ -1310,7 +1310,6 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 //Definition of images path
 #define BoardBgImageBMP "images/board/bg.bmp"
-#define MenuBGImageBMP "images/menu.bmp"
 #define ConnexionBGImageBMP "images/connexion/connexionBG.bmp"
 #define InscriptionBGImageBMP "images/inscription/inscriptionBG.bmp"
 #define OptionImageBMP "images/option.bmp"
@@ -1321,6 +1320,9 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define ButtonConnexionBMP "images/connexion/buttonConnexion.bmp"
 #define HoverButtonInscriptionBMP "images/inscription/hoverButtonInscription.bmp"
 #define ButtonInscriptionBMP "images/inscription/buttonInscription.bmp"
+#define ModeSelectionBGImageBMP "images/main_menu/gameMoveBG.bmp"
+#define TempsPartieBGImageBMP "images/main_menu/tempsPartieBG.bmp"
+#define MenuBGImageBMP "images/main_menu/menu.bmp"
 
 #define BlackPawnImageBMP "images/board/black/pawn.bmp"
 #define BlackKnightImageBMP "images/board/black/knight.bmp"
@@ -1347,11 +1349,11 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 //Definition of pseudo-function
 #define ALLImageAndTransparencyINIT(X,Y, Z, render)   X = SDL_LoadBMP(Z);\
-                            SDL_SetColorKey(X, SDL_TRUE, SDL_MapRGB(X->format, transparentColor));\
-                            Y = SDL_CreateTextureFromSurface(render, X);
+        SDL_SetColorKey(X, SDL_TRUE, SDL_MapRGB(X->format, transparentColor));\
+        Y = SDL_CreateTextureFromSurface(render, X);
 
 #define ALLImageINIT(X,Y, Z, render)   X = SDL_LoadBMP(Z);\
-                            Y = SDL_CreateTextureFromSurface(render, X);
+        Y = SDL_CreateTextureFromSurface(render, X);    
 
 #define DrawImage(rect, rectP, i, texture) rect.x= (xMinBoard+(i%8)*lenSquare);\
             rect.y= (yMinBoard+(i/8)*lenSquare);\
@@ -2277,7 +2279,6 @@ int dayCorrectInThisMonth(int day,int month, int year)
 
 void loginPage(SDL_Window* window, SDL_Renderer* render)
 {
-    
     CreateRenderInNewWindow(window, render)
 
     SDL_Surface* imageConnexionBackground = NULL;
@@ -2414,7 +2415,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                         break;
                 }
         }
-        SDL_Delay(5);
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
@@ -2437,7 +2437,6 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Surface* imageButtonBackground = NULL;
     SDL_Texture* textureButtonBackground = NULL;
     ALLImageAndTransparencyINIT(imageButtonBackground, textureButtonBackground, ButtonInscriptionBMP, render)
-    //Issue above
 
     SDL_Surface* imageHoverButtonBackground = NULL;
     SDL_Texture* textureHoverButtonBackground = NULL;
@@ -2862,7 +2861,85 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
                         break;
                 }
         }
-        SDL_Delay(5);
+    }
+    SDL_RenderClear(render);
+    SDL_RenderPresent(render);
+}
+
+
+
+void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
+{
+    
+    CreateRenderInNewWindow(window, render)
+
+    SDL_Surface* imageModeSelectionBackground = NULL;
+    SDL_Texture* textureModeSelectionBackground = NULL;
+    ALLImageINIT(imageModeSelectionBackground, textureModeSelectionBackground, ModeSelectionBGImageBMP, render)
+
+    SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+
+    SDL_Surface* imageHoverButtonBackground = NULL;
+    SDL_Texture* textureHoverButtonBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonInscriptionBMP, render)
+    SDL_Rect rectButton;
+    rectButton.x= 798;
+    rectButton.y= 882;
+    rectButton.h= 81;
+    rectButton.w= 323;
+
+    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
+    TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+    SDL_Color color = { 0, 0, 0};
+
+
+    SDL_Surface * surfaceInscription1 = TTF_RenderText_Solid(font,"", color);
+    SDL_Texture * textureInscription1 = SDL_CreateTextureFromSurface(render, surfaceInscription1);    
+    int texWInscription1 = 729;
+    int texHInscription1 = 38;
+    SDL_QueryTexture(textureInscription1, NULL, NULL, &texWInscription1, &texHInscription1);
+    SDL_Rect sdlRectInscription1 = {595, 349, texWInscription1, texHInscription1};
+    SDL_RenderCopy(render, textureInscription1, NULL, &sdlRectInscription1);
+
+
+    SDL_RenderPresent(render);
+
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x >798 && event.motion.x <1121 && event.motion.y >881 && event.motion.y <963)
+                {
+                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureButtonBackground, NULL, &rectButton);
+                    SDL_RenderPresent(render);
+                }
+                break;
+            case SDL_QUIT:
+                continuer = 0;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+            446, 370
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    continuer=0;
+                }
+                else if (event.button.x>446 && event.button.y>370 && event.button.x<496 && event.button.y<426 )
+                {
+                    continuer=0;
+                }
+                break;
+            case SDL_KEYDOWN:
+                break;
+        }
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
@@ -2911,6 +2988,10 @@ void menuPage(SDL_Window* window, SDL_Renderer* render)
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
 }
+
+
+
+
 
 
 void mainBoard(SDL_Window* window,SDL_Renderer* render)
@@ -3406,8 +3487,9 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     
+    modeSelectionPage(window, render);
     //inscriptionPage(window, render);
-    loginPage(window, render);
+    //loginPage(window, render);
     //Launch the mainBoard
     //mainBoard(window, render);
     //menuPage(window, render);
