@@ -4229,10 +4229,10 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-
+    printf("123");
     int nextPage=2;
     CreateRenderInNewWindow(window, render)
-    while (nextPage!=1)
+    while (1==1)
     {
         int test1 = nextPage;
         if (nextPage==2)
@@ -4258,6 +4258,10 @@ int main(int argc, char* argv[])
         else if (nextPage==7)
         {
             timeSelectionPage(window, render, &nextPage);
+        }
+        else
+        {
+            mainMenuPage(window, render, &nextPage);
         }
         int test2 = nextPage;
         if (test1==test2)
