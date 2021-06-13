@@ -1342,6 +1342,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define HoverAmisMainMenuBMP "images/main_menu/hoverAmis.bmp"
 #define QuitterMainMenuBMP "images/main_menu/quitter.bmp"
 #define HoverQuitterMainMenuBMP "images/main_menu/hoverQuitter.bmp"
+#define ExitConfirmationBMP "images/exitConfirmation.bmp"
 
 
 #define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"
@@ -2328,6 +2329,41 @@ int dayCorrectInThisMonth(int day,int month, int year)
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
 
+
+int doYouWantToQuitNoTime(SDL_Renderer* render)
+{
+    SDL_Surface* imageExitConfirmationBackground = NULL;
+    SDL_Texture* textureExitConfirmationBackground = NULL;
+    ALLImageAndTransparencyINIT(imageExitConfirmationBackground, textureExitConfirmationBackground, ExitConfirmationBMP, render)
+    SDL_RenderCopy(render, textureExitConfirmationBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>604 && event.button.x<1315 && event.button.y>386 && event.button.y<609)
+                {
+                    if (event.button.x>756 && event.button.x<901 && event.button.y>514 && event.button.y<566)
+                    {
+                        return 0;
+                    }
+                    else if (event.button.x>1019 && event.button.x<1164 && event.button.y>514 && event.button.y<566)
+                    {
+                        return 1;
+                    }
+                }
+                else
+                {
+                    return 0;
+                }
+                break;
+        }
+    }
+}
 void loginPage(SDL_Window* window, SDL_Renderer* render)
 {
     CreateRenderInNewWindow(window, render)
@@ -3431,7 +3467,6 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
             case SDL_MOUSEBUTTONDOWN:
                 if (slideAmis==1)
                 {
-                    /////
                     if (event.button.x<403 && event.button.y>34)
                     {
                         
@@ -3451,7 +3486,16 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
-                    continuer=0;
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        continuer=0;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
                 }
                 else if (event.button.x>1043 && event.button.x<1595 && event.button.y>340 && event.button.y<955)
                 {
@@ -3463,13 +3507,27 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637)
                 {
-                    slideAmis=1;
-                    for (int i=8; i>-1; i--)
+                    if (slideAmis==0)
                     {
-                        rectButtonFriendList.x= -50*i;
-                        SDL_RenderCopy(render, textureMakeFriendListBackground, NULL, &rectButtonFriendList);
-                        SDL_RenderPresent(render);
-                        SDL_Delay(5);
+                        slideAmis=1;
+                        for (int i=8; i>-1; i--)
+                        {
+                            rectButtonFriendList.x= -50*i;
+                            SDL_RenderCopy(render, textureMakeFriendListBackground, NULL, &rectButtonFriendList);
+                            SDL_RenderPresent(render);
+                            SDL_Delay(5);
+                        }
+                    }
+                    else
+                    {
+                        slideAmis=0;
+                        for (int i=8; i>-1; i--)
+                        {
+                            rectButtonFriendListHider.x= -50*i;
+                            SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
+                            SDL_RenderPresent(render);
+                            SDL_Delay(5);
+                        }
                     }
                     //Amis
                 }
@@ -3479,14 +3537,22 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>773 && event.button.y<866)
                 {
-                    continuer=0;
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        continuer=0;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
                     //Quitter
                 }
                 break;
             case SDL_KEYDOWN: 
                 break;
         }
-        SDL_Delay(5);
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
