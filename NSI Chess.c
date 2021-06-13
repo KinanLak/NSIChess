@@ -8,6 +8,7 @@
 #include "sqlite3.h"
 //#include <mysql.h>
 
+
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
 struct MoveStructure
@@ -3423,6 +3424,20 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
+                if (slideAmis==1)
+                {
+                    /////
+                    if (event.button.x<403 && event.button.y>34)
+                    {
+                        
+                    }
+                    else
+
+                    {
+                        slideAmis=0;
+                        //Hide slideAmis
+                    }
+                }
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
                     continuer=0;
@@ -3450,11 +3465,6 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                     continuer=0;
                     //Quitter
                 }
-                if (slideAmis==1)
-                {
-                    /////
-                }
-                
                 break;
             case SDL_KEYDOWN: 
                 break;
