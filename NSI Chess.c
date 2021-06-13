@@ -3440,8 +3440,13 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
 
                     {
                         slideAmis=0;
-                        SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
-                        SDL_RenderPresent(render);
+                        for (int i=8; i>-1; i--)
+                        {
+                            rectButtonFriendListHider.x= -50*i;
+                            SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
+                            SDL_RenderPresent(render);
+                            SDL_Delay(5);
+                        }
                     }
                 }
                 if (event.button.x >=1875 && event.button.y <=45)
