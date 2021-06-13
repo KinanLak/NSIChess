@@ -1332,6 +1332,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define HoverPuzzleMainMenuBMP "images/main_menu/puzzleButtonHover.bmp"
 #define PuzzleMainMenuBMP "images/main_menu/puzzleButton.bmp"
 #define FriendListMainMenuBMP "images/main_menu/friendList.bmp"
+#define FriendListHiderMainMenuBMP "images/main_menu/friendListHider.bmp"
 #define JouerMainMenuBMP "images/main_menu/jouer.bmp"
 #define HoverJouerMainMenuBMP "images/main_menu/hoverJouer.bmp"
 #define AmisMainMenuBMP "images/main_menu/amis.bmp"
@@ -3356,10 +3357,14 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     rectButtonFriendList.w= 402;
     rectButtonFriendList.h= 1035;
     
-    SDL_Surface* imageFriendListBackground = NULL;
-    SDL_Texture* textureFriendListBackground = NULL;
-    ALLImageAndTransparencyINIT(imageFriendListBackground, textureFriendListBackground, FriendListMainMenuBMP, render)
-
+    SDL_Surface* imageFriendListHiderBackground = NULL;
+    SDL_Texture* textureFriendListHiderBackground = NULL;
+    ALLImageAndTransparencyINIT(imageFriendListHiderBackground, textureFriendListHiderBackground, FriendListHiderMainMenuBMP, render)
+    SDL_Rect rectButtonFriendListHider;
+    rectButtonFriendListHider.x= 0;
+    rectButtonFriendListHider.y= 0;
+    rectButtonFriendListHider.w= 402;
+    rectButtonFriendListHider.h= 1080;
 
     SDL_Event event;
     int continuer = 1;
@@ -3435,7 +3440,8 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
 
                     {
                         slideAmis=0;
-                        //Hide slideAmis
+                        SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
+                        SDL_RenderPresent(render);
                     }
                 }
                 if (event.button.x >=1875 && event.button.y <=45)
@@ -3452,8 +3458,14 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637)
                 {
-                    SDL_RenderCopy(render, textureMakeFriendListBackground, NULL, &rectButtonFriendList);
-                    SDL_RenderPresent(render);
+                    slideAmis=1;
+                    for (int i=8; i>-1; i--)
+                    {
+                        rectButtonFriendList.x= -50*i;
+                        SDL_RenderCopy(render, textureMakeFriendListBackground, NULL, &rectButtonFriendList);
+                        SDL_RenderPresent(render);
+                        SDL_Delay(5);
+                    }
                     //Amis
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>659 && event.button.y<752)
