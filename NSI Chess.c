@@ -2325,6 +2325,68 @@ int dayCorrectInThisMonth(int day,int month, int year)
                     keyPressedConnexion(SDLK_EXCLAIM, 33, -1, -1, limitChar)\
                     keyPressedConnexion(SDLK_SEMICOLON, -1, 46, -1, limitChar)\
                 }
+
+#define emptyChamps(x, y) SDL_Surface * surfaceChampsVide = TTF_RenderText_Solid(fontBold,"Champs vide", colorIncorrect);\
+                        SDL_Texture * textureChampsVide = SDL_CreateTextureFromSurface(render, surfaceChampsVide);\
+                        int texWChamps1 = 729;\
+                        int texHChamps1 = 38;\
+                        SDL_QueryTexture(textureChampsVide, NULL, NULL, &texWChamps1, &texHChamps1);\
+                        SDL_Rect sdlRectChamps1 = {x, y, texWChamps1, texHChamps1};\
+                        SDL_RenderCopy(render, textureChampsVide, NULL, &sdlRectChamps1);
+
+#define champsErrorText(x, y, text) SDL_Surface * surfaceChampsVide = TTF_RenderText_Solid(fontBold,text, colorIncorrect);\
+                        SDL_Texture * textureChampsVide = SDL_CreateTextureFromSurface(render, surfaceChampsVide);\
+                        int texWChamps1 = 729;\
+                        int texHChamps1 = 38;\
+                        SDL_QueryTexture(textureChampsVide, NULL, NULL, &texWChamps1, &texHChamps1);\
+                        SDL_Rect sdlRectChamps1 = {x, y, texWChamps1, texHChamps1};\
+                        SDL_RenderCopy(render, textureChampsVide, NULL, &sdlRectChamps1);
+
+
+int emailFormatCorrect(char* string, int stringSize)
+{
+    int at=0;
+    int dot=0;
+    if (stringSize <5)
+    {
+        return 0;
+    }
+    for (int i=0; i<stringSize; i++)
+    {
+        if (string[i]==64)
+        {
+            at+=1;
+        }
+        else if (string[i]==46)
+        {
+            dot+=1;
+        }
+    }
+    if (at==1 && dot>0)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+int passwordSame(char* string1, char* string2, int sizeString1, int sizeString2)
+{
+    if (sizeString1 != sizeString2)
+    {
+        return 0;
+    }
+    for (int i=0; i<sizeString1; i++)
+    {
+        if (string1[i] != string2[i])
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
 //---------------------------------------------------------------------------------
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
@@ -2381,13 +2443,15 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     ALLImageAndTransparencyINIT(imageHoverButtonBackground, textureHoverButtonBackground, HoverButtonConnexionBMP, render)
     SDL_Rect rectButton;
     rectButton.x= 797;
-    rectButton.y= 740;
+    rectButton.y= 739;
     rectButton.h= 81;
     rectButton.w= 323;
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
+    TTF_Font * fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
     SDL_Color color = { 0, 0, 0};
+    SDL_Color colorIncorrect = {255, 128, 155};
     SDL_Surface * surfaceConnexion1 = TTF_RenderText_Solid(font,"", color);
     SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);    
     int texWConnexion1 = 729;
@@ -2440,6 +2504,20 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderCopy(render, textureButtonBackground, NULL, &rectButton);
                     SDL_RenderPresent(render);
                 }
+                if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
+                {
+                    SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+                    SDL_RenderDrawLine(render, 853, 889, 1070, 889);
+                    SDL_RenderDrawLine(render, 890, 929, 1037, 929);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(render, 29, 137, 228, 255);
+                    SDL_RenderDrawLine(render, 853, 889, 1070, 889);
+                    SDL_RenderDrawLine(render, 890, 929, 1037, 929);
+                    SDL_RenderPresent(render);
+                }
                 break;
             case SDL_QUIT:
                 continuer = 0;
@@ -2447,7 +2525,16 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
-                    continuer=0;
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        continuer=0;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
                 }
                 if (event.button.x >593 && event.button.y > 529 && event.button.x <1324 && event.button.y < 569)
                 {
@@ -2467,7 +2554,35 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x>797 && event.button.y>740 && event.button.x <1120 && event.button.y<821)
                 {
-                    //Send request
+                    if (cptNumberOfValuesConnexion1==0)
+                    {
+                        emptyChamps(714, 484);
+                        SDL_RenderPresent(render);
+                    }
+                    else if (cptNumberOfValuesConnexion2==0)
+                    {
+                        emptyChamps(840, 603);
+                        SDL_RenderPresent(render);
+                    }
+                    else
+                    {
+                        //Send request if True (need sql)
+
+                        //Error if false
+                        SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
+                        SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
+                        int texWChampsIncorrect = 729;
+                        int texHChampsIncorrect = 38;
+                        SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
+                        SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
+                        SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
+                        SDL_RenderPresent(render);
+
+                    }
+                }
+                else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
+                {
+                    //Go to inscription page
                 }
                 else
                 {
@@ -2548,8 +2663,10 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
     rectButton.w= 323;
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
+    TTF_Font * fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
     SDL_Color color = { 0, 0, 0};
+    SDL_Color colorIncorrect = {255, 128, 155};
 
 
     SDL_Surface * surfaceInscription1 = TTF_RenderText_Solid(font,"", color);
@@ -2720,16 +2837,75 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x >798 && event.button.x <1121 && event.button.y >881 && event.button.y <963)
                 {
-                    //Test date:
-                    if (cptNumberOfValuesInscription3==10)
+                    if (cptNumberOfValuesInscription1==0)
+                    {
+                        emptyChamps(700, 304);
+                        SDL_RenderPresent(render);
+                    }
+                    else if (cptNumberOfValuesInscription2==0)
+                    {
+                        emptyChamps(740, 423);
+                        SDL_RenderPresent(render);
+                    }
+                    else if (cptNumberOfValuesInscription3==0)
+                    {
+                        emptyChamps(995, 464);
+                        SDL_RenderPresent(render);
+                    }
+                    else if (cptNumberOfValuesInscription4==0)
+                    {
+                        emptyChamps(707, 536);
+                        SDL_RenderPresent(render);
+                    }
+                    else if (cptNumberOfValuesInscription5==0)
+                    {
+                        emptyChamps(843, 650);
+                        SDL_RenderPresent(render);
+                    }
+                    else if (cptNumberOfValuesInscription6==0)
+                    {
+                        emptyChamps(842, 764);
+                        SDL_RenderPresent(render);
+                    }
+                    else if (cptNumberOfValuesInscription3==10)
                     {
                         int day = (strPointeurInscription3[0]-48)*10 + (strPointeurInscription3[1]-48);
                         int month = (strPointeurInscription3[3]-48)*10 + (strPointeurInscription3[4]-48);
                         int year = (strPointeurInscription3[6]-48)*1000 + (strPointeurInscription3[7]-48)*100 + (strPointeurInscription3[8]-48)*10 + (strPointeurInscription3[9]-48);
                         if (day<32 && day>0 && month<13 && month>0 && year>1900 && year<2021 && dayCorrectInThisMonth(day, month, year))
                         {
-                            continuer=0;
                         }
+                        else
+                        {
+                            champsErrorText(995, 514, "Date incorrecte");
+                            SDL_RenderPresent(render);
+                        }
+                    }
+                    else if (cptNumberOfValuesInscription3!=10)
+                    {
+                        champsErrorText(995, 514, "Date incomplete");
+                        SDL_RenderPresent(render);
+                    }
+                    else if (emailFormatCorrect(strPointeurInscription4, cptNumberOfValuesInscription4)==0)
+                    {
+                        SDL_RenderClear(render);
+                        champsErrorText(707, 536, "Format de l'email incorrect");
+                        SDL_RenderPresent(render);
+                    }
+                    else if (emailFormatCorrect(strPointeurInscription4, cptNumberOfValuesInscription4)!=0)
+                    {
+                        SDL_RenderClear(render);
+                        champsErrorText(707, 536, "Format de l'email incorrect");
+                        SDL_RenderPresent(render);
+                    }
+                    else if (passwordSame(strInscription5, strInscription6, cptNumberOfValuesInscription5, cptNumberOfValuesInscription6)==0)
+                    {
+                        champsErrorText(842, 764, "Confirmation différente du mot de passe");
+                        SDL_RenderPresent(render);
+                    }
+                    else
+                    {
+                        continuer=0;
                     }
 
                     //Send request
@@ -4061,11 +4237,11 @@ int main(int argc, char* argv[])
     
     //timeSelectionPage(window, render);
     //modeSelectionPage(window, render);
-    //inscriptionPage(window, render);
+    inscriptionPage(window, render);
     //loginPage(window, render);
     //Launch the mainBoard
     //mainBoard(window, render);
-    mainMenuPage(window, render);
+    //mainMenuPage(window, render);
 
     
     //Destruction of the window
