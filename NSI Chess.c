@@ -1330,6 +1330,16 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define HoverLancerTimeBMP "images/main_menu/hoverLancer.bmp"
 #define HoverPuzzleMainMenuBMP "images/main_menu/puzzleButtonHover.bmp"
 #define PuzzleMainMenuBMP "images/main_menu/puzzleButton.bmp"
+#define FriendListMainMenuBMP "images/main_menu/friendList.bmp"
+#define JouerMainMenuBMP "images/main_menu/jouer.bmp"
+#define HoverJouerMainMenuBMP "images/main_menu/hoverJouer.bmp"
+#define AmisMainMenuBMP "images/main_menu/amis.bmp"
+#define HoverAmisMainMenuBMP "images/main_menu/hoverAmis.bmp"
+#define OptionsMainMenuBMP "images/main_menu/options.bmp"
+#define HoverOptionsMainMenuBMP "images/main_menu/hoverOptions.bmp"
+#define HoverAmisMainMenuBMP "images/main_menu/hoverAmis.bmp"
+#define QuitterMainMenuBMP "images/main_menu/quitter.bmp"
+#define HoverQuitterMainMenuBMP "images/main_menu/hoverQuitter.bmp"
 
 
 #define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"
@@ -3279,61 +3289,76 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     //Jouer
     SDL_Surface* imageHoverJouerBackground = NULL;
     SDL_Texture* textureHoverJouerBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverJouerBackground, textureHoverJouerBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverJouerBackground, textureHoverJouerBackground, HoverJouerMainMenuBMP, render)
     SDL_Rect rectButtonJouer;
     rectButtonJouer.x= 452;
     rectButtonJouer.y= 430;
-    rectButtonJouer.w= 0;//Checker images
-    rectButtonJouer.h= 0;//Checker images
+    rectButtonJouer.w= 304;
+    rectButtonJouer.h= 92;
     
     SDL_Surface* imageJouerBackground = NULL;
     SDL_Texture* textureJouerBackground = NULL;
-    ALLImageAndTransparencyINIT(imageJouerBackground, textureJouerBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageJouerBackground, textureJouerBackground, JouerMainMenuBMP, render)
 
 
     //Amis
     SDL_Surface* imageHoverAmisBackground = NULL;
     SDL_Texture* textureHoverAmisBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverAmisBackground, textureHoverAmisBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverAmisBackground, textureHoverAmisBackground, HoverAmisMainMenuBMP, render)
     SDL_Rect rectButtonAmis;
     rectButtonAmis.x= 452;
     rectButtonAmis.y= 545;
-    rectButtonAmis.w= 0;//Checker images
-    rectButtonAmis.h= 0;//Checker images
+    rectButtonAmis.w= 304;
+    rectButtonAmis.h= 92;
     
     SDL_Surface* imageAmisBackground = NULL;
     SDL_Texture* textureAmisBackground = NULL;
-    ALLImageAndTransparencyINIT(imageAmisBackground, textureAmisBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageAmisBackground, textureAmisBackground, AmisMainMenuBMP, render)
 
 
     //Options
     SDL_Surface* imageHoverOptionsBackground = NULL;
     SDL_Texture* textureHoverOptionsBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverOptionsBackground, textureHoverOptionsBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverOptionsBackground, textureHoverOptionsBackground, HoverOptionsMainMenuBMP, render)
     SDL_Rect rectButtonOptions;
     rectButtonOptions.x= 452;
     rectButtonOptions.y= 660;
-    rectButtonOptions.w= 0;//Checker images
-    rectButtonOptions.h= 0;//Checker images
+    rectButtonOptions.w= 304;
+    rectButtonOptions.h= 92;
     
     SDL_Surface* imageOptionsBackground = NULL;
     SDL_Texture* textureOptionsBackground = NULL;
-    ALLImageAndTransparencyINIT(imageOptionsBackground, textureOptionsBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageOptionsBackground, textureOptionsBackground, OptionsMainMenuBMP, render)
 
 
     //Quitter
     SDL_Surface* imageHoverQuitterBackground = NULL;
     SDL_Texture* textureHoverQuitterBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverQuitterBackground, textureHoverQuitterBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverQuitterBackground, textureHoverQuitterBackground, HoverQuitterMainMenuBMP, render)
     SDL_Rect rectButtonQuitter;
     rectButtonQuitter.x= 452;
     rectButtonQuitter.y= 774;
-    rectButtonQuitter.w= 0;//Checker images
-    rectButtonQuitter.h= 0;//Checker images
+    rectButtonQuitter.w= 304;
+    rectButtonQuitter.h= 92;
     
     SDL_Surface* imageQuitterBackground = NULL;
     SDL_Texture* textureQuitterBackground = NULL;
-    ALLImageAndTransparencyINIT(imageQuitterBackground, textureQuitterBackground, MenuBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageQuitterBackground, textureQuitterBackground, QuitterMainMenuBMP, render)
+
+    //FriendList
+    SDL_Surface* imageMakeFriendListBackground = NULL;
+    SDL_Texture* textureMakeFriendListBackground = NULL;
+    ALLImageAndTransparencyINIT(imageMakeFriendListBackground, textureMakeFriendListBackground, FriendListMainMenuBMP, render)
+    SDL_Rect rectButtonFriendList;
+    rectButtonFriendList.x= 0;
+    rectButtonFriendList.y= 45;
+    rectButtonFriendList.w= 402;
+    rectButtonFriendList.h= 1035;
+    
+    SDL_Surface* imageFriendListBackground = NULL;
+    SDL_Texture* textureFriendListBackground = NULL;
+    ALLImageAndTransparencyINIT(imageFriendListBackground, textureFriendListBackground, FriendListMainMenuBMP, render)
+
 
     SDL_Event event;
     int continuer = 1;
@@ -3355,35 +3380,43 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 if(event.motion.x>451 && event.motion.x<756 && event.motion.y>429 && event.motion.y<522)
                 {
-                    //Jouer
+                    SDL_RenderCopy(render, textureHoverJouerBackground, NULL, &rectButtonJouer);
+                    SDL_RenderPresent(render);
                 }
                 else
                 {
-                    //Not Jouer
+                    SDL_RenderCopy(render, textureJouerBackground, NULL, &rectButtonJouer);
+                    SDL_RenderPresent(render);
                 }
                 if(event.motion.x>451 && event.motion.x<756 && event.motion.y>544 && event.motion.y<637)
                 {
-                    //Amis
+                    SDL_RenderCopy(render, textureHoverAmisBackground, NULL, &rectButtonAmis);
+                    SDL_RenderPresent(render);
                 }
                 else
                 {
-                    //Not Amis
+                    SDL_RenderCopy(render, textureAmisBackground, NULL, &rectButtonAmis);
+                    SDL_RenderPresent(render);
                 }
                 if(event.motion.x>451 && event.motion.x<756 && event.motion.y>659 && event.motion.y<752)
                 {
-                    //Options
+                    SDL_RenderCopy(render, textureHoverOptionsBackground, NULL, &rectButtonOptions);
+                    SDL_RenderPresent(render);
                 }
                 else
                 {
-                    //Not Options
+                    SDL_RenderCopy(render, textureOptionsBackground, NULL, &rectButtonOptions);
+                    SDL_RenderPresent(render);
                 }
                 if(event.motion.x>451 && event.motion.x<756 && event.motion.y>773 && event.motion.y<866)
                 {
-                    //Quitter
+                    SDL_RenderCopy(render, textureHoverQuitterBackground, NULL, &rectButtonQuitter);
+                    SDL_RenderPresent(render);
                 }
                 else
                 {
-                    //Not Quitter
+                    SDL_RenderCopy(render, textureQuitterBackground, NULL, &rectButtonQuitter);
+                    SDL_RenderPresent(render);
                 }
                 break;
             case SDL_QUIT:
@@ -3404,20 +3437,24 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637)
                 {
+                    SDL_RenderCopy(render, textureMakeFriendListBackground, NULL, &rectButtonFriendList);
+                    SDL_RenderPresent(render);
                     //Amis
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>659 && event.button.y<752)
                 {
-                    //Otpions
+                    //Options
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>773 && event.button.y<866)
                 {
+                    continuer=0;
                     //Quitter
                 }
                 if (slideAmis==1)
                 {
                     /////
                 }
+                
                 break;
             case SDL_KEYDOWN: 
                 break;
