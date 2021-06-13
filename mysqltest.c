@@ -19,13 +19,14 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (mysql_real_connect(con, "52.47.124.122", "user", "nathanpute",
-                           "db", 3306, NULL, 0) == NULL)
+    if (mysql_real_connect(con, "35.181.56.11", "request", "",
+                           "lightdb", 3306, NULL, 0) == NULL)
     {
+        printf("Non connecte\n");
         finish_with_error(con);
     }
     printf("Connecté");
-    if (mysql_query(con, "SELECT * FROM User"))
+    if (mysql_query(con, "SELECT COUNT(*) FROM User"))
     {
         finish_with_error(con);
     }
