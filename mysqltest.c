@@ -20,17 +20,17 @@ int main(int argc, char **argv)
     }
 
     if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123",
-                           "lightdb", 3306, NULL, 0) == NULL)
+                           "pokedex", 3306, NULL, 0) == NULL)
     {
         printf("Non connecte\n");
         finish_with_error(con);
     }
-    printf("Connecté\n");
+    printf("Connecte\n");
     if (mysql_query(con, "SELECT * FROM User"))
     {
         finish_with_error(con);
     }
-    printf("Requete effectué\n");
+    printf("Requete effectue\n");
     MYSQL_RES *result = mysql_store_result(con);
 
     if (result == NULL)
