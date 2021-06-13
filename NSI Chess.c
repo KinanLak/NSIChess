@@ -1328,20 +1328,50 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define RetourTimeBMP "images/main_menu/retour.bmp"
 #define LancerTimeBMP "images/main_menu/lancer.bmp"
 #define HoverLancerTimeBMP "images/main_menu/hoverLancer.bmp"
+#define HoverPuzzleMainMenuBMP "images/main_menu/puzzleButtonHover.bmp"
+#define PuzzleMainMenuBMP "images/main_menu/puzzleButton.bmp"
 
-#define BlackPawnImageBMP "images/board/black/pawn.bmp"
-#define BlackKnightImageBMP "images/board/black/knight.bmp"
-#define BlackKingImageBMP "images/board/black/king.bmp"
-#define BlackQueenImageBMP "images/board/black/queen.bmp"
-#define BlackRookImageBMP "images/board/black/rook.bmp"
-#define BlackBishopImageBMP "images/board/black/bishop.bmp"
 
-#define WhitePawnImageBMP "images/board/white/pawn.bmp"
-#define WhiteKnightImageBMP "images/board/white/knight.bmp"
-#define WhiteKingImageBMP "images/board/white/king.bmp"
-#define WhiteQueenImageBMP "images/board/white/queen.bmp"
-#define WhiteRookImageBMP "images/board/white/rook.bmp"
-#define WhiteBishopImageBMP "images/board/white/bishop.bmp"
+#define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"
+#define BlackKnightImageBMP "images/pieces/type1/black/knight.bmp"
+#define BlackKingImageBMP "images/pieces/type1/black/king.bmp"
+#define BlackQueenImageBMP "images/pieces/type1/black/queen.bmp"
+#define BlackRookImageBMP "images/pieces/type1/black/rook.bmp"
+#define BlackBishopImageBMP "images/pieces/type1/black/bishop.bmp"
+
+#define WhitePawnImageBMP "images/pieces/type1/white/pawn.bmp"
+#define WhiteKnightImageBMP "images/pieces/type1/white/knight.bmp"
+#define WhiteKingImageBMP "images/pieces/type1/white/king.bmp"
+#define WhiteQueenImageBMP "images/pieces/type1/white/queen.bmp"
+#define WhiteRookImageBMP "images/pieces/type1/white/rook.bmp"
+#define WhiteBishopImageBMP "images/pieces/type1/white/bishop.bmp"
+
+
+/*#define defineAllPiecesType1() #define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"\
+    #define BlackKnightImageBMP "images/pieces/type1/black/knight.bmp"\
+    #define BlackKingImageBMP "images/pieces/type1/black/king.bmp"\
+    #define BlackQueenImageBMP "images/pieces/type1/black/queen.bmp"\
+    #define BlackRookImageBMP "images/pieces/type1/black/rook.bmp"\
+    #define BlackBishopImageBMP "images/pieces/type1/black/bishop.bmp"\
+    #define WhitePawnImageBMP "images/pieces/type1/white/pawn.bmp"\
+    #define WhiteKnightImageBMP "images/pieces/type1/white/knight.bmp"\
+    #define WhiteKingImageBMP "images/pieces/type1/white/king.bmp"\
+    #define WhiteQueenImageBMP "images/pieces/type1/white/queen.bmp"\
+    #define WhiteRookImageBMP "images/pieces/type1/white/rook.bmp"\
+    #define WhiteBishopImageBMP "images/pieces/type1/white/bishop.bmp"
+
+#define undefinedAllPieces() #undef BlackPawnImageBMP\
+    #undef BlackKnightImageBMP\
+    #undef BlackKingImageBMP\
+    #undef BlackQueenImageBMP\
+    #undef BlackRookImageBMP\
+    #undef BlackBishopImageBMP\
+    #undef WhitePawnImageBMP\
+    #undef WhiteKnightImageBMP\
+    #undef WhiteKingImageBMP\
+    #undef WhiteQueenImageBMP\
+    #undef WhiteRookImageBMP\
+    #undef WhiteBishopImageBMP*/
 
 
 //Definition of files path
@@ -1366,7 +1396,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
             rect.w= 118;\
             SDL_RenderCopy(render, texture, NULL, rectP);
 
-#define CreateRenderInNewWindow(window, render) window = SDL_CreateWindow("Hello world", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_SWSURFACE);\
+#define CreateRenderInNewWindow(window, render) window = SDL_CreateWindow("Logames", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_SWSURFACE);\
     render = SDL_CreateRenderer(window, NOTHING, 0);
 
 
@@ -3228,26 +3258,28 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
     SDL_RenderPresent(render);
 
+    int slideAmis=0;
+
 
     //Puzzle
     SDL_Surface* imageHoverPuzzleBackground = NULL;
     SDL_Texture* textureHoverPuzzleBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverPuzzleBackground, textureHoverPuzzleBackground, /////, render)
+    ALLImageINIT(imageHoverPuzzleBackground, textureHoverPuzzleBackground, HoverPuzzleMainMenuBMP, render)
     SDL_Rect rectButtonPuzzle;
     rectButtonPuzzle.x= 1044;
     rectButtonPuzzle.y= 340;
-    rectButtonPuzzle.w= 0;//Checker images
-    rectButtonPuzzle.h= 0;//Checker images
+    rectButtonPuzzle.w= 551;
+    rectButtonPuzzle.h= 615;
     
     SDL_Surface* imagePuzzleBackground = NULL;
     SDL_Texture* texturePuzzleBackground = NULL;
-    ALLImageAndTransparencyINIT(imagePuzzleBackground, texturePuzzleBackground, /////, render)
+    ALLImageINIT(imagePuzzleBackground, texturePuzzleBackground, PuzzleMainMenuBMP, render)
 
 
     //Jouer
     SDL_Surface* imageHoverJouerBackground = NULL;
     SDL_Texture* textureHoverJouerBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverJouerBackground, textureHoverJouerBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageHoverJouerBackground, textureHoverJouerBackground, MenuBGImageBMP, render)
     SDL_Rect rectButtonJouer;
     rectButtonJouer.x= 452;
     rectButtonJouer.y= 430;
@@ -3256,13 +3288,13 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     
     SDL_Surface* imageJouerBackground = NULL;
     SDL_Texture* textureJouerBackground = NULL;
-    ALLImageAndTransparencyINIT(imageJouerBackground, textureJouerBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageJouerBackground, textureJouerBackground, MenuBGImageBMP, render)
 
 
     //Amis
     SDL_Surface* imageHoverAmisBackground = NULL;
     SDL_Texture* textureHoverAmisBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverAmisBackground, textureHoverAmisBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageHoverAmisBackground, textureHoverAmisBackground, MenuBGImageBMP, render)
     SDL_Rect rectButtonAmis;
     rectButtonAmis.x= 452;
     rectButtonAmis.y= 545;
@@ -3271,13 +3303,13 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     
     SDL_Surface* imageAmisBackground = NULL;
     SDL_Texture* textureAmisBackground = NULL;
-    ALLImageAndTransparencyINIT(imageAmisBackground, textureAmisBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageAmisBackground, textureAmisBackground, MenuBGImageBMP, render)
 
 
     //Options
     SDL_Surface* imageHoverOptionsBackground = NULL;
     SDL_Texture* textureHoverOptionsBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverOptionsBackground, textureHoverOptionsBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageHoverOptionsBackground, textureHoverOptionsBackground, MenuBGImageBMP, render)
     SDL_Rect rectButtonOptions;
     rectButtonOptions.x= 452;
     rectButtonOptions.y= 660;
@@ -3286,13 +3318,13 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     
     SDL_Surface* imageOptionsBackground = NULL;
     SDL_Texture* textureOptionsBackground = NULL;
-    ALLImageAndTransparencyINIT(imageOptionsBackground, textureOptionsBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageOptionsBackground, textureOptionsBackground, MenuBGImageBMP, render)
 
 
     //Quitter
     SDL_Surface* imageHoverQuitterBackground = NULL;
     SDL_Texture* textureHoverQuitterBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverQuitterBackground, textureHoverQuitterBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageHoverQuitterBackground, textureHoverQuitterBackground, MenuBGImageBMP, render)
     SDL_Rect rectButtonQuitter;
     rectButtonQuitter.x= 452;
     rectButtonQuitter.y= 774;
@@ -3301,7 +3333,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     
     SDL_Surface* imageQuitterBackground = NULL;
     SDL_Texture* textureQuitterBackground = NULL;
-    ALLImageAndTransparencyINIT(imageQuitterBackground, textureQuitterBackground, /////, render)
+    ALLImageAndTransparencyINIT(imageQuitterBackground, textureQuitterBackground, MenuBGImageBMP, render)
 
     SDL_Event event;
     int continuer = 1;
@@ -3310,6 +3342,50 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
         SDL_WaitEvent(&event);
         switch(event.type)
         {
+            case SDL_MOUSEMOTION:
+                if(event.motion.x>1043 && event.motion.x<1595 && event.motion.y>340 && event.motion.y<955)
+                {
+                    SDL_RenderCopy(render, textureHoverPuzzleBackground, NULL, &rectButtonPuzzle);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, texturePuzzleBackground, NULL, &rectButtonPuzzle);
+                    SDL_RenderPresent(render);
+                }
+                if(event.motion.x>451 && event.motion.x<756 && event.motion.y>429 && event.motion.y<522)
+                {
+                    //Jouer
+                }
+                else
+                {
+                    //Not Jouer
+                }
+                if(event.motion.x>451 && event.motion.x<756 && event.motion.y>544 && event.motion.y<637)
+                {
+                    //Amis
+                }
+                else
+                {
+                    //Not Amis
+                }
+                if(event.motion.x>451 && event.motion.x<756 && event.motion.y>659 && event.motion.y<752)
+                {
+                    //Options
+                }
+                else
+                {
+                    //Not Options
+                }
+                if(event.motion.x>451 && event.motion.x<756 && event.motion.y>773 && event.motion.y<866)
+                {
+                    //Quitter
+                }
+                else
+                {
+                    //Not Quitter
+                }
+                break;
             case SDL_QUIT:
                 continuer = 0;
                 break;
@@ -3317,6 +3393,30 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
                     continuer=0;
+                }
+                else if (event.button.x>1043 && event.button.x<1595 && event.button.y>340 && event.button.y<955)
+                {
+                    //Puzzle
+                }
+                else if (event.button.x>451 && event.button.x<756 && event.button.y>429 && event.button.y<522)
+                {
+                    //Jouer
+                }
+                else if (event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637)
+                {
+                    //Amis
+                }
+                else if (event.button.x>451 && event.button.x<756 && event.button.y>659 && event.button.y<752)
+                {
+                    //Otpions
+                }
+                else if (event.button.x>451 && event.button.x<756 && event.button.y>773 && event.button.y<866)
+                {
+                    //Quitter
+                }
+                if (slideAmis==1)
+                {
+                    /////
                 }
                 break;
             case SDL_KEYDOWN: 
@@ -3337,7 +3437,6 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
 {
 
     CreateRenderInNewWindow(window, render)
-
     initAllSurfaces()
     initAllTextures() 
 
