@@ -19,18 +19,18 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (mysql_real_connect(con, "35.181.56.11", "request", "",
+    if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123",
                            "lightdb", 3306, NULL, 0) == NULL)
     {
         printf("Non connecte\n");
         finish_with_error(con);
     }
-    printf("Connecté");
-    if (mysql_query(con, "SELECT COUNT(*) FROM User"))
+    printf("Connecté\n");
+    if (mysql_query(con, "SELECT * FROM User"))
     {
         finish_with_error(con);
     }
-    printf("Requete effectué");
+    printf("Requete effectué\n");
     MYSQL_RES *result = mysql_store_result(con);
 
     if (result == NULL)
