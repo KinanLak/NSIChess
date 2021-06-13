@@ -3553,6 +3553,10 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
             case SDL_KEYDOWN: 
                 break;
         }
+<<<<<<< Updated upstream
+=======
+        //SDL_Delay(5);
+>>>>>>> Stashed changes
     }
     SDL_RenderClear(render);
     SDL_RenderPresent(render);
@@ -4025,7 +4029,7 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
             SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
-            SDL_Delay(5);
+            //SDL_Delay(5);
         }
     }
     SDL_RenderClear(render);
