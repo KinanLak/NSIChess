@@ -2387,9 +2387,6 @@ int passwordSame(char* string1, char* string2, int sizeString1, int sizeString2)
     }
     return 1;
 }
-//---------------------------------------------------------------------------------
-//------------------------------------All Pages------------------------------------
-//---------------------------------------------------------------------------------
 
 
 int doYouWantToQuitNoTime(SDL_Renderer* render)
@@ -2426,9 +2423,16 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
         }
     }
 }
-void loginPage(SDL_Window* window, SDL_Renderer* render)
+
+//---------------------------------------------------------------------------------
+//------------------------------------All Pages------------------------------------
+//---------------------------------------------------------------------------------
+
+
+void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
-    CreateRenderInNewWindow(window, render)
+    //CreateRenderInNewWindow(window, render)
+    SDL_RenderClear(render);
 
     SDL_Surface* imageConnexionBackground = NULL;
     SDL_Texture* textureConnexionBackground = NULL;
@@ -2477,6 +2481,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     int cptNumberOfValuesConnexion1 = 0;
     int cptNumberOfValuesConnexion2 = 0;
     int focus = 0;
+    
     int leftShift=0;
     int rightShift=0;
     int leftAlt=0;
@@ -2567,22 +2572,24 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                     else
                     {
                         //Send request if True (need sql)
+                        *nextPage=5;
+                        continuer=0;
 
                         //Error if false
-                        SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
-                        SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
-                        int texWChampsIncorrect = 729;
-                        int texHChampsIncorrect = 38;
-                        SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
-                        SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
-                        SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
-                        SDL_RenderPresent(render);
-
+                        //SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
+                        //SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
+                        //int texWChampsIncorrect = 729;
+                        //int texHChampsIncorrect = 38;
+                        //SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
+                        //SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
+                        //SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
+                        //SDL_RenderPresent(render);
                     }
                 }
                 else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
                 {
-                    //Go to inscription page
+                    continuer=0;
+                    *nextPage=3;
                 }
                 else
                 {
@@ -2593,9 +2600,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
                     SDL_RenderPresent(render);
                 }
                 break;
-//----------------------------------------------
-//---Have to take into account the 'lock' key---
-//----------------------------------------------
             case SDL_KEYDOWN: 
                 allKeyConnexion()
                 showTextesConnexion()
@@ -2629,19 +2633,16 @@ void loginPage(SDL_Window* window, SDL_Renderer* render)
     SDL_DestroyTexture(textureHoverButtonBackground);
     SDL_DestroyTexture(textureConnexion1);
     SDL_DestroyTexture(textureConnexion2);
-
-    SDL_RenderClear(render);
-    SDL_RenderPresent(render);
-
 }
 
 
 
 
-void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
+void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     
-    CreateRenderInNewWindow(window, render)
+    //CreateRenderInNewWindow(window, render)
+    SDL_RenderClear(render);
 
     SDL_Surface* imageInscriptionBackground = NULL;
     SDL_Texture* textureInscriptionBackground = NULL;
@@ -2742,6 +2743,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
     int cptNumberOfValuesInscription6 = 0;
 
     int focus = 0;
+    
 
     int leftShift=0;
     int rightShift=0;
@@ -2785,7 +2787,8 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
                 }
                 else if (event.button.x >598 && event.button.y >225 && event.button.x <640 && event.button.y <269)
                 {
-                    //Back to Connexion
+                    continuer=0;
+                    *nextPage=2;
                 }
                 else if (event.button.x >593 && event.button.y > 347 && event.button.x <1322 && event.button.y < 385)
                 {
@@ -2889,20 +2892,22 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
                     else if (emailFormatCorrect(strPointeurInscription4, cptNumberOfValuesInscription4)==0)
                     {
                         SDL_RenderClear(render);
+                        SDL_RenderPresent(render);
                         champsErrorText(707, 536, "Format de l'email incorrect");
                         SDL_RenderPresent(render);
                     }
                     else if (emailFormatCorrect(strPointeurInscription4, cptNumberOfValuesInscription4)!=0)
                     {
                         SDL_RenderClear(render);
+                        SDL_RenderPresent(render);
                         champsErrorText(707, 536, "Format de l'email incorrect");
                         SDL_RenderPresent(render);
                     }
-                    else if (passwordSame(strInscription5, strInscription6, cptNumberOfValuesInscription5, cptNumberOfValuesInscription6)==0)
+                    /*else if (passwordSame(strInscription5, strInscription6, cptNumberOfValuesInscription5, cptNumberOfValuesInscription6)==0)
                     {
                         champsErrorText(842, 764, "Confirmation différente du mot de passe");
                         SDL_RenderPresent(render);
-                    }
+                    }*/
                     else
                     {
                         continuer=0;
@@ -3155,17 +3160,15 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_DestroyTexture(textureInscription4);
     SDL_DestroyTexture(textureInscription5);
     SDL_DestroyTexture(textureInscription6);
-
-    SDL_RenderClear(render);
-    SDL_RenderPresent(render);
 }
 
 
 
-void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
+void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     
-    CreateRenderInNewWindow(window, render)
+    //CreateRenderInNewWindow(window, render)
+    SDL_RenderClear(render);
 
     SDL_Surface* imageModeSelectionBackground = NULL;
     SDL_Texture* textureModeSelectionBackground = NULL;
@@ -3197,6 +3200,8 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
 
     SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
     SDL_RenderPresent(render);
+
+    
 
     SDL_Event event;
     int continuer = 1;
@@ -3270,17 +3275,15 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_DestroyTexture(textureOrdinateur);
     SDL_DestroyTexture(textureSelectionLocal);
     SDL_DestroyTexture(textureMultijoueur);
-
-    SDL_RenderClear(render);
-    SDL_RenderPresent(render);
 }
 
 
 
-void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
+void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     
-    CreateRenderInNewWindow(window, render)
+    //CreateRenderInNewWindow(window, render)
+    SDL_RenderClear(render);
 
     SDL_Surface* imageTempsPartieBackground = NULL;
     SDL_Texture* textureTempsPartieBackground = NULL;
@@ -3319,9 +3322,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
     SDL_Texture* textureLancerBackground = NULL;
     ALLImageAndTransparencyINIT(imageLancerBackground, textureLancerBackground, LancerTimeBMP, render)
 
-
     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
     SDL_RenderPresent(render);
+
+    
 
     SDL_Event event;
     int continuer=1, focus=0;
@@ -3465,15 +3469,14 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render)
                 break;
         }
     }
-    SDL_RenderClear(render);
-    SDL_RenderPresent(render);
 }
 
 
-void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
+void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     
-    CreateRenderInNewWindow(window, render)
+    //CreateRenderInNewWindow(window, render)
+    SDL_RenderClear(render);
 
     SDL_Surface* imageBackgroundMenu = NULL;
     SDL_Texture* textureBackgroundMenu = NULL;
@@ -3577,7 +3580,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
     rectButtonFriendListHider.y= 0;
     rectButtonFriendListHider.w= 402;
     rectButtonFriendListHider.h= 1080;
-
+    
     SDL_Event event;
     int continuer = 1;
     while (continuer)
@@ -3729,13 +3732,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
             case SDL_KEYDOWN: 
                 break;
         }
-<<<<<<< Updated upstream
-=======
-        //SDL_Delay(5);
->>>>>>> Stashed changes
     }
-    SDL_RenderClear(render);
-    SDL_RenderPresent(render);
 }
 
 
@@ -3743,10 +3740,11 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render)
 
 
 
-void mainBoard(SDL_Window* window,SDL_Renderer* render)
+int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
 
-    CreateRenderInNewWindow(window, render)
+    //CreateRenderInNewWindow(window, render)
+    SDL_RenderClear(render);
     initAllSurfaces()
     initAllTextures() 
 
@@ -3804,7 +3802,6 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     displayAllpiecesInRender()
     SDL_RenderPresent(render);
-
 
     SDL_Event event;
     FileMoveStructure* file = NULL;
@@ -4208,8 +4205,6 @@ void mainBoard(SDL_Window* window,SDL_Renderer* render)
             //SDL_Delay(5);
         }
     }
-    SDL_RenderClear(render);
-    SDL_RenderPresent(render);
 
     destroyAllBoardStructures()
     freeAllBoardSurfaces()
@@ -4234,16 +4229,44 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    
-    //timeSelectionPage(window, render);
-    //modeSelectionPage(window, render);
-    inscriptionPage(window, render);
-    //loginPage(window, render);
-    //Launch the mainBoard
-    //mainBoard(window, render);
-    //mainMenuPage(window, render);
 
-    
+    int nextPage=2;
+    CreateRenderInNewWindow(window, render)
+    while (nextPage!=1)
+    {
+        int test1 = nextPage;
+        if (nextPage==2)
+        {
+            loginPage(window, render, &nextPage);
+        }
+        else if (nextPage==3)
+        {
+            inscriptionPage(window, render, &nextPage);
+        }
+        else if (nextPage==5)
+        {
+            mainMenuPage(window, render, &nextPage);
+        }
+        else if (nextPage==10)
+        {
+            mainBoard(window, render, &nextPage);
+        }
+        else if (nextPage==6)
+        {
+            modeSelectionPage(window, render, &nextPage);
+        }
+        else if (nextPage==7)
+        {
+            timeSelectionPage(window, render, &nextPage);
+        }
+        int test2 = nextPage;
+        if (test1==test2)
+        {
+            nextPage=1;
+        }
+    }
+
+
     //Destruction of the window
     TTF_Quit();
     SDL_DestroyRenderer(render);
