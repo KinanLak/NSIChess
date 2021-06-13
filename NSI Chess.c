@@ -5,7 +5,6 @@
 #include <SDL2/SDL_ttf.h>
 //#include <SDL2/SDL_image.h>
 #include <winsock2.h>
-#include "sqlite3.h"
 //#include <mysql.h>
 
 
@@ -2433,6 +2432,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageConnexionBackground = NULL;
     SDL_Texture* textureConnexionBackground = NULL;
@@ -2643,6 +2643,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageInscriptionBackground = NULL;
     SDL_Texture* textureInscriptionBackground = NULL;
@@ -3169,6 +3170,7 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageModeSelectionBackground = NULL;
     SDL_Texture* textureModeSelectionBackground = NULL;
@@ -3284,6 +3286,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageTempsPartieBackground = NULL;
     SDL_Texture* textureTempsPartieBackground = NULL;
@@ -3477,6 +3480,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageBackgroundMenu = NULL;
     SDL_Texture* textureBackgroundMenu = NULL;
@@ -3746,7 +3750,8 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
     initAllSurfaces()
-    initAllTextures() 
+    initAllTextures()
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     //Create all images
     initAllBoardImages()
@@ -4224,7 +4229,7 @@ int main(int argc, char* argv[])
     WSAStartup(MAKEWORD(2, 0), &WSAData);*/
 
     //Initialisation of the window
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "10");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
