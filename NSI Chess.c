@@ -1700,7 +1700,11 @@ int dayCorrectInThisMonth(int day,int month, int year)
                 textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);\
                 SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);\
                 SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};\
-                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
+                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);\
+                SDL_FreeSurface(surfaceConnexion1);\
+                SDL_DestroyTexture(textureConnexion1);\
+                SDL_FreeSurface(surfaceConnexion2);\
+                SDL_DestroyTexture(textureConnexion2);
 
 #define showTextesInscription() changeValueInscription1()\
                 surfaceInscription1 = TTF_RenderText_Solid(font, strInscription1, color);\
@@ -2559,7 +2563,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>797 && event.button.y>740 && event.button.x <1120 && event.button.y<821)
                 {
-                    if (cptNumberOfValuesConnexion1==0)
+                    /*if (cptNumberOfValuesConnexion1==0)
                     {
                         emptyChamps(714, 484);
                         SDL_RenderPresent(render);
@@ -2570,7 +2574,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderPresent(render);
                     }
                     else
-                    {
+                    {*/
                         //Send request if True (need sql)
                         *nextPage=5;
                         continuer=0;
@@ -2584,7 +2588,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         //SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
                         //SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
                         //SDL_RenderPresent(render);
-                    }
+                   // }
                 }
                 else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
                 {
@@ -4229,7 +4233,6 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    printf("123");
     int nextPage=2;
     CreateRenderInNewWindow(window, render)
     while (1==1)
@@ -4275,6 +4278,12 @@ int main(int argc, char* argv[])
     TTF_Quit();
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
+
+
+    FILE *fp;
+    fp  = fopen ("data.txt", "w");
+
+
 
     return 1;
 }

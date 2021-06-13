@@ -329,14 +329,15 @@ void shrinkChar(char* longChar, int sizeNewChar)
 
 int main(int argc, char* argv[])
 {
-    unsigned int chessBoard[64];
+    /*unsigned int chessBoard[64];
 
     char fen[] = "rnbqkbn1/pppp1pp1/7r/4p2p/5P2/4P1P1/PPPP3P/RNBQKBNR w KQq e6 0 4     ";
     //FENToList(fen, chessBoard);
     //printBoard(chessBoard);
     char b[]="⬤";
     char* a= b;
-    printf("%d", a[0]);
+    printf("%d", a[0]);*/
+
 
     return 1;
 }
