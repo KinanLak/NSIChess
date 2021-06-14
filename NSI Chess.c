@@ -2442,6 +2442,30 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
     }
 }
 
+#define showTypePieces() SDL_SetRenderDrawColor(render, 160, 160, 160, 255);\
+        SDL_Rect rectBehindPieces;\
+        rectTypePieces.x= 915;\
+        rectTypePieces.y= 753;\
+        rectTypePieces.w= 100;\
+        rectTypePieces.h= 100;\
+        SDL_RenderFillRect(render, &rectTypePieces);\
+        if (typePieces==1)\
+        {\
+            SDL_RenderCopy(render, textureTypepieces1BG, NULL, &rectTypePieces);\
+        }\
+        else if (typePieces==2)\
+        {\
+            SDL_RenderCopy(render, textureTypepieces2BG, NULL, &rectTypePieces);\
+        }\
+        else if (typePieces==3)\
+        {\
+            SDL_RenderCopy(render, textureTypepieces3BG, NULL, &rectTypePieces);\
+        }\
+        else if (typePieces==4)\
+        {\
+            SDL_RenderCopy(render, textureTypepieces4BG, NULL, &rectTypePieces);\
+        }
+
 int optionNoTime(SDL_Renderer* render)
 {
     SDL_Surface* imageOptionsBG = NULL;
@@ -2461,10 +2485,10 @@ int optionNoTime(SDL_Renderer* render)
     SDL_Texture* textureTypepieces4BG = NULL;
     ALLImageAndTransparencyINIT(imageTypepieces4BG, textureTypepieces4BG, TypePieces4OptionsImageBMP, render)
     SDL_Rect rectTypePieces;
-    rectTypePieces.x= 893;
-    rectTypePieces.y= 525;
-    rectTypePieces.w= 114;
-    rectTypePieces.h= 55;
+    rectTypePieces.x= 915;
+    rectTypePieces.y= 753;
+    rectTypePieces.w= 100;
+    rectTypePieces.h= 100;
 
     SDL_Surface* imageSwitchOnBG = NULL;
     SDL_Texture* textureSwitchOnBG = NULL;
@@ -2526,8 +2550,9 @@ int optionNoTime(SDL_Renderer* render)
     int switch1=1;
     int switch2=1;
     int typePieces=1;
-
+    int typeBoard=1;
     SDL_RenderCopy(render, textureOptionsBG, NULL, NULL);
+    showTypePieces()
     SDL_RenderPresent(render);
     SDL_Event event;
     int continuer = 1;
@@ -2653,10 +2678,30 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>865 && event.button.x<893 && event.button.y>791 && event.button.y<822)
                     {
+                        if (typePieces==1)
+                        {
+                            typePieces=4;
+                        }
+                        else
+                        {
+                            typePieces-=1;
+                        }
+                        showTypePieces()
+                        SDL_RenderPresent(render);
                         //leftArrow1
                     }
                     else if (event.button.x>1046 && event.button.x<1074 && event.button.y>791 && event.button.y<822)
                     {
+                        if (typePieces==4)
+                        {
+                            typePieces=1;
+                        }
+                        else
+                        {
+                            typePieces+=1;
+                        }
+                        showTypePieces()
+                        SDL_RenderPresent(render);
                         //rightArrow1
                     }
                     else if (event.button.x>1198 && event.button.x<1226 && event.button.y>791 && event.button.y<822)
