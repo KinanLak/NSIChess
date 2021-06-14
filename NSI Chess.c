@@ -1686,19 +1686,20 @@ int dayCorrectInThisMonth(int day,int month, int year)
     }
 }
 
-#define showTextesConnexion() changeValueConnexion1()\
-                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);\
-                surfaceConnexion1 = TTF_RenderText_Solid(font, strConnexion1, color);\
-                textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);\
-                SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1);\
-                SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};\
-                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);\
-                changeValueConnexion2()\
-                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);\
-                surfaceConnexion2 = TTF_RenderText_Solid(fontPassword, strConnexion2Hidder, color);\
-                textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);\
-                SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);\
-                SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};\
+//                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);\
+//SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);\
+
+#define showTextesConnexion() changeValueConnexion1() \
+                surfaceConnexion1 = TTF_RenderText_Solid(font, strConnexion1, color); \
+                textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1); \
+                SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1); \
+                SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1}; \
+                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1); \
+                changeValueConnexion2() \
+                surfaceConnexion2 = TTF_RenderText_Solid(fontPassword, strConnexion2Hidder, color); \
+                textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2); \
+                SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2); \
+                SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2}; \
                 SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
 
 #define showTextesInscription() changeValueInscription1()\
@@ -2431,6 +2432,10 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     //CreateRenderInNewWindow(window, render)
+    TTF_Init();
+
+    SDL_ClearError();
+
     SDL_RenderClear(render);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
@@ -2451,27 +2456,51 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     rectButton.h= 81;
     rectButton.w= 323;
 
+    SDL_Log(SDL_GetError());
+
+    //En dessous
+
+    SDL_ClearError();
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
-    TTF_Font * fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
+    TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
     SDL_Color color = { 0, 0, 0};
     SDL_Color colorIncorrect = {255, 128, 155};
     SDL_Surface * surfaceConnexion1 = TTF_RenderText_Solid(font,"", color);
-    SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);    
+    SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);
+    SDL_Log("%s", surfaceConnexion1);
+    SDL_Log(SDL_GetError());
+
+    //Au dessus erreur SDL_CreateTextureFromSurface() passed NULL surface
+    //En dessous invalid texture
+
+    SDL_ClearError();
     int texWConnexion1 = 729;
     int texHConnexion1 = 38;
     SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1);
     SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};
     SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);
-    
+    SDL_Log(SDL_GetError());
+
+    //Au dessus et en dessous
+
+    SDL_ClearError();
+    //TTF_CloseFont(font);
+    //TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
     SDL_Surface * surfaceConnexion2 = TTF_RenderText_Solid(fontPassword,"", color);
-    SDL_Texture * textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);    
+    SDL_Texture * textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);
+    //TTF_CloseFont(fontPassword);
     int texWConnexion2 = 729;
     int texHConnexion2 = 38;
     SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);
     SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};
     SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
-    
+    SDL_Log(SDL_GetError());
+
+    //Au dessus
+
+    //TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
+
     char strConnexion1[38]="                                      ";
     char* strPointeurConnexion1 = strConnexion1;
     char strConnexion2[38]="                                      ";
@@ -2490,6 +2519,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int limitChar=30;
     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
     SDL_RenderPresent(render);
+
+    SDL_Log("Ici");
+    SDL_Log(SDL_GetError());
 
     SDL_Event event;
     int continuer = 1;
@@ -2561,7 +2593,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 {
                     if (cptNumberOfValuesConnexion1==0)
                     {
-                        emptyChamps(714, 484);
+                        emptyChamps(714, 484);  
                         SDL_RenderPresent(render);
                     }
                     else if (cptNumberOfValuesConnexion2==0)
@@ -2574,16 +2606,16 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         //Send request if True (need sql)
                         *nextPage=5;
                         continuer=0;
-
                         //Error if false
-                        //SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
-                        //SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
-                        //int texWChampsIncorrect = 729;
-                        //int texHChampsIncorrect = 38;
-                        //SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
-                        //SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
-                        //SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
-                        //SDL_RenderPresent(render);
+
+                        SDL_Surface *surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold, "Email ou Mot de passe incorrect", colorIncorrect);
+                        SDL_Texture *textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);
+                        int texWChampsIncorrect = 729;
+                        int texHChampsIncorrect = 38;
+                        SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
+                        SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
+                        SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
+                        SDL_RenderPresent(render); 
                     }
                 }
                 else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
@@ -2621,7 +2653,11 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         break;
                 }
         }
+        //TTF_CloseFont(fontBold)
     }
+    SDL_Log("La");
+    SDL_Log(SDL_GetError());
+
     SDL_FreeSurface(imageConnexionBackground);
     SDL_FreeSurface(imageButtonBackground);
     SDL_FreeSurface(imageHoverButtonBackground);
