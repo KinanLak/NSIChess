@@ -4,8 +4,7 @@
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
 //#include <SDL2/SDL_image.h>
-#include <winsock2.h>
-#include "sqlite3.h"
+//#include <winsock2.h>
 //#include <mysql.h>
 
 
@@ -1687,24 +1686,27 @@ int dayCorrectInThisMonth(int day,int month, int year)
     }
 }
 
-#define showTextesConnexion() changeValueConnexion1()\
-                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);\
-                surfaceConnexion1 = TTF_RenderText_Solid(font, strConnexion1, color);\
-                textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);\
-                SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1);\
-                SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};\
-                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);\
-                changeValueConnexion2()\
-                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);\
-                surfaceConnexion2 = TTF_RenderText_Solid(fontPassword, strConnexion2Hidder, color);\
-                textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);\
-                SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);\
-                SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};\
-                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);\
-                SDL_FreeSurface(surfaceConnexion1);\
-                SDL_DestroyTexture(textureConnexion1);\
-                SDL_FreeSurface(surfaceConnexion2);\
-                SDL_DestroyTexture(textureConnexion2);
+int verificationOfTheDayOfBirth(char* strPointeurInscription3)
+{
+    int day = (strPointeurInscription3[0]-48)*10 + (strPointeurInscription3[1]-48);
+    int month = (strPointeurInscription3[3]-48)*10 + (strPointeurInscription3[4]-48);
+    int year = (strPointeurInscription3[6]-48)*1000 + (strPointeurInscription3[7]-48)*100 + (strPointeurInscription3[8]-48)*10 + (strPointeurInscription3[9]-48);
+    return dayCorrectInThisMonth(day, month, year);
+}
+
+
+#define showTextesConnexion() changeValueConnexion1() \
+                surfaceConnexion1 = TTF_RenderText_Solid(font, strConnexion1, color); \
+                textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1); \
+                SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1); \
+                SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1}; \
+                SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1); \
+                changeValueConnexion2() \
+                surfaceConnexion2 = TTF_RenderText_Solid(fontPassword, strConnexion2Hidder, color); \
+                textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2); \
+                SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2); \
+                SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2}; \
+                SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
 
 #define showTextesInscription() changeValueInscription1()\
                 surfaceInscription1 = TTF_RenderText_Solid(font, strInscription1, color);\
@@ -2428,6 +2430,13 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
     }
 }
 
+#define openFonts() font = TTF_OpenFont("fonts/arial.ttf", 34);\
+    fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);\
+    fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+
+#define closeFonts() TTF_CloseFont(font);\
+    TTF_CloseFont(fontBold);\
+    TTF_CloseFont(fontPassword);
 //---------------------------------------------------------------------------------
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
@@ -2436,7 +2445,13 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     //CreateRenderInNewWindow(window, render)
-    SDL_RenderClear(render);
+    TTF_Init();
+
+    TTF_Font * font=NULL;
+    TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
+    TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageConnexionBackground = NULL;
     SDL_Texture* textureConnexionBackground = NULL;
@@ -2455,27 +2470,44 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     rectButton.h= 81;
     rectButton.w= 323;
 
-    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
-    TTF_Font * fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
-    TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+    //En dessous
     SDL_Color color = { 0, 0, 0};
     SDL_Color colorIncorrect = {255, 128, 155};
-    SDL_Surface * surfaceConnexion1 = TTF_RenderText_Solid(font,"", color);
-    SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);    
+    openFonts()
+    SDL_Surface * surfaceConnexion1 = TTF_RenderText_Solid(font,"   ", color);
+    SDL_Log(SDL_GetError());
+    closeFonts()
+    SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);
+    SDL_Log("%s", surfaceConnexion1);
+
+    //Au dessus erreur SDL_CreateTextureFromSurface() passed NULL surface
+    //En dessous invalid texture
+
     int texWConnexion1 = 729;
     int texHConnexion1 = 38;
     SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1);
     SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};
     SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);
-    
-    SDL_Surface * surfaceConnexion2 = TTF_RenderText_Solid(fontPassword,"", color);
-    SDL_Texture * textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);    
+    SDL_Log(SDL_GetError());
+
+    //Au dessus et en dessous
+    openFonts()
+    //TTF_CloseFont(font);
+    //TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+    SDL_Surface * surfaceConnexion2 = TTF_RenderText_Solid(fontPassword,"   ", color);
+    SDL_Texture * textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);
+    //TTF_CloseFont(fontPassword);
     int texWConnexion2 = 729;
     int texHConnexion2 = 38;
     SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);
     SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};
     SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
-    
+    SDL_Log(SDL_GetError());
+
+    //Au dessus
+
+    //TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
+
     char strConnexion1[38]="                                      ";
     char* strPointeurConnexion1 = strConnexion1;
     char strConnexion2[38]="                                      ";
@@ -2494,6 +2526,10 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int limitChar=30;
     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
     SDL_RenderPresent(render);
+
+    SDL_Log("Boucle commence");
+    SDL_Log(SDL_GetError());
+    closeFonts()
 
     SDL_Event event;
     int continuer = 1;
@@ -2537,6 +2573,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     if (doYouWantToQuitNoTime(render)==1)
                     {
                         continuer=0;
+                        *nextPage=1;
                     }
                     else
                     {
@@ -2547,48 +2584,60 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 if (event.button.x >593 && event.button.y > 529 && event.button.x <1324 && event.button.y < 569)
                 {
+                    openFonts()
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                     focusConnexion1()
                     showTextesConnexion()
                     SDL_RenderPresent(render);
+                    closeFonts()
+                    SDL_Log(SDL_GetError());
                 }
                 else if (event.button.x >591 && event.button.y > 644 && event.button.x <1325 && event.button.y < 684)
                 {
+                    openFonts()
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                     focusConnexion2()
                     showTextesConnexion()
                     SDL_RenderPresent(render);
+                    closeFonts()
                 }
                 else if (event.button.x>797 && event.button.y>740 && event.button.x <1120 && event.button.y<821)
                 {
-                    /*if (cptNumberOfValuesConnexion1==0)
+                    if (cptNumberOfValuesConnexion1==0)
                     {
-                        emptyChamps(714, 484);
+                        openFonts()
+                        emptyChamps(714, 484);  
                         SDL_RenderPresent(render);
+                        closeFonts()
                     }
                     else if (cptNumberOfValuesConnexion2==0)
                     {
+                        openFonts()
                         emptyChamps(840, 603);
                         SDL_RenderPresent(render);
+                        closeFonts()
                     }
                     else
-                    {*/
+                    {
                         //Send request if True (need sql)
                         *nextPage=5;
                         continuer=0;
-
                         //Error if false
-                        //SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
-                        //SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
-                        //int texWChampsIncorrect = 729;
-                        //int texHChampsIncorrect = 38;
-                        //SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
-                        //SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
-                        //SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
-                        //SDL_RenderPresent(render);
-                   // }
+                        SDL_ClearError();
+                        openFonts()
+                        SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
+                        SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
+                        int texWChampsIncorrect = 729;
+                        int texHChampsIncorrect = 38;
+                        SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
+                        SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
+                        SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
+                        SDL_RenderPresent(render);
+                        closeFonts()
+                        SDL_Log(SDL_GetError());
+                    }
                 }
                 else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
                 {
@@ -2597,17 +2646,21 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else
                 {
+                    openFonts()
                     focus=0;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                     showTextesConnexion()
                     SDL_RenderPresent(render);
+                    closeFonts()
                 }
                 break;
             case SDL_KEYDOWN: 
                 allKeyConnexion()
+                openFonts()
                 showTextesConnexion()
                 SDL_RenderPresent(render);
+                closeFonts()
                 break;
             case SDL_KEYUP:
                 switch( event.key.keysym.sym ){
@@ -2625,12 +2678,18 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         break;
                 }
         }
+        //TTF_CloseFont(fontBold)
     }
+
+    SDL_Log(SDL_GetError());
+    SDL_Log("Boucle finis");
+
     SDL_FreeSurface(imageConnexionBackground);
     SDL_FreeSurface(imageButtonBackground);
     SDL_FreeSurface(imageHoverButtonBackground);
     SDL_FreeSurface(surfaceConnexion1);
-    SDL_FreeSurface(surfaceConnexion1);
+    SDL_FreeSurface(surfaceConnexion2);
+
 
     SDL_DestroyTexture(textureConnexionBackground);
     SDL_DestroyTexture(textureButtonBackground);
@@ -2647,6 +2706,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageInscriptionBackground = NULL;
     SDL_Texture* textureInscriptionBackground = NULL;
@@ -2667,60 +2727,71 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     rectButton.h= 81;
     rectButton.w= 323;
 
-    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
-    TTF_Font * fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
-    TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+    TTF_Font * font = NULL;
+    TTF_Font * fontBold = NULL;
+    TTF_Font * fontPassword = NULL;
     SDL_Color color = { 0, 0, 0};
     SDL_Color colorIncorrect = {255, 128, 155};
 
-
-    SDL_Surface * surfaceInscription1 = TTF_RenderText_Solid(font,"", color);
+    openFonts();
+    SDL_Surface * surfaceInscription1 = TTF_RenderText_Solid(font," ", color);
     SDL_Texture * textureInscription1 = SDL_CreateTextureFromSurface(render, surfaceInscription1);    
     int texWInscription1 = 729;
     int texHInscription1 = 38;
     SDL_QueryTexture(textureInscription1, NULL, NULL, &texWInscription1, &texHInscription1);
     SDL_Rect sdlRectInscription1 = {595, 349, texWInscription1, texHInscription1};
     SDL_RenderCopy(render, textureInscription1, NULL, &sdlRectInscription1);
+    closeFonts();
 
-    SDL_Surface * surfaceInscription2 = TTF_RenderText_Solid(font,"", color);
+    openFonts();
+    SDL_Surface * surfaceInscription2 = TTF_RenderText_Solid(font," ", color);
     SDL_Texture * textureInscription2 = SDL_CreateTextureFromSurface(render, surfaceInscription2);    
     int texWInscription2 = 326;
     int texHInscription2 = 38;
     SDL_QueryTexture(textureInscription2, NULL, NULL, &texWInscription2, &texHInscription2);
     SDL_Rect sdlRectInscription2 = {593, 462, texWInscription2, texHInscription2};
     SDL_RenderCopy(render, textureInscription2, NULL, &sdlRectInscription2);
+    closeFonts();
 
-    SDL_Surface * surfaceInscription3 = TTF_RenderText_Solid(font,"", color);
+    openFonts();
+    SDL_Surface * surfaceInscription3 = TTF_RenderText_Solid(font," ", color);
     SDL_Texture * textureInscription3 = SDL_CreateTextureFromSurface(render, surfaceInscription3);    
     int texWInscription3 = 326;
     int texHInscription3 = 38;
     SDL_QueryTexture(textureInscription3, NULL, NULL, &texWInscription3, &texHInscription3);
     SDL_Rect sdlRectInscription3 = {993, 462, texWInscription3, texHInscription3};
     SDL_RenderCopy(render, textureInscription3, NULL, &sdlRectInscription3);
+    closeFonts();
 
-    SDL_Surface * surfaceInscription4 = TTF_RenderText_Solid(font,"", color);
+    openFonts();
+    SDL_Surface * surfaceInscription4 = TTF_RenderText_Solid(font," ", color);
     SDL_Texture * textureInscription4 = SDL_CreateTextureFromSurface(render, surfaceInscription4);    
     int texWInscription4 = 729;
     int texHInscription4 = 38;
     SDL_QueryTexture(textureInscription4, NULL, NULL, &texWInscription4, &texHInscription4);
     SDL_Rect sdlRectInscription4 = {595, 578, texWInscription4, texHInscription4};
     SDL_RenderCopy(render, textureInscription4, NULL, &sdlRectInscription4);
+    closeFonts();
 
-    SDL_Surface * surfaceInscription5 = TTF_RenderText_Solid(fontPassword,"", color);
+    openFonts();
+    SDL_Surface * surfaceInscription5 = TTF_RenderText_Solid(fontPassword," ", color);
     SDL_Texture * textureInscription5 = SDL_CreateTextureFromSurface(render, surfaceInscription5);    
     int texWInscription5 = 729;
     int texHInscription5 = 38;
     SDL_QueryTexture(textureInscription5, NULL, NULL, &texWInscription5, &texHInscription5);
     SDL_Rect sdlRectInscription5 = {593, 693, texWInscription5, texHInscription5};
     SDL_RenderCopy(render, textureInscription5, NULL, &sdlRectInscription5);
+    closeFonts();
 
-    SDL_Surface * surfaceInscription6 = TTF_RenderText_Solid(fontPassword,"", color);
+    openFonts();
+    SDL_Surface * surfaceInscription6 = TTF_RenderText_Solid(fontPassword," ", color);
     SDL_Texture * textureInscription6 = SDL_CreateTextureFromSurface(render, surfaceInscription6);    
     int texWInscription6 = 729;
     int texHInscription6 = 38;
     SDL_QueryTexture(textureInscription6, NULL, NULL, &texWInscription6, &texHInscription6);
     SDL_Rect sdlRectInscription6 = {593, 804, texWInscription6, texHInscription6};
     SDL_RenderCopy(render, textureInscription6, NULL, &sdlRectInscription6);
+    closeFonts();
     
     char strInscription1[38]="                                      ";
     char* strPointeurInscription1 = strInscription1;
@@ -2787,7 +2858,11 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
-                    continuer=0;
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        continuer=0;
+                        *nextPage=1;
+                    }
                 }
                 else if (event.button.x >598 && event.button.y >225 && event.button.x <640 && event.button.y <269)
                 {
@@ -2796,136 +2871,153 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >593 && event.button.y > 347 && event.button.x <1322 && event.button.y < 385)
                 {
+                    openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                     focusInscription1()
                     showTextesInscription()
                     SDL_RenderPresent(render);
+                    closeFonts();
                 }
                 else if (event.button.x >593 && event.button.y > 462 && event.button.x <919 && event.button.y < 500)
                 {
+                    openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                     focusInscription2()
                     showTextesInscription()
                     SDL_RenderPresent(render);
+                    closeFonts();
                 }
                 else if (event.button.x >993 && event.button.y > 462 && event.button.x <1319 && event.button.y < 500)
                 {
+                    openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                     focusInscription3()
                     showTextesInscription()
                     SDL_RenderPresent(render);
+                    closeFonts();
                 }
                 else if (event.button.x >595 && event.button.y > 578 && event.button.x <1324 && event.button.y < 616)
                 {
+                    openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                     focusInscription4()
                     showTextesInscription()
                     SDL_RenderPresent(render);
+                    closeFonts();
                 }
                 else if (event.button.x >593 && event.button.y > 693 && event.button.x <1322 && event.button.y < 731)
                 {
+                    openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                     focusInscription5()
                     showTextesInscription()
                     SDL_RenderPresent(render);
+                    closeFonts();
                 }
                 else if (event.button.x >593 && event.button.y > 803 && event.button.x <1322 && event.button.y < 841)
                 {
+                    openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                     focusInscription6()
                     showTextesInscription()
                     SDL_RenderPresent(render);
+                    closeFonts();
                 }
                 else if (event.button.x >798 && event.button.x <1121 && event.button.y >881 && event.button.y <963)
                 {
                     if (cptNumberOfValuesInscription1==0)
                     {
+                        openFonts();
                         emptyChamps(700, 304);
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
                     else if (cptNumberOfValuesInscription2==0)
                     {
+                        openFonts();
                         emptyChamps(740, 423);
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
                     else if (cptNumberOfValuesInscription3==0)
                     {
+                        openFonts();
                         emptyChamps(995, 464);
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
                     else if (cptNumberOfValuesInscription4==0)
                     {
+                        openFonts();
                         emptyChamps(707, 536);
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
                     else if (cptNumberOfValuesInscription5==0)
                     {
+                        openFonts();
                         emptyChamps(843, 650);
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
                     else if (cptNumberOfValuesInscription6==0)
                     {
+                        openFonts()
                         emptyChamps(842, 764);
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
-                    else if (cptNumberOfValuesInscription3==10)
+                    else if (cptNumberOfValuesInscription3==10 && verificationOfTheDayOfBirth(strPointeurInscription3)==0)
                     {
-                        int day = (strPointeurInscription3[0]-48)*10 + (strPointeurInscription3[1]-48);
-                        int month = (strPointeurInscription3[3]-48)*10 + (strPointeurInscription3[4]-48);
-                        int year = (strPointeurInscription3[6]-48)*1000 + (strPointeurInscription3[7]-48)*100 + (strPointeurInscription3[8]-48)*10 + (strPointeurInscription3[9]-48);
-                        if (day<32 && day>0 && month<13 && month>0 && year>1900 && year<2021 && dayCorrectInThisMonth(day, month, year))
-                        {
-                        }
-                        else
-                        {
-                            champsErrorText(995, 514, "Date incorrecte");
-                            SDL_RenderPresent(render);
-                        }
+                        openFonts();
+                        champsErrorText(995, 514, "Date incorrecte");
+                        SDL_RenderPresent(render);
+                        closeFonts();
                     }
                     else if (cptNumberOfValuesInscription3!=10)
                     {
+                        openFonts();
                         champsErrorText(995, 514, "Date incomplete");
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
                     else if (emailFormatCorrect(strPointeurInscription4, cptNumberOfValuesInscription4)==0)
                     {
-                        SDL_RenderClear(render);
-                        SDL_RenderPresent(render);
+                        openFonts()
                         champsErrorText(707, 536, "Format de l'email incorrect");
                         SDL_RenderPresent(render);
+                        closeFonts();
                     }
-                    else if (emailFormatCorrect(strPointeurInscription4, cptNumberOfValuesInscription4)!=0)
+                    else if (passwordSame(strInscription5, strInscription6, cptNumberOfValuesInscription5, cptNumberOfValuesInscription6)==0)
                     {
-                        SDL_RenderClear(render);
+                        openFonts();
+                        champsErrorText(842, 764, "Confirmation differente du mot de passe");
                         SDL_RenderPresent(render);
-                        champsErrorText(707, 536, "Format de l'email incorrect");
-                        SDL_RenderPresent(render);
+                        closeFonts();
                     }
-                    /*else if (passwordSame(strInscription5, strInscription6, cptNumberOfValuesInscription5, cptNumberOfValuesInscription6)==0)
-                    {
-                        champsErrorText(842, 764, "Confirmation différente du mot de passe");
-                        SDL_RenderPresent(render);
-                    }*/
                     else
                     {
+                        //Send request
+                        *nextPage=2;
                         continuer=0;
                     }
 
-                    //Send request
                 }
                 else
                 {
+                    openFonts();
                     focus=0;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                     showTextesInscription()
                     SDL_RenderPresent(render);
+                    closeFonts();
                 }
                 break;
             case SDL_KEYDOWN:
@@ -3002,6 +3094,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     case SDLK_TAB:
                         if (focus==0)
                         {
+                            openFonts();
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                             showTextesInscription()
@@ -3013,9 +3106,11 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
                             }
                             SDL_RenderPresent(render);
+                            closeFonts();
                         }
                         else if (focus==1)
                         {
+                            openFonts();
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                             showTextesInscription()
@@ -3027,9 +3122,11 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
                             }
                             SDL_RenderPresent(render);
+                            closeFonts();
                         }
                         else if (focus==2)
                         {
+                            openFonts();
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                             showTextesInscription()
@@ -3041,9 +3138,11 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
                             }
                             SDL_RenderPresent(render);
+                            closeFonts();
                         }
                         else if (focus==3)
                         {
+                            openFonts();
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                             showTextesInscription()
@@ -3055,9 +3154,11 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
                             }
                             SDL_RenderPresent(render);
+                            closeFonts();
                         }
                         else if (focus==4)
                         {
+                            openFonts();
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                             showTextesInscription()
@@ -3069,9 +3170,11 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
                             }
                             SDL_RenderPresent(render);
+                            closeFonts();
                         }
                         else if (focus==5)
                         {
+                            openFonts();
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
                             showTextesInscription()
@@ -3083,6 +3186,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
                             }
                             SDL_RenderPresent(render);
+                            closeFonts();
                         }
                         break;
                     keyPressedInscription(SDLK_a, 97, 65, -1)
@@ -3125,8 +3229,10 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     keyPressedInscription(SDLK_EXCLAIM, 33, -1, -1)
                     keyPressedInscription(SDLK_SEMICOLON, -1, 46, -1)
                 }
+                openFonts();
                 showTextesInscription()
                 SDL_RenderPresent(render);
+                closeFonts();
                 break;
             case SDL_KEYUP:
                 switch( event.key.keysym.sym ){
@@ -3173,6 +3279,7 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageModeSelectionBackground = NULL;
     SDL_Texture* textureModeSelectionBackground = NULL;
@@ -3288,6 +3395,7 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageTempsPartieBackground = NULL;
     SDL_Texture* textureTempsPartieBackground = NULL;
@@ -3481,6 +3589,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     SDL_Surface* imageBackgroundMenu = NULL;
     SDL_Texture* textureBackgroundMenu = NULL;
@@ -3671,6 +3780,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 {
                     if (doYouWantToQuitNoTime(render)==1)
                     {
+                        *nextPage=1;
                         continuer=0;
                     }
                     else
@@ -3722,6 +3832,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 {
                     if (doYouWantToQuitNoTime(render)==1)
                     {
+                        *nextPage=1;
                         continuer=0;
                     }
                     else
@@ -3750,7 +3861,8 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
     initAllSurfaces()
-    initAllTextures() 
+    initAllTextures()
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     //Create all images
     initAllBoardImages()
@@ -4228,14 +4340,14 @@ int main(int argc, char* argv[])
     WSAStartup(MAKEWORD(2, 0), &WSAData);*/
 
     //Initialisation of the window
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "10");
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
     int nextPage=2;
     CreateRenderInNewWindow(window, render)
-    while (1==1)
+    while (nextPage!=1)
     {
         int test1 = nextPage;
         if (nextPage==2)
@@ -4266,24 +4378,15 @@ int main(int argc, char* argv[])
         {
             mainMenuPage(window, render, &nextPage);
         }
-        int test2 = nextPage;
-        if (test1==test2)
-        {
-            nextPage=1;
-        }
     }
 
 
     //Destruction of the window
+    SDL_Log("Error at the end of the programm:");
+    SDL_Log(SDL_GetError());
     TTF_Quit();
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
-
-
-    FILE *fp;
-    fp  = fopen ("data.txt", "w");
-
-
 
     return 1;
 }
