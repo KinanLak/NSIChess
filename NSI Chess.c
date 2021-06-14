@@ -2442,7 +2442,6 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
     }
 }
 
-#define showTypePieces() if ()
 int optionNoTime(SDL_Renderer* render)
 {
     SDL_Surface* imageOptionsBG = NULL;
