@@ -3,9 +3,9 @@
 #include <SDL2/SDL.h>
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
+#include <mysql.h>
 //#include <SDL2/SDL_image.h>
 //#include <winsock2.h>
-//#include <mysql.h>
 
 
 //Creation of the structure for each move
@@ -1312,7 +1312,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define BoardBgImageBMP "images/board/bg.bmp"
 #define ConnexionBGImageBMP "images/connexion/connexionBG.bmp"
 #define InscriptionBGImageBMP "images/inscription/inscriptionBG.bmp"
-#define OptionImageBMP "images/option.bmp"
+#define OptionsBGImageBMP "images/options/optionsBG.bmp"
 #define PointImageBMP "images/board/point.bmp"
 #define WhitePromoteBarBMP "images/board/whitePB.bmp"
 #define BlackPromoteBarBMP "images/board/blackPB.bmp"
@@ -1342,6 +1342,18 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define QuitterMainMenuBMP "images/main_menu/quitter.bmp"
 #define HoverQuitterMainMenuBMP "images/main_menu/hoverQuitter.bmp"
 #define ExitConfirmationBMP "images/exitConfirmation.bmp"
+#define OptionsSwitchOnImageBMP "images/options/switchButtonOn.bmp"
+#define OptionsSwitchOffImageBMP "images/options/switchButtonOff.bmp"
+#define RightArrowOptionsImageBMP "images/options/rightArrow.bmp"
+#define HoverRightArrowOptionsImageBMP "images/options/hoverRightArrow.bmp"
+#define LeftArrowOptionsImageBMP "images/options/leftArrow.bmp"
+#define HoverLeftArrowOptionsImageBMP "images/options/hoverLeftArrow.bmp"
+#define DeconnexionOptionsImageBMP "images/options/deconnexionButton.bmp"
+#define HoverDeconnexionOptionsImageBMP "images/options/hoverDeconnexionButton.bmp"
+#define TypePieces1OptionsImageBMP "images/options/pieces/type1.bmp"
+#define TypePieces2OptionsImageBMP "images/options/pieces/type2.bmp"
+#define TypePieces3OptionsImageBMP "images/options/pieces/type3.bmp"
+#define TypePieces4OptionsImageBMP "images/options/pieces/type4.bmp"
 
 
 #define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"
@@ -2430,6 +2442,243 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
     }
 }
 
+#define showTypePieces() if ()
+int optionNoTime(SDL_Renderer* render)
+{
+    SDL_Surface* imageOptionsBG = NULL;
+    SDL_Texture* textureOptionsBG = NULL;
+    ALLImageAndTransparencyINIT(imageOptionsBG, textureOptionsBG, OptionsBGImageBMP, render)
+
+    SDL_Surface* imageTypepieces1BG = NULL;
+    SDL_Texture* textureTypepieces1BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces1BG, textureTypepieces1BG, TypePieces1OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces2BG = NULL;
+    SDL_Texture* textureTypepieces2BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces2BG, textureTypepieces2BG, TypePieces2OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces3BG = NULL;
+    SDL_Texture* textureTypepieces3BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces3BG, textureTypepieces3BG, TypePieces3OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces4BG = NULL;
+    SDL_Texture* textureTypepieces4BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces4BG, textureTypepieces4BG, TypePieces4OptionsImageBMP, render)
+    SDL_Rect rectTypePieces;
+    rectTypePieces.x= 893;
+    rectTypePieces.y= 525;
+    rectTypePieces.w= 114;
+    rectTypePieces.h= 55;
+
+    SDL_Surface* imageSwitchOnBG = NULL;
+    SDL_Texture* textureSwitchOnBG = NULL;
+    ALLImageAndTransparencyINIT(imageSwitchOnBG, textureSwitchOnBG, OptionsSwitchOnImageBMP, render)
+
+    SDL_Surface* imageSwitchOffBG = NULL;
+    SDL_Texture* textureSwitchOffBG = NULL;
+    ALLImageAndTransparencyINIT(imageSwitchOffBG, textureSwitchOffBG, OptionsSwitchOffImageBMP, render)
+
+    SDL_Rect rectSwitch1;
+    rectSwitch1.x= 893;
+    rectSwitch1.y= 525;
+    rectSwitch1.w= 114;
+    rectSwitch1.h= 55;
+
+    SDL_Rect rectSwitch2;
+    rectSwitch2.x= 893;
+    rectSwitch2.y= 625;
+    rectSwitch2.w= 114;
+    rectSwitch2.h= 55;
+
+    SDL_Surface* imageDeconnexionOffBG = NULL;
+    SDL_Texture* textureDeconnexionOffBG = NULL;
+    ALLImageAndTransparencyINIT(imageDeconnexionOffBG, textureDeconnexionOffBG, DeconnexionOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverDeconnexionOffBG = NULL;
+    SDL_Texture* textureHoverDeconnexionOffBG = NULL;
+    ALLImageAndTransparencyINIT(imageHoverDeconnexionOffBG, textureHoverDeconnexionOffBG, HoverDeconnexionOptionsImageBMP, render)
+
+    SDL_Rect rectDeconnexion;
+    rectDeconnexion.x= 521;
+    rectDeconnexion.y= 767;
+    rectDeconnexion.w= 268;
+    rectDeconnexion.h= 81;
+
+    SDL_Surface* imageRightArrow = NULL;
+    SDL_Texture* textureRightArrow = NULL;
+    ALLImageAndTransparencyINIT(imageRightArrow, textureRightArrow, RightArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageLeftArrow = NULL;
+    SDL_Texture* textureLeftArrow = NULL;
+    ALLImageAndTransparencyINIT(imageLeftArrow, textureLeftArrow, LeftArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverRightArrow = NULL;
+    SDL_Texture* textureHoverRightArrow = NULL;
+    ALLImageAndTransparencyINIT(imageHoverRightArrow, textureHoverRightArrow, HoverRightArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverLeftArrow = NULL;
+    SDL_Texture* textureHoverLeftArrow = NULL;
+    ALLImageAndTransparencyINIT(imageHoverLeftArrow, textureHoverLeftArrow, HoverLeftArrowOptionsImageBMP, render)
+
+    SDL_Rect rectArrow;
+    rectArrow.x= 0;
+    rectArrow.y= 792;
+    rectArrow.w= 27;
+    rectArrow.h= 30;
+
+
+    int switch1=1;
+    int switch2=1;
+    int typePieces=1;
+
+    SDL_RenderCopy(render, textureOptionsBG, NULL, NULL);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>520 && event.motion.x<789 && event.motion.y>766 && event.motion.y<848)
+                {
+                    SDL_RenderCopy(render, textureHoverDeconnexionOffBG, NULL, &rectDeconnexion);
+                    SDL_RenderPresent(render);
+                    //déconnexion
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureDeconnexionOffBG, NULL, &rectDeconnexion);
+                    SDL_RenderPresent(render);
+                    //not déconnexion
+                }
+                if (event.motion.x>865 && event.motion.x<893 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=866;
+                    SDL_RenderCopy(render, textureHoverLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //leftArrow1
+                }
+                else
+                {
+                    rectArrow.x=866;
+                    SDL_RenderCopy(render, textureLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not leftArrow1
+                }
+                if (event.motion.x>1198 && event.motion.x<1226 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1199;
+                    SDL_RenderCopy(render, textureHoverLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //leftArrow2
+                }
+                else
+                {
+                    rectArrow.x=1199;
+                    SDL_RenderCopy(render, textureLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not leftArrow2
+                }
+                if (event.motion.x>1046 && event.motion.x<1074 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1047;
+                    SDL_RenderCopy(render, textureHoverRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //rightArrow1
+                }
+                else
+                {
+                    rectArrow.x=1047;
+                    SDL_RenderCopy(render, textureRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not rightArrow1
+                }
+                if (event.motion.x>1287 && event.motion.x<1315 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1288;
+                    SDL_RenderCopy(render, textureHoverRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //rightArrow2
+                }
+                else
+                {
+                    rectArrow.x=1288;
+                    SDL_RenderCopy(render, textureRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not rightArrow2
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>466 && event.button.x<1455 && event.button.y>331 && event.button.y<886)
+                {
+                    if (event.button.x>504 && event.button.x<569 && event.button.y>331 && event.button.y<398)
+                    {
+                        return 0;
+                        //Back button
+                    }
+                    else if (event.button.x>892 && event.button.x<1007 && event.button.y>524 && event.button.y<580)
+                    {
+                        if (switch1==1)
+                        {
+                            switch1=0;
+                            SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
+                            SDL_RenderPresent(render);
+                        }
+                        else
+                        {
+                            switch1=1;
+                            SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
+                            SDL_RenderPresent(render);
+                        }
+                        //switch1
+                    }
+                    else if (event.button.x>892 && event.button.x<1007 && event.button.y>624 && event.button.y<680)
+                    {
+                        if (switch2==1)
+                        {
+                            switch2=0;
+                            SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch2);
+                            SDL_RenderPresent(render);
+                        }
+                        else
+                        {
+                            switch2=1;
+                            SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch2);
+                            SDL_RenderPresent(render);
+                        }
+                        //switch2
+                    }
+                    else if (event.button.x>520 && event.button.x<789 && event.button.y>766 && event.button.y<848)
+                    {
+                        return 1;
+                        //déconnexion
+                    }
+                    else if (event.button.x>865 && event.button.x<893 && event.button.y>791 && event.button.y<822)
+                    {
+                        //leftArrow1
+                    }
+                    else if (event.button.x>1046 && event.button.x<1074 && event.button.y>791 && event.button.y<822)
+                    {
+                        //rightArrow1
+                    }
+                    else if (event.button.x>1198 && event.button.x<1226 && event.button.y>791 && event.button.y<822)
+                    {
+                        //leftArrow2
+                    }
+                    else if (event.button.x>1287 && event.button.x<1315 && event.button.y>791 && event.button.y<822)
+                    {
+                        //rightArrow2
+                    }
+                }
+                else
+                {
+                    continuer=0;
+                }
+                break;
+        }
+    }
+    return 0;
+}
+
 #define openFonts() font = TTF_OpenFont("fonts/arial.ttf", 34);\
     fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);\
     fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
@@ -2475,10 +2724,8 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Color colorIncorrect = {255, 128, 155};
     openFonts()
     SDL_Surface * surfaceConnexion1 = TTF_RenderText_Solid(font,"   ", color);
-    SDL_Log(SDL_GetError());
     closeFonts()
     SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);
-    SDL_Log("%s", surfaceConnexion1);
 
     //Au dessus erreur SDL_CreateTextureFromSurface() passed NULL surface
     //En dessous invalid texture
@@ -2488,7 +2735,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_QueryTexture(textureConnexion1, NULL, NULL, &texWConnexion1, &texHConnexion1);
     SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};
     SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);
-    SDL_Log(SDL_GetError());
 
     //Au dessus et en dessous
     openFonts()
@@ -2502,7 +2748,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);
     SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};
     SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
-    SDL_Log(SDL_GetError());
 
     //Au dessus
 
@@ -2527,8 +2772,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
     SDL_RenderPresent(render);
 
-    SDL_Log("Boucle commence");
-    SDL_Log(SDL_GetError());
     closeFonts()
 
     SDL_Event event;
@@ -2591,7 +2834,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     showTextesConnexion()
                     SDL_RenderPresent(render);
                     closeFonts()
-                    SDL_Log(SDL_GetError());
                 }
                 else if (event.button.x >591 && event.button.y > 644 && event.button.x <1325 && event.button.y < 684)
                 {
@@ -2620,23 +2862,31 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         closeFonts()
                     }
                     else
-                    {
-                        //Send request if True (need sql)
-                        *nextPage=5;
-                        continuer=0;
-                        //Error if false
-                        SDL_ClearError();
-                        openFonts()
-                        SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
-                        SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
-                        int texWChampsIncorrect = 729;
-                        int texHChampsIncorrect = 38;
-                        SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
-                        SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
-                        SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
-                        SDL_RenderPresent(render);
-                        closeFonts()
-                        SDL_Log(SDL_GetError());
+                    {   
+                        //mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0)
+                        //char chaine[] = "SELECT COUNT(*) FROM USER WHERE"
+                        //int requestResult = mysql_query(con, "SELECT COUNT(*) FROM Puzzle");
+                        //int testResult = requestResult;
+                        //if (testResult==1)
+                        //{
+                            //Send request if True (need sql)
+                            *nextPage=5;
+                            continuer=0;
+                        //}
+                        //else
+                        //{
+                            //Error if false
+                            openFonts()
+                            SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
+                            SDL_Texture * textureChampsIncorrect = SDL_CreateTextureFromSurface(render, surfaceChampsIncorrect);    
+                            int texWChampsIncorrect = 729;
+                            int texHChampsIncorrect = 38;
+                            SDL_QueryTexture(textureChampsIncorrect, NULL, NULL, &texWChampsIncorrect, &texHChampsIncorrect);
+                            SDL_Rect sdlRectChampsIncorrect = {750, 704, texWChampsIncorrect, texHChampsIncorrect};
+                            SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
+                            SDL_RenderPresent(render);
+                            closeFonts()
+                        //}
                     }
                 }
                 else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
@@ -2680,9 +2930,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         }
         //TTF_CloseFont(fontBold)
     }
-
-    SDL_Log(SDL_GetError());
-    SDL_Log("Boucle finis");
 
     SDL_FreeSurface(imageConnexionBackground);
     SDL_FreeSurface(imageButtonBackground);
@@ -3767,9 +4014,9 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
                     {
                         slideAmis=0;
-                        for (int i=8; i>-1; i--)
+                        for (int i=16; i>-1; i--)
                         {
-                            rectButtonFriendListHider.x= -50*i;
+                            rectButtonFriendListHider.x= -25*i;
                             SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
                             SDL_RenderPresent(render);
                             SDL_Delay(5);
@@ -3803,9 +4050,9 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     if (slideAmis==0)
                     {
                         slideAmis=1;
-                        for (int i=8; i>-1; i--)
+                        for (int i=16; i>-1; i--)
                         {
-                            rectButtonFriendList.x= -50*i;
+                            rectButtonFriendList.x= -25*i;
                             SDL_RenderCopy(render, textureMakeFriendListBackground, NULL, &rectButtonFriendList);
                             SDL_RenderPresent(render);
                             SDL_Delay(5);
@@ -3814,9 +4061,9 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     else
                     {
                         slideAmis=0;
-                        for (int i=8; i>-1; i--)
+                        for (int i=16; i>-1; i--)
                         {
-                            rectButtonFriendListHider.x= -50*i;
+                            rectButtonFriendListHider.x= -25*i;
                             SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
                             SDL_RenderPresent(render);
                             SDL_Delay(5);
@@ -3826,6 +4073,18 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>659 && event.button.y<752)
                 {
+                    if (optionNoTime(render)==1)
+                    {
+                        //l'utilisateur veut se déconnecter
+                        *nextPage=2;
+                        continuer=0;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
                     //Options
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>773 && event.button.y<866)
@@ -4345,7 +4604,7 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    int nextPage=2;
+    int nextPage=5;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
@@ -4382,8 +4641,6 @@ int main(int argc, char* argv[])
 
 
     //Destruction of the window
-    SDL_Log("Error at the end of the programm:");
-    SDL_Log(SDL_GetError());
     TTF_Quit();
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);

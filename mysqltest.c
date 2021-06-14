@@ -26,17 +26,14 @@ int main(int argc, char **argv)
         finish_with_error(con);
     }
     printf("Connecte\n");
-    if (mysql_query(con, "SELECT * FROM User"))
+    int caca = mysql_query(con, "SELECT COUNT(*) FROM Puzzle");
+    int test = caca;
+    if (test==1261833)
     {
-        finish_with_error(con);
+        printf("caca -> %d",test);
     }
-    printf("Requete effectue\n");
+    
     MYSQL_RES *result = mysql_store_result(con);
-
-    if (result == NULL)
-    {
-        finish_with_error(con);
-    }
 
     int num_fields = mysql_num_fields(result);
 
