@@ -72,6 +72,8 @@ int main(int argc, char **argv)
     int len = log10(user_id)+1;
     char userIdChar[len];
     itoa(user_id, userIdChar, 10);
+    printf("resultat %c", result);
+    
     mysql_free_result(result);
     mysql_close(con);
 

@@ -3098,7 +3098,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         mysql_close(con);
                         if (boolean==1)
                         {
-                            SDL_Log("1");
                             *nextPage=5;
                             continuer=0;
                         }
@@ -3499,8 +3498,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         MYSQL *con = mysql_init(NULL);
                         time_t t = time(NULL);
                         struct tm tm = *localtime(&t);
-                        char request[] = "INSERT INTO User Values (";
-                        char date[9];
+                        char date[]="         ";
                         int year=tm.tm_year+1900;
                         int month= tm.tm_mon + 1;
                         int day = tm.tm_mday;
@@ -3514,6 +3512,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         date[7] = 47;
                         date[8] = 48 + (day/10);
                         date[9] = 48 + (day%10);
+                        date[10]=0;
 
                         printf("now: %d-%d-%d\n", year, month, day);
                         if (con == NULL)
@@ -3522,7 +3521,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             exit(1);
                         }
 
-                        if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                        if (mysql_real_connect(con, "15.188.183.249", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
                         {
                             SDL_Log("Non connecte");
                             exit(1);
@@ -3533,15 +3532,19 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         int num_fields = mysql_num_fields(result);
                         MYSQL_ROW row = mysql_fetch_row(result);
                         int user_id = atoi(row[0])+1;
+                        SDL_Log(row[0]);
                         int len = log10(user_id)+1;
                         char userIdChar[len];
                         itoa(user_id, userIdChar, 10);
                         mysql_free_result(result);
                         mysql_close(con);
 
-
+                        char request[] = "INSERT INTO User Values (";
+                        SDL_Log(request);
                         strcat(userIdChar, ",'");
+                        SDL_Log(request);
                         strcat(request, userIdChar);
+                        SDL_Log(request);
 
                         char newPrenom[cptNumberOfValuesInscription2];
                         for (int i=0; i<cptNumberOfValuesInscription2; i++)
@@ -3577,22 +3580,25 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         strcat(newPrenom, "','");
                         strcat(newPrenom, newPassword);
                         strcat(newPrenom, "','");
+                        SDL_Log(date);
                         strcat(newPrenom, date);
+                        SDL_Log(date);
                         strcat(newPrenom, "', 1000, 1000, 'francais', '");
                         strcat(newEmail, "', 0);");
                         strcat(newPrenom, newEmail);
                         strcat(request, newPrenom);
 
                         MYSQL *con2 = mysql_init(NULL);
-
-                        char test[] = "INSERT INTO User Values (3,'Julien','Chemillier', 192837465,'2021/06/15', 1000, 1000, 'francais', 'Email', 0);";
-                        if (mysql_real_connect(con2, "35.181.56.11", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
+                        char* requestpointeur=request;
+                        requestpointeur[0]=73;
+                        SDL_Log(request);
+                        if (mysql_real_connect(con2, "15.188.183.249", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
                         {
                             SDL_Log("Non connecte2");
                         }
-                        if (mysql_query(con2, test))
+                        if (mysql_query(con2, request))
                         {
-                            SDL_Log("Error request2");
+                            SDL_Log(request);
                             exit(1);
                         }
                         *nextPage=4;
@@ -5204,7 +5210,7 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    int nextPage=4;
+    int nextPage=2;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
