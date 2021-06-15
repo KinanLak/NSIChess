@@ -8,7 +8,7 @@
 //#include <SDL2/SDL_image.h>
 //#include <winsock2.h>
 
-
+int son=1;
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
 struct MoveStructure
@@ -608,7 +608,7 @@ void legalMovesRook(unsigned int* chessBoard, int position, FileMoveStructure* f
     if (position%8 != 0)
     {
         i=position-1;
-        while (i%8 != 7)
+        while (i%8!=7 && i>=0)
         {
             if (chessBoard[i]==0)
             {
@@ -1292,6 +1292,8 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 
 //Definitions of variables
+int typeChessboard=1;
+int typePieces=2;
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 #define xMinBoard 488
@@ -1366,21 +1368,26 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define MailConfirmationBGImageBMP "images/inscription/mailConfirmation.bmp"
 #define MailConfirmationButtonImageBMP "images/inscription/validerButton.bmp"
 #define MailConfirmationButtonHoverImageBMP "images/inscription/hoverValiderButton.bmp"
+#define WinBGImageBMP "images/winBG.bmp"
+#define LooseBGImageBMP "images/looseBG.bmp"
+
+#define ButtonContinuerIssueGameBGImageBMP "images/continuer.bmp"
+#define HoverButtonContinuerIssueGameBGImageBMP "images/hoverContinuer.bmp"
 
 
-#define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"
-#define BlackKnightImageBMP "images/pieces/type1/black/knight.bmp"
-#define BlackKingImageBMP "images/pieces/type1/black/king.bmp"
-#define BlackQueenImageBMP "images/pieces/type1/black/queen.bmp"
-#define BlackRookImageBMP "images/pieces/type1/black/rook.bmp"
-#define BlackBishopImageBMP "images/pieces/type1/black/bishop.bmp"
+#define BlackPawnImageBMP "/black/pawn.bmp"
+#define BlackKnightImageBMP "/black/knight.bmp"
+#define BlackKingImageBMP "/black/king.bmp"
+#define BlackQueenImageBMP "/black/queen.bmp"
+#define BlackRookImageBMP "/black/rook.bmp"
+#define BlackBishopImageBMP "/black/bishop.bmp"
 
-#define WhitePawnImageBMP "images/pieces/type1/white/pawn.bmp"
-#define WhiteKnightImageBMP "images/pieces/type1/white/knight.bmp"
-#define WhiteKingImageBMP "images/pieces/type1/white/king.bmp"
-#define WhiteQueenImageBMP "images/pieces/type1/white/queen.bmp"
-#define WhiteRookImageBMP "images/pieces/type1/white/rook.bmp"
-#define WhiteBishopImageBMP "images/pieces/type1/white/bishop.bmp"
+#define WhitePawnImageBMP "/white/pawn.bmp"
+#define WhiteKnightImageBMP "/white/knight.bmp"
+#define WhiteKingImageBMP "/white/king.bmp"
+#define WhiteQueenImageBMP "/white/queen.bmp"
+#define WhiteRookImageBMP "/white/rook.bmp"
+#define WhiteBishopImageBMP "/white/bishop.bmp"
 
 
 /*#define defineAllPiecesType1() #define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"\
@@ -1422,6 +1429,32 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define ALLImageAndTransparencyINIT(X,Y, Z, render)   X = SDL_LoadBMP(Z);\
         SDL_SetColorKey(X, SDL_TRUE, SDL_MapRGB(X->format, transparentColor));\
         Y = SDL_CreateTextureFromSurface(render, X);
+
+#define ALLImageAndTransparencyINITPieces(X,Y, Z, render)   if (1)\
+        {\
+            char pathPieces[]="images/pieces/type1";\
+            char* pointeurPathPieces=pathPieces;\
+            if (typePieces==1)\
+            {\
+                pointeurPathPieces[18]=49;\
+            }\
+            else if (typePieces==2)\
+            {\
+                pointeurPathPieces[18]=50;\
+            }\
+            else if (typePieces==3)\
+            {\
+                pointeurPathPieces[18]=51;\
+            }\
+            else if (typePieces==4)\
+            {\
+                pointeurPathPieces[18]=52;\
+            }\
+            strcat(pathPieces, Z);\
+            X = SDL_LoadBMP(pathPieces);\
+            SDL_SetColorKey(X, SDL_TRUE, SDL_MapRGB(X->format, transparentColor));\
+            Y = SDL_CreateTextureFromSurface(render, X);\
+        }
 
 #define ALLImageINIT(X,Y, Z, render)   X = SDL_LoadBMP(Z);\
         Y = SDL_CreateTextureFromSurface(render, X);    
@@ -1494,18 +1527,18 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
             }
 #define initAllBoardImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
     ALLImageINIT(imagePoint, texturePoint, PointImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageBlackKnight ,textureBlackKnight, BlackKnightImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageBlackQueen ,textureBlackQueen, BlackQueenImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageBlackKing ,textureBlackKing, BlackKingImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageWhitePawn ,textureWhitePawn, WhitePawnImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageWhiteRook ,textureWhiteRook, WhiteRookImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageWhiteBishop ,textureWhiteBishop, WhiteBishopImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageWhiteKnight ,textureWhiteKnight, WhiteKnightImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageWhiteQueen ,textureWhiteQueen, WhiteQueenImageBMP, render)\
-    ALLImageAndTransparencyINIT(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageBlackBishop ,textureBlackBishop, BlackBishopImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageBlackKnight ,textureBlackKnight, BlackKnightImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageBlackQueen ,textureBlackQueen, BlackQueenImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageBlackKing ,textureBlackKing, BlackKingImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageWhitePawn ,textureWhitePawn, WhitePawnImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageWhiteRook ,textureWhiteRook, WhiteRookImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageWhiteBishop ,textureWhiteBishop, WhiteBishopImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageWhiteKnight ,textureWhiteKnight, WhiteKnightImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageWhiteQueen ,textureWhiteQueen, WhiteQueenImageBMP, render)\
+    ALLImageAndTransparencyINITPieces(imageWhiteKing ,textureWhiteKing, WhiteKingImageBMP, render)\
     ALLImageINIT(imageWhitePromoteBar, textureWhitePromoteBar, WhitePromoteBarBMP, render)\
     ALLImageINIT(imageBlackPromoteBar, textureBlackPromoteBar, BlackPromoteBarBMP, render)
 
@@ -2680,7 +2713,6 @@ int optionNoTime(SDL_Renderer* render)
 
     int switch1=1;
     int switch2=1;
-    int typePieces=1;
     int typeChessboard=1;
     SDL_RenderCopy(render, textureOptionsBG, NULL, NULL);
     showTypePieces()
@@ -3061,7 +3093,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     else
                     {   
                         MYSQL *con = mysql_init(NULL);
-                        if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                        if (mysql_real_connect(con, "15.188.183.249", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
                         {
                             SDL_Log("Error connexion database");
                         }
@@ -3070,25 +3102,31 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             SDL_Log("connected database");
                         }
                         char request[] = "SELECT Count(*) FROM User Where email='";
-                        char requesttransition1[] = "' AND password=";
-                        char requesttransition3[] = ";";
+                        char requesttransition1[] = "' AND password='";
+                        char requesttransition3[] = "';";
 
                         char newConnexion1[cptNumberOfValuesConnexion1];
                         for (int i=0; i<cptNumberOfValuesConnexion1; i++)
                         {
                             newConnexion1[i] = strPointeurConnexion1[i];
                         }
+                        newConnexion1[cptNumberOfValuesConnexion1]=0;
                         char newConnexion2[cptNumberOfValuesConnexion2];
                         for (int i=0; i<cptNumberOfValuesConnexion2; i++)
                         {
                             newConnexion2[i] = strPointeurConnexion2[i];
                         }
+                        newConnexion2[cptNumberOfValuesConnexion2]=0;
                         strcat(request, newConnexion1);
                         strcat(requesttransition1,  newConnexion2);
                         strcat(requesttransition1,  requesttransition3);
                         strcat(request, requesttransition1);
 
-                        mysql_query(con, request);
+                        if (mysql_query(con, request))
+                        {
+                            SDL_Log("Error, request connexion");
+                            SDL_Log(request);
+                        }
                         MYSQL_RES *result = mysql_store_result(con);
                         int num_fields = mysql_num_fields(result);
 
@@ -3098,11 +3136,13 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         mysql_close(con);
                         if (boolean==1)
                         {
+                            SDL_Log("1");
                             *nextPage=5;
                             continuer=0;
                         }
                         else
                         {
+                            SDL_Log("Error");
                             //Error if false
                             openFonts()
                             SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
@@ -3540,11 +3580,8 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         mysql_close(con);
 
                         char request[] = "INSERT INTO User Values (";
-                        SDL_Log(request);
                         strcat(userIdChar, ",'");
-                        SDL_Log(request);
                         strcat(request, userIdChar);
-                        SDL_Log(request);
 
                         char newPrenom[cptNumberOfValuesInscription2];
                         for (int i=0; i<cptNumberOfValuesInscription2; i++)
@@ -3580,9 +3617,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         strcat(newPrenom, "','");
                         strcat(newPrenom, newPassword);
                         strcat(newPrenom, "','");
-                        SDL_Log(date);
                         strcat(newPrenom, date);
-                        SDL_Log(date);
                         strcat(newPrenom, "', 1000, 1000, 'francais', '");
                         strcat(newEmail, "', 0);");
                         strcat(newPrenom, newEmail);
@@ -3671,7 +3706,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         else if (focus==5)
                         {
-                            if (cptNumberOfValuesInscription1>0)
+                            if (cptNumberOfValuesInscription5>0)
                             {
                                 cptNumberOfValuesInscription5-=1;
                                 strPointeurInscription5[cptNumberOfValuesInscription5]=32;
@@ -3680,7 +3715,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         else if (focus==6)
                         {
-                            if (cptNumberOfValuesInscription1>0)
+                            if (cptNumberOfValuesInscription6>0)
                             {
                                 cptNumberOfValuesInscription6-=1;
                                 strPointeurInscription6[cptNumberOfValuesInscription6]=32;
@@ -3937,7 +3972,7 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 {
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
-                    SDL_RenderCopy(render, textureOrdinateur, NULL, &sdlRectOrdinateur);
+                    //SDL_RenderCopy(render, textureOrdinateur, NULL, &sdlRectOrdinateur);
                     SDL_RenderPresent(render);
                 }
                 else
@@ -3954,8 +3989,17 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
-                    *nextPage=1;
-                    continuer=0;
+                    if (doYouWantToQuitNoTime(render))
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
                 }
                 else if (event.button.x>446 && event.button.y>370 && event.button.x<496 && event.button.y<426 )
                 {
@@ -3976,8 +4020,8 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >1187 && event.button.x <1405 && event.button.y >545 && event.button.y <774)
                 {
-                    *nextPage=7;
-                    continuer=0;
+                    //*nextPage=7;
+                    //continuer=0;
                     //3
                 }
                 break;
@@ -4521,7 +4565,20 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     //Quitter
                 }
                 break;
-            case SDL_KEYDOWN: 
+            case SDL_KEYDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                    }
+                    else
+                    {
+                        *nextPage=5;
+                        continuer=0;
+                    }
+                }
                 break;
         }
     }
@@ -4529,7 +4586,68 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
 
 
+int issueOfTheGame(SDL_Renderer* render, int* nextPage, int win, int type)
+{
+    SDL_Surface* imageBackground = NULL;
+    SDL_Texture* textureBackground = NULL;
+    if (win==1)
+    {
+        ALLImageAndTransparencyINIT(imageBackground, textureBackground, WinBGImageBMP, render)
+    }
+    else
+    {
+        ALLImageAndTransparencyINIT(imageBackground, textureBackground, LooseBGImageBMP, render)
+    }
+    
+    SDL_Surface* imageHoverContinuerButton = NULL;
+    SDL_Texture* textureHoverContinuerButton = NULL;
+    ALLImageAndTransparencyINIT(imageHoverContinuerButton, textureHoverContinuerButton, HoverButtonContinuerIssueGameBGImageBMP, render)
+    SDL_Rect rectButtonContinuer;
+    rectButtonContinuer.x= 833;
+    rectButtonContinuer.y= 875;
+    rectButtonContinuer.w= 254;
+    rectButtonContinuer.h= 72;
+    
+    SDL_Surface* imageContinuerButton = NULL;
+    SDL_Texture* textureContinuerButton = NULL;
+    ALLImageAndTransparencyINIT(imageContinuerButton, textureContinuerButton, ButtonContinuerIssueGameBGImageBMP, render)
 
+
+    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>832 && event.motion.x<1087 && event.motion.y>874 && event.motion.y<947)
+                {
+                    SDL_RenderCopy(render, textureHoverContinuerButton, NULL, &rectButtonContinuer);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureContinuerButton, NULL, &rectButtonContinuer);
+                    SDL_RenderPresent(render);
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>832 && event.button.x<1087 && event.button.y>874 && event.button.y<947)
+                {
+                    SDL_RenderCopy(render, textureHoverContinuerButton, NULL, &rectButtonContinuer);
+                    SDL_RenderPresent(render);
+                }
+                break;
+            case SDL_QUIT:
+                *nextPage=1;
+                continuer=0;
+                break;
+        }
+    }
+}
 
 
 int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
@@ -4611,9 +4729,24 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
-                    continuer=0;
+                    if (doYouWantToQuitNoTime(render))
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                        continue;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                        showPreviousMoves()
+                        displayAllpiecesInRender()
+                        SDL_RenderPresent(render);
+                        SDL_Delay(100);
+                    }
+                    
                 }
-                if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
+                else if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
                     int caseNumber = 0;
                     if (inverse)
@@ -4735,7 +4868,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     {
                         if (caseNumber==change)
                         {
-                            change=NOTHING;
+                            /*change=NOTHING;
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureBackground, NULL, NULL);
                             if (previousMove[0]!=NOTHING)
@@ -4743,7 +4876,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 showPreviousMoves()
                             }
                             displayAllpiecesInRender()
-                            SDL_RenderPresent(render);
+                            SDL_RenderPresent(render);*/
                         }
                         else if (chessBoard[caseNumber]!=0)
                         {
