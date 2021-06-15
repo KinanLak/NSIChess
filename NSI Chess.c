@@ -5500,7 +5500,11 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
+<<<<<<< Updated upstream
     int nextPage=5;
+=======
+    int nextPage=2;
+>>>>>>> Stashed changes
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
