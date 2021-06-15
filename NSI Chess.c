@@ -3019,35 +3019,10 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     {
         SDL_Log("Connected");
     }
-    char request[500]="SELECT Count(*) FROM Puzzle LEFT JOIN (SELECT * FROM Puzzle_done WHERE user_id=";
-    char* pointeurRequest=request;
-    int cpt=79;
-    char charUserId[3];
-    itoa(userIdConnected, charUserId, 10);
-    strcat(request, charUserId);
-    cpt+=log10(userIdConnected)+1;
-    char test2[]=") as Puzzle_done_change ON Puzzle.puzzle_id = Puzzle_done_change.puzzle_id WHERE (Puzzle_done_change.user_id is NULL) AND ";
-
-    for (int i=0; i<122; i++)
-    {
-        pointeurRequest[cpt]=test2[cpt];
-        cpt+=1;
-    }
-
-    char charUserPuzzleScore[4];
-    itoa(puzzle_score, charUserPuzzleScore, 10);
-    for (int i=0; i<4; i++)
-    {
-        pointeurRequest[cpt]=charUserPuzzleScore[cpt];
-        cpt+=1;
-    }
-    char test3[]=">Puzzle.puzzle_score_min AND ";
-    char test4[]="<Puzzle.puzzle_score_max ORDER BY Puzzle.Puzzle_id LIMIT 1;";
-
-    /*
+    char request[]="SELECT * FROM Puzzle LEFT JOIN (SELECT * FROM Puzzle_done WHERE user_id=001) as Puzzle_done_change ON Puzzle.puzzle_id = Puzzle_done_change.puzzle_id WHERE (Puzzle_done_change.user_id is NULL) AND 1550>Puzzle.puzzle_score_min AND 1550<Puzzle.puzzle_score_max ORDER BY Puzzle.Puzzle_id LIMIT 1;";
     strcat(request, test3);
     strcat(request, charUserPuzzleScore);
-    strcat(request, test4);*/
+    strcat(request, test4);
     SDL_Log(request);
     mysql_query(con, request);
     SDL_Log("Test after request");
@@ -3060,6 +3035,7 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     //mysql_close(con);
 
 }
+
 
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
@@ -5524,7 +5500,7 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    int nextPage=8;
+    int nextPage=5;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
