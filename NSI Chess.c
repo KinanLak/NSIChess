@@ -4,6 +4,7 @@
 #include <time.h>
 #include <SDL2/SDL_ttf.h>
 #include <mysql.h>
+#include <math.h>
 //#include <SDL2/SDL_image.h>
 //#include <winsock2.h>
 
@@ -1354,6 +1355,17 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 #define TypePieces2OptionsImageBMP "images/options/pieces/type2.bmp"
 #define TypePieces3OptionsImageBMP "images/options/pieces/type3.bmp"
 #define TypePieces4OptionsImageBMP "images/options/pieces/type4.bmp"
+#define TypeChessboard1OptionsImageBMP "images/options/chessboard/type1.bmp"
+#define TypeChessboard2OptionsImageBMP "images/options/chessboard/type2.bmp"
+#define TypeChessboard3OptionsImageBMP "images/options/chessboard/type3.bmp"
+#define TypeChessboard4OptionsImageBMP "images/options/chessboard/type4.bmp"
+#define TypeChessboard5OptionsImageBMP "images/options/chessboard/type5.bmp"
+#define TypeChessboard6OptionsImageBMP "images/options/chessboard/type6.bmp"
+#define TypeChessboard7OptionsImageBMP "images/options/chessboard/type7.bmp"
+#define TypeChessboard8OptionsImageBMP "images/options/chessboard/type8.bmp"
+#define MailConfirmationBGImageBMP "images/inscription/mailConfirmation.bmp"
+#define MailConfirmationButtonImageBMP "images/inscription/validerButton.bmp"
+#define MailConfirmationButtonHoverImageBMP "images/inscription/hoverValiderButton.bmp"
 
 
 #define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"
@@ -2019,6 +2031,44 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                         }\
                         break;
 
+#define keyPressedCodeValidation(key, valueKey, valueKeyShift, valueKeyAlt) case key:\
+                        if (cptNumberOfValuesConfirmation<limitCharDate)\
+                        {\
+                            if ((rightAlt==1 || leftAlt==1) && (leftShift==1 || rightShift==1))\
+                            {\
+                            }\
+                            else if (rightAlt==1 || leftAlt==1)\
+                            {\
+                                if ((valueKeyAlt!=-1) && (valueKeyAlt>47 && valueKeyAlt<58))\
+                                {\
+                                    strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]= valueKeyAlt;\
+                                    cptNumberOfValuesConfirmation+=1;\
+                                }\
+                            }\
+                            else if (leftShift==1 || rightShift==1)\
+                            {\
+                                if ((valueKeyShift!=-1) && (valueKeyShift>47 && valueKeyShift<58))\
+                                {\
+                                    strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]= valueKeyShift;\
+                                    cptNumberOfValuesConfirmation+=1;\
+                                }\
+                            }\
+                            else\
+                            {\
+                                if ((valueKey!=-1) && (valueKey>47 && valueKey<58))\
+                                {\
+                                    strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]= valueKey;\
+                                    cptNumberOfValuesConfirmation+=1;\
+                                    if (cptNumberOfValuesConfirmation==2 || cptNumberOfValuesConfirmation==5)\
+                                    {\
+                                        strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]=47;\
+                                        cptNumberOfValuesConfirmation+=1;\
+                                    }\
+                                }\
+                            }\
+                        }\
+                        break;
+
 #define keyPressedInscription(key, valueKey, valueKeyShift, valueKeyAlt) case key:\
                         if (focus==1)\
                         {\
@@ -2390,7 +2440,7 @@ int emailFormatCorrect(char* string, int stringSize)
     }
 }
 
-int passwordSame(char* string1, char* string2, int sizeString1, int sizeString2)
+int charSame(char* string1, char* string2, int sizeString1, int sizeString2)
 {
     if (sizeString1 != sizeString2)
     {
@@ -2402,6 +2452,26 @@ int passwordSame(char* string1, char* string2, int sizeString1, int sizeString2)
         {
             return 0;
         }
+    }
+    return 1;
+}
+
+
+int intAndCharSame(int codeConfirmation, char* string, int sizeString)
+{
+    if (sizeString!=6)
+    {
+        return 0;
+    }
+    int intUser=0;
+    for (int i=5; i>=0; i--)
+    {
+        int pow=1;
+        for (int ii=0; ii>i; ii++)
+        {
+            pow = pow*10;
+        }
+        intUser += (string[5-i]-48)*pow;
     }
     return 1;
 }
@@ -2443,11 +2513,6 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
 }
 
 #define showTypePieces() SDL_SetRenderDrawColor(render, 160, 160, 160, 255);\
-        SDL_Rect rectBehindPieces;\
-        rectTypePieces.x= 915;\
-        rectTypePieces.y= 753;\
-        rectTypePieces.w= 100;\
-        rectTypePieces.h= 100;\
         SDL_RenderFillRect(render, &rectTypePieces);\
         if (typePieces==1)\
         {\
@@ -2465,6 +2530,41 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
         {\
             SDL_RenderCopy(render, textureTypepieces4BG, NULL, &rectTypePieces);\
         }
+
+#define showTypeChessboard() SDL_SetRenderDrawColor(render, 160, 160, 160, 255);\
+        SDL_RenderFillRect(render, &rectTypeChessboard);\
+        if (typeChessboard==1)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard1BG, NULL, &rectTypeChessboard);\
+        }\
+        else if (typeChessboard==2)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard2BG, NULL, &rectTypeChessboard);\
+        }\
+        else if (typeChessboard==3)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard3BG, NULL, &rectTypeChessboard);\
+        }\
+        else if (typeChessboard==4)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard4BG, NULL, &rectTypeChessboard);\
+        }\
+        else if (typeChessboard==5)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard5BG, NULL, &rectTypeChessboard);\
+        }\
+        else if (typeChessboard==6)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard6BG, NULL, &rectTypeChessboard);\
+        }\
+        else if (typeChessboard==7)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard7BG, NULL, &rectTypeChessboard);\
+        }\
+        else if (typeChessboard==8)\
+        {\
+            SDL_RenderCopy(render, textureTypeChessboard8BG, NULL, &rectTypeChessboard);\
+        }\
 
 int optionNoTime(SDL_Renderer* render)
 {
@@ -2489,6 +2589,37 @@ int optionNoTime(SDL_Renderer* render)
     rectTypePieces.y= 753;
     rectTypePieces.w= 100;
     rectTypePieces.h= 100;
+
+
+    SDL_Surface* imageTypeChessboard1BG = NULL;
+    SDL_Texture* textureTypeChessboard1BG = NULL;
+    ALLImageINIT(imageTypeChessboard1BG, textureTypeChessboard1BG, TypeChessboard1OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard2BG = NULL;
+    SDL_Texture* textureTypeChessboard2BG = NULL;
+    ALLImageINIT(imageTypeChessboard2BG, textureTypeChessboard2BG, TypeChessboard2OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard3BG = NULL;
+    SDL_Texture* textureTypeChessboard3BG = NULL;
+    ALLImageINIT(imageTypeChessboard3BG, textureTypeChessboard3BG, TypeChessboard3OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard4BG = NULL;
+    SDL_Texture* textureTypeChessboard4BG = NULL;
+    ALLImageINIT(imageTypeChessboard4BG, textureTypeChessboard4BG, TypeChessboard4OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard5BG = NULL;
+    SDL_Texture* textureTypeChessboard5BG = NULL;
+    ALLImageINIT(imageTypeChessboard5BG, textureTypeChessboard5BG, TypeChessboard5OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard6BG = NULL;
+    SDL_Texture* textureTypeChessboard6BG = NULL;
+    ALLImageINIT(imageTypeChessboard6BG, textureTypeChessboard6BG, TypeChessboard6OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard7BG = NULL;
+    SDL_Texture* textureTypeChessboard7BG = NULL;
+    ALLImageINIT(imageTypeChessboard7BG, textureTypeChessboard7BG, TypeChessboard7OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard8BG = NULL;
+    SDL_Texture* textureTypeChessboard8BG = NULL;
+    ALLImageINIT(imageTypeChessboard8BG, textureTypeChessboard8BG, TypeChessboard8OptionsImageBMP, render)
+    SDL_Rect rectTypeChessboard;
+    rectTypeChessboard.x= 1134;
+    rectTypeChessboard.y= 523;
+    rectTypeChessboard.w= 248;
+    rectTypeChessboard.h= 248;
 
     SDL_Surface* imageSwitchOnBG = NULL;
     SDL_Texture* textureSwitchOnBG = NULL;
@@ -2550,9 +2681,10 @@ int optionNoTime(SDL_Renderer* render)
     int switch1=1;
     int switch2=1;
     int typePieces=1;
-    int typeBoard=1;
+    int typeChessboard=1;
     SDL_RenderCopy(render, textureOptionsBG, NULL, NULL);
     showTypePieces()
+    showTypeChessboard()
     SDL_RenderPresent(render);
     SDL_Event event;
     int continuer = 1;
@@ -2706,10 +2838,30 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>1198 && event.button.x<1226 && event.button.y>791 && event.button.y<822)
                     {
+                        if (typeChessboard==1)
+                        {
+                            typeChessboard=8;
+                        }
+                        else
+                        {
+                            typeChessboard-=1;
+                        }
+                        showTypeChessboard()
+                        SDL_RenderPresent(render);
                         //leftArrow2
                     }
                     else if (event.button.x>1287 && event.button.x<1315 && event.button.y>791 && event.button.y<822)
                     {
+                        if (typeChessboard==8)
+                        {
+                            typeChessboard=1;
+                        }
+                        else
+                        {
+                            typeChessboard+=1;
+                        }
+                        showTypeChessboard()
+                        SDL_RenderPresent(render);
                         //rightArrow2
                     }
                 }
@@ -2799,9 +2951,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
     char strConnexion1[38]="                                      ";
     char* strPointeurConnexion1 = strConnexion1;
-    char strConnexion2[38]="                                      ";
+    char strConnexion2[40]="                                        ";
     char* strPointeurConnexion2 = strConnexion2;
-    char strConnexion2Hidder[38]="                                      ";
+    char strConnexion2Hidder[40]="                                        ";
     char* strPointeurConnexion2Hidder = strConnexion2Hidder;
     int cptNumberOfValuesConnexion1 = 0;
     int cptNumberOfValuesConnexion2 = 0;
@@ -2852,6 +3004,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 break;
             case SDL_QUIT:
+                *nextPage=1;
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -2907,18 +3060,50 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     }
                     else
                     {   
-                        //mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0)
-                        //char chaine[] = "SELECT COUNT(*) FROM USER WHERE"
-                        //int requestResult = mysql_query(con, "SELECT COUNT(*) FROM Puzzle");
-                        //int testResult = requestResult;
-                        //if (testResult==1)
-                        //{
-                            //Send request if True (need sql)
+                        MYSQL *con = mysql_init(NULL);
+                        if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                        {
+                            SDL_Log("Error connexion database");
+                        }
+                        else
+                        {
+                            SDL_Log("connected database");
+                        }
+                        char request[] = "SELECT Count(*) FROM User Where email='";
+                        char requesttransition1[] = "' AND password=";
+                        char requesttransition3[] = ";";
+
+                        char newConnexion1[cptNumberOfValuesConnexion1];
+                        for (int i=0; i<cptNumberOfValuesConnexion1; i++)
+                        {
+                            newConnexion1[i] = strPointeurConnexion1[i];
+                        }
+                        char newConnexion2[cptNumberOfValuesConnexion2];
+                        for (int i=0; i<cptNumberOfValuesConnexion2; i++)
+                        {
+                            newConnexion2[i] = strPointeurConnexion2[i];
+                        }
+                        strcat(request, newConnexion1);
+                        strcat(requesttransition1,  newConnexion2);
+                        strcat(requesttransition1,  requesttransition3);
+                        strcat(request, requesttransition1);
+
+                        mysql_query(con, request);
+                        MYSQL_RES *result = mysql_store_result(con);
+                        int num_fields = mysql_num_fields(result);
+
+                        MYSQL_ROW row = mysql_fetch_row(result);
+                        int boolean = atoi(row[0]);
+                        mysql_free_result(result);
+                        mysql_close(con);
+                        if (boolean==1)
+                        {
+                            SDL_Log("1");
                             *nextPage=5;
                             continuer=0;
-                        //}
-                        //else
-                        //{
+                        }
+                        else
+                        {
                             //Error if false
                             openFonts()
                             SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
@@ -2930,7 +3115,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             SDL_RenderCopy(render, textureChampsIncorrect, NULL, &sdlRectChampsIncorrect);
                             SDL_RenderPresent(render);
                             closeFonts()
-                        //}
+                        }
                     }
                 }
                 else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
@@ -3144,6 +3329,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 break;
             case SDL_QUIT:
+                *nextPage=1;
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -3153,6 +3339,15 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     {
                         continuer=0;
                         *nextPage=1;
+                    }
+                    else
+                    {
+                        openFonts();
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                        showTextesInscription()
+                        SDL_RenderPresent(render);
+                        closeFonts();
                     }
                 }
                 else if (event.button.x >598 && event.button.y >225 && event.button.x <640 && event.button.y <269)
@@ -3243,27 +3438,6 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderPresent(render);
                         closeFonts();
                     }
-                    else if (cptNumberOfValuesInscription4==0)
-                    {
-                        openFonts();
-                        emptyChamps(707, 536);
-                        SDL_RenderPresent(render);
-                        closeFonts();
-                    }
-                    else if (cptNumberOfValuesInscription5==0)
-                    {
-                        openFonts();
-                        emptyChamps(843, 650);
-                        SDL_RenderPresent(render);
-                        closeFonts();
-                    }
-                    else if (cptNumberOfValuesInscription6==0)
-                    {
-                        openFonts()
-                        emptyChamps(842, 764);
-                        SDL_RenderPresent(render);
-                        closeFonts();
-                    }
                     else if (cptNumberOfValuesInscription3==10 && verificationOfTheDayOfBirth(strPointeurInscription3)==0)
                     {
                         openFonts();
@@ -3278,6 +3452,13 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderPresent(render);
                         closeFonts();
                     }
+                    else if (cptNumberOfValuesInscription4==0)
+                    {
+                        openFonts();
+                        emptyChamps(707, 536);
+                        SDL_RenderPresent(render);
+                        closeFonts();
+                    }
                     else if (emailFormatCorrect(strPointeurInscription4, cptNumberOfValuesInscription4)==0)
                     {
                         openFonts()
@@ -3285,17 +3466,136 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderPresent(render);
                         closeFonts();
                     }
-                    else if (passwordSame(strInscription5, strInscription6, cptNumberOfValuesInscription5, cptNumberOfValuesInscription6)==0)
+                    else if (cptNumberOfValuesInscription5==0)
                     {
                         openFonts();
-                        champsErrorText(842, 764, "Confirmation differente du mot de passe");
+                        emptyChamps(843, 650);
+                        SDL_RenderPresent(render);
+                        closeFonts();
+                    }
+                    else if (cptNumberOfValuesInscription5<=5)
+                    {
+                        openFonts();
+                        champsErrorText(843, 650, "Mot de passe trop court");
+                        SDL_RenderPresent(render);
+                        closeFonts();
+                    }
+                    else if (cptNumberOfValuesInscription6==0)
+                    {
+                        openFonts()
+                        emptyChamps(842, 764);
+                        SDL_RenderPresent(render);
+                        closeFonts();
+                    }
+                    else if (charSame(strInscription5, strInscription6, cptNumberOfValuesInscription5, cptNumberOfValuesInscription6)==0)
+                    {
+                        openFonts();
+                        champsErrorText(842, 764, "Different du mot de passe");
                         SDL_RenderPresent(render);
                         closeFonts();
                     }
                     else
                     {
-                        //Send request
-                        *nextPage=2;
+                        MYSQL *con = mysql_init(NULL);
+                        time_t t = time(NULL);
+                        struct tm tm = *localtime(&t);
+                        char request[] = "INSERT INTO User Values (";
+                        char date[9];
+                        int year=tm.tm_year+1900;
+                        int month= tm.tm_mon + 1;
+                        int day = tm.tm_mday;
+                        date[0] = 48+(year/1000);
+                        date[1] = 48+(year/100)%10;
+                        date[2] = 48+(year/10)%10;
+                        date[3] = 48+(year%10);
+                        date[4] = 47;
+                        date[5] = 48 + (month/10);
+                        date[6] = 48 + (month%10);
+                        date[7] = 47;
+                        date[8] = 48 + (day/10);
+                        date[9] = 48 + (day%10);
+
+                        printf("now: %d-%d-%d\n", year, month, day);
+                        if (con == NULL)
+                        {
+                            SDL_Log("mysql_init() failed\n");
+                            exit(1);
+                        }
+
+                        if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                        {
+                            SDL_Log("Non connecte");
+                            exit(1);
+                        }
+
+                        mysql_query(con, "SELECT MAX(user_id) FROM User;");
+                        MYSQL_RES *result = mysql_store_result(con);
+                        int num_fields = mysql_num_fields(result);
+                        MYSQL_ROW row = mysql_fetch_row(result);
+                        int user_id = atoi(row[0])+1;
+                        int len = log10(user_id)+1;
+                        char userIdChar[len];
+                        itoa(user_id, userIdChar, 10);
+                        mysql_free_result(result);
+                        mysql_close(con);
+
+
+                        strcat(userIdChar, ",'");
+                        strcat(request, userIdChar);
+
+                        char newPrenom[cptNumberOfValuesInscription2];
+                        for (int i=0; i<cptNumberOfValuesInscription2; i++)
+                        {
+                            newPrenom[i] = strPointeurInscription2[i];
+                        }
+                        newPrenom[cptNumberOfValuesInscription2]=0;
+
+                        char newNom[cptNumberOfValuesInscription1];
+                        for (int i=0; i<cptNumberOfValuesInscription1; i++)
+                        {
+                            newNom[i] = strPointeurInscription1[i];
+                        }
+                        newNom[cptNumberOfValuesInscription1]=0;
+
+
+                        char newPassword[cptNumberOfValuesInscription5];
+                        for (int i=0; i<cptNumberOfValuesInscription5; i++)
+                        {
+                            newPassword[i] = strPointeurInscription5[i];
+                        }
+                        newPassword[cptNumberOfValuesInscription5]=0;
+                        
+                        char newEmail[cptNumberOfValuesInscription4];
+                        for (int i=0; i<cptNumberOfValuesInscription4; i++)
+                        {
+                            newEmail[i] = strPointeurInscription4[i];
+                        }
+                        newEmail[cptNumberOfValuesInscription4]=0;
+
+                        strcat(newPrenom, "','");
+                        strcat(newPrenom, newNom);
+                        strcat(newPrenom, "','");
+                        strcat(newPrenom, newPassword);
+                        strcat(newPrenom, "','");
+                        strcat(newPrenom, date);
+                        strcat(newPrenom, "', 1000, 1000, 'francais', '");
+                        strcat(newEmail, "', 0);");
+                        strcat(newPrenom, newEmail);
+                        strcat(request, newPrenom);
+
+                        MYSQL *con2 = mysql_init(NULL);
+
+                        char test[] = "INSERT INTO User Values (3,'Julien','Chemillier', 192837465,'2021/06/15', 1000, 1000, 'francais', 'Email', 0);";
+                        if (mysql_real_connect(con2, "35.181.56.11", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
+                        {
+                            SDL_Log("Non connecte2");
+                        }
+                        if (mysql_query(con2, test))
+                        {
+                            SDL_Log("Error request2");
+                            exit(1);
+                        }
+                        *nextPage=4;
                         continuer=0;
                     }
 
@@ -3642,27 +3942,36 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 break;
             case SDL_QUIT:
+                *nextPage=1;
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    *nextPage=1;
                     continuer=0;
                 }
                 else if (event.button.x>446 && event.button.y>370 && event.button.x<496 && event.button.y<426 )
                 {
+                    *nextPage=5;
                     continuer=0;
                 }
                 else if (event.button.x >514 && event.button.x <766 && event.button.y >552 && event.button.y <759)
                 {
+                    *nextPage=7;
+                    continuer=0;
                     //1
                 }
                 else if (event.button.x >845 && event.button.x <1082 && event.button.y >551 && event.button.y <763)
                 {
+                    *nextPage=7;
+                    continuer=0;
                     //2
                 }
                 else if (event.button.x >1187 && event.button.x <1405 && event.button.y >545 && event.button.y <774)
                 {
+                    *nextPage=7;
+                    continuer=0;
                     //3
                 }
                 break;
@@ -3728,8 +4037,6 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
     SDL_RenderPresent(render);
 
-    
-
     SDL_Event event;
     int continuer=1, focus=0;
     while (continuer)
@@ -3760,12 +4067,68 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 break;
             case SDL_QUIT:
+                *nextPage=1;
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
-                    continuer=0;
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                        if (focus==1)
+                        {
+                            createRectTimeChoice(688, 403, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==2)
+                        {
+                            createRectTimeChoice(887, 403, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==3)
+                        {
+                            createRectTimeChoice(1086, 403, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==4)
+                        {
+                            createRectTimeChoice(688, 516, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==5)
+                        {
+                            createRectTimeChoice(887, 516, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==6)
+                        {
+                            createRectTimeChoice(1086, 516, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==7)
+                        {
+                            createRectTimeChoice(688, 628, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==8)
+                        {
+                            createRectTimeChoice(887, 628, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        else if (focus==9)
+                        {
+                            createRectTimeChoice(1086, 628, 146, 71)
+                            SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                        }
+                        SDL_RenderPresent(render);
+                    }
                 }
                 else if (event.button.x>688 && event.button.x<834 && event.button.y>403 && event.button.y<475 && focus!=1)
                 {
@@ -3850,6 +4213,8 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>639 && event.button.x<944 && event.button.y>777 && event.button.y<870)
                 {
+                    *nextPage=6;
+                    continuer=0;
                     //Previous Page
                 }
                 else if (event.button.x>976 && event.button.x<1280 && event.button.y>777 && event.button.y<870)
@@ -4045,6 +4410,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 break;
             case SDL_QUIT:
+                *nextPage=1;
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -4087,6 +4453,8 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>429 && event.button.y<522)
                 {
+                    *nextPage=6;
+                    continuer=0;
                     //Jouer
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637)
@@ -4231,6 +4599,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         switch(event.type)
         {
             case SDL_QUIT:
+                *nextPage=1;
                 continuer = 0;
                 break;
             case SDL_MOUSEBUTTONDOWN:
@@ -4630,9 +4999,196 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 }
 
 
-void puzzleBoard(SDL_Window* window, SDL_Renderer* renderer)
+void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
+    SDL_Surface* imageMailConfirmationBackground = NULL;
+    SDL_Texture* textureMailConfirmationBackground = NULL;
+    ALLImageINIT(imageMailConfirmationBackground, textureMailConfirmationBackground, MailConfirmationBGImageBMP, render)
 
+    SDL_Surface* imageValiderButton = NULL;
+    SDL_Texture* textureValiderButton = NULL;
+    ALLImageAndTransparencyINIT(imageValiderButton, textureValiderButton, MailConfirmationButtonImageBMP, render)
+
+    SDL_Surface* imageValiderHoverButton = NULL;
+    SDL_Texture* textureValiderHoverButton = NULL;
+    ALLImageAndTransparencyINIT(imageValiderHoverButton, textureValiderHoverButton, MailConfirmationButtonHoverImageBMP, render)
+    SDL_Rect rectValiderButton;
+    rectValiderButton.x = 833;
+    rectValiderButton.y = 670;
+    rectValiderButton.w = 254;
+    rectValiderButton.h = 74; 
+
+    char strCodeConfirmation[38]="                                      ";
+    char* strPointeurCodeConfirmation = strCodeConfirmation;
+    int cptNumberOfValuesConfirmation=0;
+
+    int leftShift=0;
+    int rightShift=0;
+    int rightAlt=0;
+    int leftAlt=0;
+    int limitCharDate=6;
+
+    //Generation of the code
+    int codeConfirmation=0;
+    srand(time(NULL));
+    for (int x=0; x<6; x++)
+    {
+        int r = (rand()%100)%10;
+        int pow=1;
+        for (int y=0; y<x; y++)
+        {
+            pow=pow*10;
+        }
+        codeConfirmation+=pow*r;
+    }
+
+    SDL_RenderCopy(render, textureMailConfirmationBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>832 && event.motion.x<1087 && event.motion.y>669 && event.motion.y<744)
+                {
+                    SDL_RenderCopy(render, textureValiderHoverButton, NULL, &rectValiderButton);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureValiderButton, NULL, &rectValiderButton);
+                    SDL_RenderPresent(render);
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        continuer=0;
+                        *nextPage=1;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureMailConfirmationBackground, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
+                }
+                if (event.button.x>832 && event.button.x<1087 && event.button.y>669 && event.button.y<744)
+                {
+                    if (intAndCharSame(codeConfirmation, strPointeurCodeConfirmation, cptNumberOfValuesConfirmation)==0)
+                    {
+                        SDL_Color color = {230, 20, 20};
+                        TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 33);
+
+                        SDL_Surface * surface = TTF_RenderText_Solid(font, "Code Incorrect", color);
+                        SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
+                        int texWChamps1 = 729;
+                        int texHChamps1 = 38;
+                        SDL_QueryTexture(texture, NULL, NULL, &texWChamps1, &texHChamps1);
+                        SDL_Rect sdlRectChamps1 = { 855, 630, texWChamps1, texHChamps1};
+                        SDL_RenderCopy(render, texture, NULL, &sdlRectChamps1);
+                        SDL_RenderPresent(render);
+                        TTF_CloseFont(font);
+                        SDL_Delay(3000);
+
+                        SDL_SetRenderDrawColor(render, 239, 239, 239, 239);
+                        SDL_Rect rectCode;
+                        rectCode.x = 770;
+                        rectCode.y = 630;
+                        rectCode.w = 350;
+                        rectCode.h = 30;
+                        SDL_RenderFillRect(render, &rectCode);
+                        SDL_RenderPresent(render);
+                    }
+                    else
+                    {
+                        SDL_Color color = {20, 230, 20};
+                        TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 33);
+
+                        SDL_Surface * surface = TTF_RenderText_Solid(font, "Code correct !", color);
+                        SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
+                        int texWChamps1 = 729;
+                        int texHChamps1 = 38;
+                        SDL_QueryTexture(texture, NULL, NULL, &texWChamps1, &texHChamps1);
+                        SDL_Rect sdlRectChamps1 = { 855, 630, texWChamps1, texHChamps1};
+                        SDL_RenderCopy(render, texture, NULL, &sdlRectChamps1);
+                        SDL_RenderPresent(render);
+                        TTF_CloseFont(font);
+                        SDL_Delay(3000);
+
+                        continuer=0;
+                        *nextPage=2;
+                    }
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch( event.key.keysym.sym ){
+                    case SDLK_LSHIFT:
+                        leftShift=1;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=1;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=1;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=1;
+                        break;
+                    case SDLK_BACKSPACE:
+                        if (cptNumberOfValuesConfirmation>0)
+                        {
+                            cptNumberOfValuesConfirmation-=1;
+                            strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]=32;
+                        }
+                        break;
+                    keyPressedCodeValidation(SDLK_1, 38, 49, -1)
+                    keyPressedCodeValidation(SDLK_2, 233, 50, -1)
+                    keyPressedCodeValidation(SDLK_3, -1, 51, 35)
+                    keyPressedCodeValidation(SDLK_4, -1, 52, -1)
+                    keyPressedCodeValidation(SDLK_5, -1, 53, -1)
+                    keyPressedCodeValidation(SDLK_6, 45, 54, -1)
+                    keyPressedCodeValidation(SDLK_7, 232, 55, -1)
+                    keyPressedCodeValidation(SDLK_8, 95, 56, -1)
+                    keyPressedCodeValidation(SDLK_9, 231, 57, -1)
+                    keyPressedCodeValidation(SDLK_0, 224, 48, 64)
+                }
+                //updateTextesCodeConfirmation()
+                SDL_Color color = {0, 0, 0};
+                TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 40);
+                SDL_SetRenderDrawColor(render, WHITE);
+                SDL_Rect rectCode;
+                rectCode.x = 695;
+                rectCode.y = 557;
+                rectCode.w = 36;
+                rectCode.h = 53;
+                for (int i=0; i<6; i++)
+                {
+                    rectCode.x+=71;
+                    SDL_RenderFillRect(render, &rectCode);
+
+                    char test[38]="                                      ";
+                    char* testpointeur=test;
+                    testpointeur[0]=strPointeurCodeConfirmation[i];
+
+                    SDL_Surface * surface = TTF_RenderText_Solid(font, test, color);
+                    SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
+                    int texWChamps1 = 729;
+                    int texHChamps1 = 38;
+                    SDL_QueryTexture(texture, NULL, NULL, &texWChamps1, &texHChamps1);
+                    SDL_Rect sdlRectChamps1 = { 770+(71*i), 557, texWChamps1, texHChamps1};
+                    SDL_RenderCopy(render, texture, NULL, &sdlRectChamps1);
+                }
+                TTF_CloseFont(font);
+                SDL_RenderPresent(render);
+                break;
+        }
+    }
 }
 
 
@@ -4648,7 +5204,7 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    int nextPage=5;
+    int nextPage=4;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
@@ -4661,13 +5217,13 @@ int main(int argc, char* argv[])
         {
             inscriptionPage(window, render, &nextPage);
         }
+        else if (nextPage==4)
+        {
+            attenteCodePage(window, render, &nextPage);
+        }
         else if (nextPage==5)
         {
             mainMenuPage(window, render, &nextPage);
-        }
-        else if (nextPage==10)
-        {
-            mainBoard(window, render, &nextPage);
         }
         else if (nextPage==6)
         {
@@ -4677,9 +5233,9 @@ int main(int argc, char* argv[])
         {
             timeSelectionPage(window, render, &nextPage);
         }
-        else
+        else if (nextPage==10)
         {
-            mainMenuPage(window, render, &nextPage);
+            mainBoard(window, render, &nextPage);
         }
     }
 
@@ -4752,6 +5308,3 @@ void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
     rect.h = lenSquare;
     SDL_RenderFillRect(render, &rect);
 }
-
-//#undef NUM
-//#define NUM 200
