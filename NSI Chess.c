@@ -8,7 +8,6 @@
 //#include <SDL2/SDL_image.h>
 //#include <winsock2.h>
 
-int son=1;
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
 struct MoveStructure
@@ -1293,7 +1292,10 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 //Definitions of variables
 int typeChessboard=1;
-int typePieces=2;
+int sound=1;
+int typePieces=1;
+int puzzle_score=0;
+int userIdConnected=1;
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
 #define xMinBoard 488
@@ -1312,7 +1314,7 @@ int typePieces=2;
 
 
 //Definition of images path
-#define BoardBgImageBMP "images/board/bg.bmp"
+#define LoadPuzzleBGImageBMP "images/loadPuzzleBG.bmp"
 #define ConnexionBGImageBMP "images/connexion/connexionBG.bmp"
 #define InscriptionBGImageBMP "images/inscription/inscriptionBG.bmp"
 #define OptionsBGImageBMP "images/options/optionsBG.bmp"
@@ -1357,6 +1359,11 @@ int typePieces=2;
 #define TypePieces2OptionsImageBMP "images/options/pieces/type2.bmp"
 #define TypePieces3OptionsImageBMP "images/options/pieces/type3.bmp"
 #define TypePieces4OptionsImageBMP "images/options/pieces/type4.bmp"
+#define TypePieces5OptionsImageBMP "images/options/pieces/type5.bmp"
+
+#define TypeChessboard1ImageBMP "images/board/types/type1.bmp"
+
+
 #define TypeChessboard1OptionsImageBMP "images/options/chessboard/type1.bmp"
 #define TypeChessboard2OptionsImageBMP "images/options/chessboard/type2.bmp"
 #define TypeChessboard3OptionsImageBMP "images/options/chessboard/type3.bmp"
@@ -1450,6 +1457,10 @@ int typePieces=2;
             {\
                 pointeurPathPieces[18]=52;\
             }\
+            else if (typePieces==5)\
+            {\
+                pointeurPathPieces[18]=53;\
+            }\
             strcat(pathPieces, Z);\
             X = SDL_LoadBMP(pathPieces);\
             SDL_SetColorKey(X, SDL_TRUE, SDL_MapRGB(X->format, transparentColor));\
@@ -1458,6 +1469,41 @@ int typePieces=2;
 
 #define ALLImageINIT(X,Y, Z, render)   X = SDL_LoadBMP(Z);\
         Y = SDL_CreateTextureFromSurface(render, X);    
+
+#define ALLImageINITBoard(X,Y, render)   char pathBoard[]= TypeChessboard1ImageBMP;\
+        char* pointeurPathBoard=pathBoard;\
+        if (typeChessboard==2)\
+        {\
+            pointeurPathBoard[23]=50;\
+        }\
+        else if (typeChessboard==3)\
+        {\
+            pointeurPathBoard[23]=51;\
+        }\
+        else if (typeChessboard==4)\
+        {\
+            pointeurPathBoard[23]=52;\
+        }\
+        else if (typeChessboard==5)\
+        {\
+            pointeurPathBoard[23]=53;\
+        }\
+        else if (typeChessboard==6)\
+        {\
+            pointeurPathBoard[23]=54;\
+        }\
+        else if (typeChessboard==7)\
+        {\
+            pointeurPathBoard[23]=55;\
+        }\
+        else if (typeChessboard==8)\
+        {\
+            pointeurPathBoard[23]=56;\
+        }\
+        X = SDL_LoadBMP(pathBoard);\
+        Y = SDL_CreateTextureFromSurface(render, X);    
+
+
 
 #define DrawImage(rect, rectP, i, texture) rect.x= (xMinBoard+(i%8)*lenSquare);\
             rect.y= (yMinBoard+(i/8)*lenSquare);\
@@ -1525,7 +1571,7 @@ int typePieces=2;
                     DrawImage(dstrect, &dstrect, i, textureBlack)\
                 }\
             }
-#define initAllBoardImages() ALLImageINIT(imageBackground, textureBackground, BoardBgImageBMP, render)\
+#define initAllBoardImages() ALLImageINITBoard(imageBackground, textureBackground, render)\
     ALLImageINIT(imagePoint, texturePoint, PointImageBMP, render)\
     ALLImageAndTransparencyINITPieces(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
     ALLImageAndTransparencyINITPieces(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
@@ -2562,6 +2608,10 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
         else if (typePieces==4)\
         {\
             SDL_RenderCopy(render, textureTypepieces4BG, NULL, &rectTypePieces);\
+        }\
+        else if (typePieces==5)\
+        {\
+            SDL_RenderCopy(render, textureTypepieces5BG, NULL, &rectTypePieces);\
         }
 
 #define showTypeChessboard() SDL_SetRenderDrawColor(render, 160, 160, 160, 255);\
@@ -2617,6 +2667,9 @@ int optionNoTime(SDL_Renderer* render)
     SDL_Surface* imageTypepieces4BG = NULL;
     SDL_Texture* textureTypepieces4BG = NULL;
     ALLImageAndTransparencyINIT(imageTypepieces4BG, textureTypepieces4BG, TypePieces4OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces5BG = NULL;
+    SDL_Texture* textureTypepieces5BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces5BG, textureTypepieces5BG, TypePieces5OptionsImageBMP, render)
     SDL_Rect rectTypePieces;
     rectTypePieces.x= 915;
     rectTypePieces.y= 753;
@@ -2844,7 +2897,7 @@ int optionNoTime(SDL_Renderer* render)
                     {
                         if (typePieces==1)
                         {
-                            typePieces=4;
+                            typePieces=5;
                         }
                         else
                         {
@@ -2856,7 +2909,7 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>1046 && event.button.x<1074 && event.button.y>791 && event.button.y<822)
                     {
-                        if (typePieces==4)
+                        if (typePieces==5)
                         {
                             typePieces=1;
                         }
@@ -2918,6 +2971,95 @@ int optionNoTime(SDL_Renderer* render)
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
 
+
+void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
+{
+    *nextPage=1;
+    SDL_Log("Page launch");
+    SDL_Surface* imageLoadingBackground = NULL;
+    SDL_Texture* textureLoadingBackground = NULL;
+    ALLImageAndTransparencyINIT(imageLoadingBackground, textureLoadingBackground, LoadPuzzleBGImageBMP, render)
+    SDL_RenderCopy(render, textureLoadingBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+    if (puzzle_score==0)
+    {
+        MYSQL *con = mysql_init(NULL);
+        if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+        {
+            SDL_Log("Not connected");
+        }
+        else
+        {
+            SDL_Log("Connected");
+        }
+        char request[]="SELECT puzzle_score FROM User WHERE user_id=";
+        char charUserId[3];
+        itoa(userIdConnected, charUserId, 10);
+        strcat(request, charUserId);
+        strcat(request, ";");
+
+        SDL_Log(request);
+        if (mysql_query(con, request))
+        {
+            SDL_Log("Error request");
+        }
+        MYSQL_RES *result = mysql_store_result(con);
+        int num_fields = mysql_num_fields(result);
+        MYSQL_ROW row = mysql_fetch_row(result);
+        puzzle_score = atoi(row[0]);
+        mysql_free_result(result);
+        mysql_close(con);
+    }
+    MYSQL *con = mysql_init(NULL);
+    if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+    {
+        SDL_Log("Not connected");
+    }
+    else
+    {
+        SDL_Log("Connected");
+    }
+    char request[500]="SELECT Count(*) FROM Puzzle LEFT JOIN (SELECT * FROM Puzzle_done WHERE user_id=";
+    char* pointeurRequest=request;
+    int cpt=79;
+    char charUserId[3];
+    itoa(userIdConnected, charUserId, 10);
+    strcat(request, charUserId);
+    cpt+=log10(userIdConnected)+1;
+    char test2[]=") as Puzzle_done_change ON Puzzle.puzzle_id = Puzzle_done_change.puzzle_id WHERE (Puzzle_done_change.user_id is NULL) AND ";
+
+    for (int i=0; i<122; i++)
+    {
+        pointeurRequest[cpt]=test2[cpt];
+        cpt+=1;
+    }
+
+    char charUserPuzzleScore[4];
+    itoa(puzzle_score, charUserPuzzleScore, 10);
+    for (int i=0; i<4; i++)
+    {
+        pointeurRequest[cpt]=charUserPuzzleScore[cpt];
+        cpt+=1;
+    }
+    char test3[]=">Puzzle.puzzle_score_min AND ";
+    char test4[]="<Puzzle.puzzle_score_max ORDER BY Puzzle.Puzzle_id LIMIT 1;";
+
+    /*
+    strcat(request, test3);
+    strcat(request, charUserPuzzleScore);
+    strcat(request, test4);*/
+    SDL_Log(request);
+    mysql_query(con, request);
+    SDL_Log("Test after request");
+    MYSQL_RES *result = mysql_store_result(con);
+    //int num_fields = mysql_num_fields(result);
+    //MYSQL_ROW row = mysql_fetch_row(result);
+    //SDL_Log(row[0]);
+    //puzzle_score = atoi(row[0]);
+    //mysql_free_result(result);
+    //mysql_close(con);
+
+}
 
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
@@ -2983,9 +3125,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
     char strConnexion1[38]="                                      ";
     char* strPointeurConnexion1 = strConnexion1;
-    char strConnexion2[40]="                                        ";
+    char strConnexion2[38]="                                      ";
     char* strPointeurConnexion2 = strConnexion2;
-    char strConnexion2Hidder[40]="                                        ";
+    char strConnexion2Hidder[38]="                                      ";
     char* strPointeurConnexion2Hidder = strConnexion2Hidder;
     int cptNumberOfValuesConnexion1 = 0;
     int cptNumberOfValuesConnexion2 = 0;
@@ -4271,9 +4413,9 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 {
                     if (focus!=0)
                     {
+                        *nextPage=10;
                         continuer=0;
                     }
-                    //Validation
                 }
                 else
                 {
@@ -4635,10 +4777,24 @@ int issueOfTheGame(SDL_Renderer* render, int* nextPage, int win, int type)
                 }
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                if (event.button.x>832 && event.button.x<1087 && event.button.y>874 && event.button.y<947)
+                if (event.button.x >=1875 && event.button.y <=45)
                 {
-                    SDL_RenderCopy(render, textureHoverContinuerButton, NULL, &rectButtonContinuer);
-                    SDL_RenderPresent(render);
+                    if (doYouWantToQuitNoTime(render))
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                    }
+                    else
+                    {
+                        *nextPage=5;
+                        continuer=0;
+                    }
+                    
+                }
+                else if (event.button.x>832 && event.button.x<1087 && event.button.y>874 && event.button.y<947)
+                {
+                    *nextPage=5;
+                    continuer=0;
                 }
                 break;
             case SDL_QUIT:
@@ -4800,6 +4956,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             teamToPlay=0;
                             if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
+                                issueOfTheGame(render, nextPage, inverse, 0);
                                 continuer=0;
                             }
                             enPassant=0;
@@ -4809,7 +4966,9 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             showPreviousMoves()
                             displayAllpiecesInRender()
                             SDL_RenderPresent(render);
-                        } else {
+                        } 
+                        else 
+                        {
                             if (caseNumber==noPromotion)
                             {
                                 chessBoard[change]=0;
@@ -4848,6 +5007,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             teamToPlay=1;
                             if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
+                                issueOfTheGame(render, nextPage, inverse, 0);
                                 continuer=0;
                             }
                             enPassant=0;
@@ -4950,6 +5110,10 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     chessBoard[change-4]=0;
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
+                                    if (sound==1)
+                                    {
+                                        playSound(RockSound)
+                                    }
                                 }
                                 else
                                 {
@@ -4957,6 +5121,10 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     chessBoard[change+3]=0;
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
+                                    if (sound==1)
+                                    {
+                                        playSound(RockSound)
+                                    }
                                 }
                                 enPassant=0;
                             }
@@ -4967,14 +5135,20 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
                                     enPassant=caseNumber;
-                                    playSound(MoveSound)
+                                    if (sound==1)
+                                    {
+                                        playSound(MoveSound)
+                                    }
                                 }
                                 else if ((change-9==caseNumber || change+9==caseNumber || change-7==caseNumber || change+7==caseNumber ) && (chessBoard[caseNumber]==0))
                                 {
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
                                     chessBoard[enPassant]=0;
-                                    playSound(CaptureSound)
+                                    if(sound==1)
+                                    {
+                                        playSound(CaptureSound)
+                                    }
                                 }
                                 else if (caseNumber/8==0)//White promotion
                                 {
@@ -4992,13 +5166,16 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 }
                                 else
                                 {
-                                    if (chessBoard[caseNumber]!=0)
+                                    if (sound==1)
                                     {
-                                        playSound(CaptureSound)
-                                    }
-                                    else
-                                    {
-                                        playSound(MoveSound)
+                                        if (chessBoard[caseNumber]!=0)
+                                        {
+                                            playSound(CaptureSound)
+                                        }
+                                        else
+                                        {
+                                            playSound(MoveSound)
+                                        }
                                     }
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
@@ -5009,7 +5186,10 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             {
                                 chessBoard[caseNumber] = chessBoard[change];
                                 chessBoard[change] = 0;
-                                playSound(MoveSound)
+                                if (sound==1)
+                                {
+                                    playSound(MoveSound)
+                                }
                                 enPassant=0;
                             }
                             //Change the moves in the previousMove array
@@ -5046,6 +5226,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
                                 continuer=0;
+                                issueOfTheGame(render, nextPage, inverse, 0);
                             }
                             updateRock(chessBoard, teamToPlay, &rock);
 
@@ -5343,7 +5524,7 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    int nextPage=2;
+    int nextPage=8;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
@@ -5371,6 +5552,10 @@ int main(int argc, char* argv[])
         else if (nextPage==7)
         {
             timeSelectionPage(window, render, &nextPage);
+        }
+        else if (nextPage==8)
+        {
+            recherchePuzzlePage(window, render, &nextPage);
         }
         else if (nextPage==10)
         {

@@ -33,8 +33,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123",
-                           "pokedex", 3306, NULL, 0) == NULL)
+    if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
     {
         printf("Non connecte\n");
     }
@@ -73,7 +72,7 @@ int main(int argc, char **argv)
     char userIdChar[len];
     itoa(user_id, userIdChar, 10);
     printf("resultat %c", result);
-    
+
     mysql_free_result(result);
     mysql_close(con);
 
