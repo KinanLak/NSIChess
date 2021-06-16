@@ -5363,7 +5363,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     endTime += 100;
     
     int leftOverTimeWhite = 100;
-    int leftOverTimeBlack = 100;
+    int leftOverTimeBlack = 20;
     char stringTimeToShowWhite[6]="1:40";
     char stringTimeToShowBlack[6]="1:40";
     SDL_Surface * surfaceTimerWhite = TTF_RenderText_Solid(font,stringTimeToShowWhite, color);
@@ -5416,20 +5416,41 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >=1828 && event.button.y<=45)
                 {
-                    if (optionGame(render))
+                    if (teamToPlay==1)
                     {
-                        *nextPage=1;
-                        continuer=0;
-                        continue;
+                        if (optionGame(render, leftOverTimeWhite))
+                        {
+                            *nextPage=1;
+                            continuer=0;
+                            continue;
+                        }
+                        else
+                        {
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                            showPreviousMoves()
+                            displayAllpiecesInRender()
+                            SDL_RenderPresent(render);
+                            SDL_Delay(100);
+                        }
                     }
                     else
                     {
-                        SDL_RenderClear(render);
-                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
-                        showPreviousMoves()
-                        displayAllpiecesInRender()
-                        SDL_RenderPresent(render);
-                        SDL_Delay(100);
+                        if (optionGame(render, leftOverTimeBlack))
+                        {
+                            *nextPage=1;
+                            continuer=0;
+                            continue;
+                        }
+                        else
+                        {
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                            showPreviousMoves()
+                            displayAllpiecesInRender()
+                            SDL_RenderPresent(render);
+                            SDL_Delay(100);
+                        }
                     }
                 }
                 else if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
