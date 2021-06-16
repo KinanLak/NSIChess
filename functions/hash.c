@@ -20,11 +20,9 @@ unsigned long long int jpow(unsigned long long int x, int n)
 
 unsigned long long int main(int argc, char *argv[])
 {
-    char saisie[32];
+    char saisie[]="Je m'apelle Jul";
 
     printf("\nC'est quoi ton nom maxi bg ?\n");
-    printf(">> ");
-    scanf("%s", saisie);
     printf("Salut %s, tu es vraiment un gros bg !\n", saisie);
 
     int longueurnom = strlen(saisie);
