@@ -1356,6 +1356,8 @@ int userIdConnected=1;
 #define HoverLeftArrowOptionsImageBMP "images/options/hoverLeftArrow.bmp"
 #define DeconnexionOptionsImageBMP "images/options/deconnexionButton.bmp"
 #define HoverDeconnexionOptionsImageBMP "images/options/hoverDeconnexionButton.bmp"
+#define LeaveGameOptionsImageBMP "images/options/leaveGame.bmp"
+#define HoverLeaveGameOptionsImageBMP "images/options/hoverLeaveGame.bmp"
 #define TypePieces1OptionsImageBMP "images/options/pieces/type1.bmp"
 #define TypePieces2OptionsImageBMP "images/options/pieces/type2.bmp"
 #define TypePieces3OptionsImageBMP "images/options/pieces/type3.bmp"
@@ -2875,6 +2877,330 @@ int optionNoTime(SDL_Renderer* render)
                     else if (event.button.x>520 && event.button.x<789 && event.button.y>766 && event.button.y<848)
                     {
                         stayConnected=0;
+                        return 1;
+                        //déconnexion
+                    }
+                    else if (event.button.x>865 && event.button.x<893 && event.button.y>791 && event.button.y<822)
+                    {
+                        if (typePieces==1)
+                        {
+                            typePieces=5;
+                        }
+                        else
+                        {
+                            typePieces-=1;
+                        }
+                        showTypePieces()
+                        SDL_RenderPresent(render);
+                        //leftArrow1
+                    }
+                    else if (event.button.x>1046 && event.button.x<1074 && event.button.y>791 && event.button.y<822)
+                    {
+                        if (typePieces==5)
+                        {
+                            typePieces=1;
+                        }
+                        else
+                        {
+                            typePieces+=1;
+                        }
+                        showTypePieces()
+                        SDL_RenderPresent(render);
+                        //rightArrow1
+                    }
+                    else if (event.button.x>1198 && event.button.x<1226 && event.button.y>791 && event.button.y<822)
+                    {
+                        if (typeChessboard==1)
+                        {
+                            typeChessboard=8;
+                        }
+                        else
+                        {
+                            typeChessboard-=1;
+                        }
+                        showTypeChessboard()
+                        SDL_RenderPresent(render);
+                        //leftArrow2
+                    }
+                    else if (event.button.x>1287 && event.button.x<1315 && event.button.y>791 && event.button.y<822)
+                    {
+                        if (typeChessboard==8)
+                        {
+                            typeChessboard=1;
+                        }
+                        else
+                        {
+                            typeChessboard+=1;
+                        }
+                        showTypeChessboard()
+                        SDL_RenderPresent(render);
+                        //rightArrow2
+                    }
+                }
+                else
+                {
+                    continuer=0;
+                }
+                break;
+        }
+    }
+    return 0;
+}
+
+
+
+int optionGame(SDL_Renderer* render, int timeLeftOver)
+{
+    SDL_Surface* imageOptionsBG = NULL;
+    SDL_Texture* textureOptionsBG = NULL;
+    ALLImageAndTransparencyINIT(imageOptionsBG, textureOptionsBG, OptionsBGImageBMP, render)
+
+    SDL_Surface* imageTypepieces1BG = NULL;
+    SDL_Texture* textureTypepieces1BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces1BG, textureTypepieces1BG, TypePieces1OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces2BG = NULL;
+    SDL_Texture* textureTypepieces2BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces2BG, textureTypepieces2BG, TypePieces2OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces3BG = NULL;
+    SDL_Texture* textureTypepieces3BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces3BG, textureTypepieces3BG, TypePieces3OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces4BG = NULL;
+    SDL_Texture* textureTypepieces4BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces4BG, textureTypepieces4BG, TypePieces4OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces5BG = NULL;
+    SDL_Texture* textureTypepieces5BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces5BG, textureTypepieces5BG, TypePieces5OptionsImageBMP, render)
+    SDL_Rect rectTypePieces;
+    rectTypePieces.x= 915;
+    rectTypePieces.y= 753;
+    rectTypePieces.w= 100;
+    rectTypePieces.h= 100;
+    time_t endTime;
+    time(&endTime);
+    endTime+=timeLeftOver-2;
+
+    SDL_Surface* imageTypeChessboard1BG = NULL;
+    SDL_Texture* textureTypeChessboard1BG = NULL;
+    ALLImageINIT(imageTypeChessboard1BG, textureTypeChessboard1BG, TypeChessboard1OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard2BG = NULL;
+    SDL_Texture* textureTypeChessboard2BG = NULL;
+    ALLImageINIT(imageTypeChessboard2BG, textureTypeChessboard2BG, TypeChessboard2OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard3BG = NULL;
+    SDL_Texture* textureTypeChessboard3BG = NULL;
+    ALLImageINIT(imageTypeChessboard3BG, textureTypeChessboard3BG, TypeChessboard3OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard4BG = NULL;
+    SDL_Texture* textureTypeChessboard4BG = NULL;
+    ALLImageINIT(imageTypeChessboard4BG, textureTypeChessboard4BG, TypeChessboard4OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard5BG = NULL;
+    SDL_Texture* textureTypeChessboard5BG = NULL;
+    ALLImageINIT(imageTypeChessboard5BG, textureTypeChessboard5BG, TypeChessboard5OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard6BG = NULL;
+    SDL_Texture* textureTypeChessboard6BG = NULL;
+    ALLImageINIT(imageTypeChessboard6BG, textureTypeChessboard6BG, TypeChessboard6OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard7BG = NULL;
+    SDL_Texture* textureTypeChessboard7BG = NULL;
+    ALLImageINIT(imageTypeChessboard7BG, textureTypeChessboard7BG, TypeChessboard7OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard8BG = NULL;
+    SDL_Texture* textureTypeChessboard8BG = NULL;
+    ALLImageINIT(imageTypeChessboard8BG, textureTypeChessboard8BG, TypeChessboard8OptionsImageBMP, render)
+    SDL_Rect rectTypeChessboard;
+    rectTypeChessboard.x= 1134;
+    rectTypeChessboard.y= 523;
+    rectTypeChessboard.w= 248;
+    rectTypeChessboard.h= 248;
+
+    SDL_Surface* imageSwitchOnBG = NULL;
+    SDL_Texture* textureSwitchOnBG = NULL;
+    ALLImageAndTransparencyINIT(imageSwitchOnBG, textureSwitchOnBG, OptionsSwitchOnImageBMP, render)
+
+    SDL_Surface* imageSwitchOffBG = NULL;
+    SDL_Texture* textureSwitchOffBG = NULL;
+    ALLImageAndTransparencyINIT(imageSwitchOffBG, textureSwitchOffBG, OptionsSwitchOffImageBMP, render)
+
+    SDL_Rect rectSwitch1;
+    rectSwitch1.x= 893;
+    rectSwitch1.y= 525;
+    rectSwitch1.w= 114;
+    rectSwitch1.h= 55;
+
+    SDL_Rect rectSwitch2;
+    rectSwitch2.x= 893;
+    rectSwitch2.y= 625;
+    rectSwitch2.w= 114;
+    rectSwitch2.h= 55;
+
+    SDL_Surface* imageLeaveGameBG = NULL;
+    SDL_Texture* textureLeaveGameBG = NULL;
+    ALLImageAndTransparencyINIT(imageLeaveGameBG, textureLeaveGameBG, LeaveGameOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverLeaveGameBG = NULL;
+    SDL_Texture* textureHoverLeaveGameBG = NULL;
+    ALLImageAndTransparencyINIT(imageHoverLeaveGameBG, textureHoverLeaveGameBG, HoverLeaveGameOptionsImageBMP, render)
+
+    SDL_Rect rectDeconnexion;
+    rectDeconnexion.x= 521;
+    rectDeconnexion.y= 767;
+    rectDeconnexion.w= 268;
+    rectDeconnexion.h= 81;
+
+    SDL_Surface* imageRightArrow = NULL;
+    SDL_Texture* textureRightArrow = NULL;
+    ALLImageAndTransparencyINIT(imageRightArrow, textureRightArrow, RightArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageLeftArrow = NULL;
+    SDL_Texture* textureLeftArrow = NULL;
+    ALLImageAndTransparencyINIT(imageLeftArrow, textureLeftArrow, LeftArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverRightArrow = NULL;
+    SDL_Texture* textureHoverRightArrow = NULL;
+    ALLImageAndTransparencyINIT(imageHoverRightArrow, textureHoverRightArrow, HoverRightArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverLeftArrow = NULL;
+    SDL_Texture* textureHoverLeftArrow = NULL;
+    ALLImageAndTransparencyINIT(imageHoverLeftArrow, textureHoverLeftArrow, HoverLeftArrowOptionsImageBMP, render)
+
+    SDL_Rect rectArrow;
+    rectArrow.x= 0;
+    rectArrow.y= 792;
+    rectArrow.w= 27;
+    rectArrow.h= 30;
+
+
+    SDL_RenderCopy(render, textureOptionsBG, NULL, NULL);
+    showTypePieces()
+    showTypeChessboard()
+    if (sound==1)
+    {
+        SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
+    }
+    else
+    {
+        SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
+    }
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        if (endTime<=time(NULL))
+        {
+            return 0;
+        }
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>520 && event.motion.x<789 && event.motion.y>766 && event.motion.y<848)
+                {
+                    SDL_RenderCopy(render, textureHoverLeaveGameBG, NULL, &rectDeconnexion);
+                    SDL_RenderPresent(render);
+                    //déconnexion
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureLeaveGameBG, NULL, &rectDeconnexion);
+                    SDL_RenderPresent(render);
+                    //not déconnexion
+                }
+                if (event.motion.x>865 && event.motion.x<893 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=866;
+                    SDL_RenderCopy(render, textureHoverLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //leftArrow1
+                }
+                else
+                {
+                    rectArrow.x=866;
+                    SDL_RenderCopy(render, textureLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not leftArrow1
+                }
+                if (event.motion.x>1198 && event.motion.x<1226 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1199;
+                    SDL_RenderCopy(render, textureHoverLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //leftArrow2
+                }
+                else
+                {
+                    rectArrow.x=1199;
+                    SDL_RenderCopy(render, textureLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not leftArrow2
+                }
+                if (event.motion.x>1046 && event.motion.x<1074 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1047;
+                    SDL_RenderCopy(render, textureHoverRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //rightArrow1
+                }
+                else
+                {
+                    rectArrow.x=1047;
+                    SDL_RenderCopy(render, textureRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not rightArrow1
+                }
+                if (event.motion.x>1287 && event.motion.x<1315 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1288;
+                    SDL_RenderCopy(render, textureHoverRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //rightArrow2
+                }
+                else
+                {
+                    rectArrow.x=1288;
+                    SDL_RenderCopy(render, textureRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not rightArrow2
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>466 && event.button.x<1455 && event.button.y>331 && event.button.y<886)
+                {
+                    if (event.button.x>504 && event.button.x<569 && event.button.y>331 && event.button.y<398)
+                    {
+                        return 0;
+                        //Back button
+                    }
+                    else if (event.button.x>892 && event.button.x<1007 && event.button.y>524 && event.button.y<580)
+                    {
+                        if (sound==1)
+                        {
+                            sound=0;
+                            SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
+                            SDL_RenderPresent(render);
+                        }
+                        else
+                        {
+                            sound=1;
+                            SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
+                            SDL_RenderPresent(render);
+                        }
+                        //switch1
+                    }
+                    else if (event.button.x>892 && event.button.x<1007 && event.button.y>624 && event.button.y<680)
+                    {
+                        if (stayConnected==1)
+                        {
+                            stayConnected=0;
+                            SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch2);
+                            SDL_RenderPresent(render);
+                        }
+                        else
+                        {
+                            stayConnected=1;
+                            SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch2);
+                            SDL_RenderPresent(render);
+                        }
+                        //switch2
+                    }
+                    else if (event.button.x>520 && event.button.x<789 && event.button.y>766 && event.button.y<848)
+                    {
                         return 1;
                         //déconnexion
                     }
@@ -5088,9 +5414,23 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     }
                     
                 }
-                else if (event.button.x >= xxx && event.button.y<=45)
+                else if (event.button.x >=1828 && event.button.y<=45)
                 {
-                    
+                    if (optionGame(render))
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                        continue;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                        showPreviousMoves()
+                        displayAllpiecesInRender()
+                        SDL_RenderPresent(render);
+                        SDL_Delay(100);
+                    }
                 }
                 else if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
