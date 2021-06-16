@@ -19,7 +19,7 @@ int main(int argc, char **argv)
         exit(1);
     }
 
-    if (mysql_real_connect(con, "52.47.124.122", "user", "nathanpute",
+    if (mysql_real_connect(con, "52.47.124.122", "ubuntu", "Caca.123",
                            "db", 3306, NULL, 0) == NULL)
     {
         finish_with_error(con);
