@@ -5007,7 +5007,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     //Create all images
     initAllBoardImages()
 
-
     SDL_Rect dstrect;
     int previousMove[2]={NOTHING, NOTHING};
 
@@ -5018,7 +5017,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
     SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
     
-
     unsigned int chessBoard[64] = departPosition;
 
     int change = NOTHING;
@@ -5031,7 +5029,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int timerIsOn=1;
     int inverse=0;
     int add_time=2;
-
 
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 50);
     SDL_Color color = { 0, 0, 0};
@@ -5089,6 +5086,10 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderPresent(render);
                         SDL_Delay(100);
                     }
+                    
+                }
+                else if (event.button.x >= xxx && event.button.y<=45)
+                {
                     
                 }
                 else if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
@@ -5730,15 +5731,7 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    int nextPage=5;
-=======
     int nextPage=2;
->>>>>>> Stashed changes
-=======
-    int nextPage=2;
->>>>>>> Stashed changes
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
