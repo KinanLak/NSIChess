@@ -158,13 +158,10 @@ int main(int argc, char* argv[])
 }*/
 
 
-void FENToList(char* fen, unsigned int* chessBoard)
+void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, int* enPassant)
 {
     int cptStr=0;
     int cptChessBoard=0;
-    int teamToPlay;
-    int enPassant;
-    int rock=0;
     while (fen[cptStr] != 32)
     {
         if (fen[cptStr] != 47)
@@ -249,11 +246,11 @@ void FENToList(char* fen, unsigned int* chessBoard)
     cptStr+=1;
     if (fen[cptStr]==119)
     {
-        teamToPlay=1;
+        *teamToPlay=1;
     }
     else
     {
-        teamToPlay=0;
+        *teamToPlay=0;
     }
     cptStr+=2;
     if (fen[cptStr]==45)
@@ -266,19 +263,19 @@ void FENToList(char* fen, unsigned int* chessBoard)
         {
             if (fen[cptStr]==113)
             {
-                rock+=1;
+                *rock+=1;
             }
             else if (fen[cptStr]==107)
             {
-                rock+=2;
+                *rock+=2;
             }
             else if (fen[cptStr]==81)
             {
-                rock+=4;
+                *rock+=4;
             }
             else if (fen[cptStr]==75)
             {
-                rock+=8;
+                *rock+=8;
             }
             cptStr+=1;
         }
@@ -290,18 +287,18 @@ void FENToList(char* fen, unsigned int* chessBoard)
     }
     else
     {
-        enPassant = fen[cptStr]-97 + (56-fen[cptStr+1])*8;
-        if (teamToPlay==1)
+        *enPassant = fen[cptStr]-97 + (56-fen[cptStr+1])*8;
+        if (*teamToPlay==1)
         {
-            enPassant+=8;
+            *enPassant+=8;
         }
         else
         {
-            enPassant-=8;
+            *enPassant-=8;
         }
         cptStr+=2;
     }
-    printf("\nwho to play -> %d \nrock -> %d \nenPassant -> %d\n\n", teamToPlay, rock, enPassant);
+    printf("\nwho to play -> %d \nrock -> %d \nenPassant -> %d\n\n", *teamToPlay, *rock, *enPassant);
 }
 
 void printBoard(unsigned int* chessBoard)
@@ -326,13 +323,30 @@ void shrinkChar(char* longChar, int sizeNewChar)
     }
     printf("%s", newChar);
 }
+
 int main(int argc, char* argv[])
 {
-    unsigned int chessBoard[64];
+    /*unsigned int chessBoard[64];
+    int rock=0;
+    int whoToPlay=0;
+    int enPassant=0;
+    char fen[]="rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+    FENToList(fen, chessBoard, &rock, &whoToPlay, &enPassant);
+    printBoard(chessBoard);
+    printf("\n Rock -> %d\n", rock);
+    //shrinkChar(fen, 10);*/
 
-    //FENToList(fen, chessBoard);
-    //printBoard(chessBoard);
-    shrinkChar(fen, 10);
+    int num;
+    FILE *fptr;
+
+    if ((fptr = fopen("save.txt","r")) != NULL)
+    {
+        fscanf(fptr,"%d", &num);
+
+        printf("Value of n=%d", num);
+    }
+
+    fclose(fptr);
 
 
     return 1;

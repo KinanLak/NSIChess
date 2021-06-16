@@ -1291,6 +1291,7 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 
 //Definitions of variables
+int stayConnected=0;
 int typeChessboard=1;
 int sound=1;
 int typePieces=1;
@@ -1396,35 +1397,9 @@ int userIdConnected=1;
 #define WhiteRookImageBMP "/white/rook.bmp"
 #define WhiteBishopImageBMP "/white/bishop.bmp"
 
-
-/*#define defineAllPiecesType1() #define BlackPawnImageBMP "images/pieces/type1/black/pawn.bmp"\
-    #define BlackKnightImageBMP "images/pieces/type1/black/knight.bmp"\
-    #define BlackKingImageBMP "images/pieces/type1/black/king.bmp"\
-    #define BlackQueenImageBMP "images/pieces/type1/black/queen.bmp"\
-    #define BlackRookImageBMP "images/pieces/type1/black/rook.bmp"\
-    #define BlackBishopImageBMP "images/pieces/type1/black/bishop.bmp"\
-    #define WhitePawnImageBMP "images/pieces/type1/white/pawn.bmp"\
-    #define WhiteKnightImageBMP "images/pieces/type1/white/knight.bmp"\
-    #define WhiteKingImageBMP "images/pieces/type1/white/king.bmp"\
-    #define WhiteQueenImageBMP "images/pieces/type1/white/queen.bmp"\
-    #define WhiteRookImageBMP "images/pieces/type1/white/rook.bmp"\
-    #define WhiteBishopImageBMP "images/pieces/type1/white/bishop.bmp"
-
-#define undefinedAllPieces() #undef BlackPawnImageBMP\
-    #undef BlackKnightImageBMP\
-    #undef BlackKingImageBMP\
-    #undef BlackQueenImageBMP\
-    #undef BlackRookImageBMP\
-    #undef BlackBishopImageBMP\
-    #undef WhitePawnImageBMP\
-    #undef WhiteKnightImageBMP\
-    #undef WhiteKingImageBMP\
-    #undef WhiteQueenImageBMP\
-    #undef WhiteRookImageBMP\
-    #undef WhiteBishopImageBMP*/
-
-
 //Definition of files path
+#define BoxSound "sounds/boxSound.wav"
+#define ButtonSound "sounds/buttonSound.wav"
 #define MoveSound "sounds/move.wav"
 #define CheckSound "sounds/check.wav"
 #define CaptureSound "sounds/capture.wav"
@@ -1696,9 +1671,12 @@ int userIdConnected=1;
             DrawImage(rect, &rect, (i-16), textureBlackRook)\
             DrawImage(rect, &rect, (i-24), textureBlackBishop)
             
-#define playSound(sound) SDL_LoadWAV(sound, &wavSpec, &wavBuffer, &wavLength);\
+#define playSound(soundToPlay) if (sound==1)\
+                {\
+                    SDL_LoadWAV(soundToPlay, &wavSpec, &wavBuffer, &wavLength);\
                     int success = SDL_QueueAudio(deviceId, wavBuffer, wavLength);\
-                    SDL_PauseAudioDevice(deviceId, 0);
+                    SDL_PauseAudioDevice(deviceId, 0);\
+                }
 
 //Prototypes
 int giveCaseNumber(int eventX, int eventY);
@@ -2556,40 +2534,6 @@ int intAndCharSame(int codeConfirmation, char* string, int sizeString)
 }
 
 
-int doYouWantToQuitNoTime(SDL_Renderer* render)
-{
-    SDL_Surface* imageExitConfirmationBackground = NULL;
-    SDL_Texture* textureExitConfirmationBackground = NULL;
-    ALLImageAndTransparencyINIT(imageExitConfirmationBackground, textureExitConfirmationBackground, ExitConfirmationBMP, render)
-    SDL_RenderCopy(render, textureExitConfirmationBackground, NULL, NULL);
-    SDL_RenderPresent(render);
-    SDL_Event event;
-    int continuer = 1;
-    while (continuer)
-    {
-        SDL_WaitEvent(&event);
-        switch(event.type)
-        {
-            case SDL_MOUSEBUTTONDOWN:
-                if (event.button.x>604 && event.button.x<1315 && event.button.y>386 && event.button.y<609)
-                {
-                    if (event.button.x>756 && event.button.x<901 && event.button.y>514 && event.button.y<566)
-                    {
-                        return 0;
-                    }
-                    else if (event.button.x>1019 && event.button.x<1164 && event.button.y>514 && event.button.y<566)
-                    {
-                        return 1;
-                    }
-                }
-                else
-                {
-                    return 0;
-                }
-                break;
-        }
-    }
-}
 
 #define showTypePieces() SDL_SetRenderDrawColor(render, 160, 160, 160, 255);\
         SDL_RenderFillRect(render, &rectTypePieces);\
@@ -2648,6 +2592,41 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
         {\
             SDL_RenderCopy(render, textureTypeChessboard8BG, NULL, &rectTypeChessboard);\
         }\
+
+int doYouWantToQuitNoTime(SDL_Renderer* render)
+{
+    SDL_Surface* imageExitConfirmationBackground = NULL;
+    SDL_Texture* textureExitConfirmationBackground = NULL;
+    ALLImageAndTransparencyINIT(imageExitConfirmationBackground, textureExitConfirmationBackground, ExitConfirmationBMP, render)
+    SDL_RenderCopy(render, textureExitConfirmationBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>604 && event.button.x<1315 && event.button.y>386 && event.button.y<609)
+                {
+                    if (event.button.x>756 && event.button.x<901 && event.button.y>514 && event.button.y<566)
+                    {
+                        return 0;
+                    }
+                    else if (event.button.x>1019 && event.button.x<1164 && event.button.y>514 && event.button.y<566)
+                    {
+                        return 1;
+                    }
+                }
+                else
+                {
+                    return 0;
+                }
+                break;
+        }
+    }
+}
 
 int optionNoTime(SDL_Renderer* render)
 {
@@ -2764,12 +2743,17 @@ int optionNoTime(SDL_Renderer* render)
     rectArrow.h= 30;
 
 
-    int switch1=1;
-    int switch2=1;
-    int typeChessboard=1;
     SDL_RenderCopy(render, textureOptionsBG, NULL, NULL);
     showTypePieces()
     showTypeChessboard()
+    if (sound==1)
+    {
+        SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
+    }
+    else
+    {
+        SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
+    }
     SDL_RenderPresent(render);
     SDL_Event event;
     int continuer = 1;
@@ -2858,15 +2842,15 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>892 && event.button.x<1007 && event.button.y>524 && event.button.y<580)
                     {
-                        if (switch1==1)
+                        if (sound==1)
                         {
-                            switch1=0;
+                            sound=0;
                             SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
                             SDL_RenderPresent(render);
                         }
                         else
                         {
-                            switch1=1;
+                            sound=1;
                             SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
                             SDL_RenderPresent(render);
                         }
@@ -2874,15 +2858,15 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>892 && event.button.x<1007 && event.button.y>624 && event.button.y<680)
                     {
-                        if (switch2==1)
+                        if (stayConnected==1)
                         {
-                            switch2=0;
+                            stayConnected=0;
                             SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch2);
                             SDL_RenderPresent(render);
                         }
                         else
                         {
-                            switch2=1;
+                            stayConnected=1;
                             SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch2);
                             SDL_RenderPresent(render);
                         }
@@ -2890,6 +2874,7 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>520 && event.button.x<789 && event.button.y>766 && event.button.y<848)
                     {
+                        stayConnected=0;
                         return 1;
                         //déconnexion
                     }
@@ -2967,6 +2952,167 @@ int optionNoTime(SDL_Renderer* render)
 #define closeFonts() TTF_CloseFont(font);\
     TTF_CloseFont(fontBold);\
     TTF_CloseFont(fontPassword);
+
+void listMovesToFile(FileMoveStructure* file, char* listMoves)
+{
+    int cpt=0;
+    int departure=0;
+    int arrival=0;
+    int lenListMoves = (strlen(listMoves)+1)/5;
+    for (int x=0; x<lenListMoves; x++)
+    {
+        departure = ((8-(listMoves[cpt+1]-48))*8) + (listMoves[cpt]-97);
+        cpt+=2;
+
+        arrival = ((8-(listMoves[cpt+1]-48))*8) + (listMoves[cpt]-97);
+        cpt+=3;
+
+        addMoveFile(file, departure, arrival);
+    }
+}
+
+void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, int* enPassant)
+{
+    int cptStr=0;
+    int cptChessBoard=0;
+    while (fen[cptStr] != 32)
+    {
+        if (fen[cptStr] != 47)
+        {
+            if ((fen[cptStr] > 48) && (fen[cptStr] <58))
+            {
+                for (int x=0; x<(fen[cptStr]-48); x++)
+                {
+                    chessBoard[cptChessBoard]=0;
+                    cptChessBoard+=1;
+                }
+            }
+            else if (fen[cptStr]<91)
+            {
+                if (fen[cptStr] == 80)
+                {
+                    chessBoard[cptChessBoard]=9;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 78)
+                {
+                    chessBoard[cptChessBoard]=10;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 66)
+                {
+                    chessBoard[cptChessBoard]=11;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 82)
+                {
+                    chessBoard[cptChessBoard]=12;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 81)
+                {
+                    chessBoard[cptChessBoard]=14;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 75)
+                {
+                    chessBoard[cptChessBoard]=15;
+                    cptChessBoard+=1;
+                }
+            }
+            else
+            {
+                if (fen[cptStr] == 112)
+                {
+                    chessBoard[cptChessBoard]=1;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 110)
+                {
+                    chessBoard[cptChessBoard]=2;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 98)
+                {
+                    chessBoard[cptChessBoard]=3;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 114)
+                {
+                    chessBoard[cptChessBoard]=4;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 113)
+                {
+                    chessBoard[cptChessBoard]=6;
+                    cptChessBoard+=1;
+                }
+                else if (fen[cptStr] == 107)
+                {
+                    chessBoard[cptChessBoard]=7;
+                    cptChessBoard+=1;
+                }
+            }
+        }
+        cptStr+=1;
+    }
+    cptStr+=1;
+    if (fen[cptStr]==119)
+    {
+        *teamToPlay=1;
+    }
+    else
+    {
+        *teamToPlay=0;
+    }
+    cptStr+=2;
+    if (fen[cptStr]==45)
+    {
+        cptStr+=1;
+    }
+    else
+    {
+        while (fen[cptStr] != 32)
+        {
+            if (fen[cptStr]==113)
+            {
+                *rock+=1;
+            }
+            else if (fen[cptStr]==107)
+            {
+                *rock+=2;
+            }
+            else if (fen[cptStr]==81)
+            {
+                *rock+=4;
+            }
+            else if (fen[cptStr]==75)
+            {
+                *rock+=8;
+            }
+            cptStr+=1;
+        }
+    }
+    cptStr+=1;
+    if (fen[cptStr]==45)
+    {
+        cptStr+=1;
+    }
+    else
+    {
+        *enPassant = fen[cptStr]-97 + (56-fen[cptStr+1])*8;
+        if (*teamToPlay==1)
+        {
+            *enPassant+=8;
+        }
+        else
+        {
+            *enPassant-=8;
+        }
+        cptStr+=2;
+    }
+}
+
 //---------------------------------------------------------------------------------
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
@@ -3019,23 +3165,67 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     {
         SDL_Log("Connected");
     }
-    char request[]="SELECT * FROM Puzzle LEFT JOIN (SELECT * FROM Puzzle_done WHERE user_id=001) as Puzzle_done_change ON Puzzle.puzzle_id = Puzzle_done_change.puzzle_id WHERE (Puzzle_done_change.user_id is NULL) AND 1550>Puzzle.puzzle_score_min AND 1550<Puzzle.puzzle_score_max ORDER BY Puzzle.Puzzle_id LIMIT 1;";
-    strcat(request, test3);
-    strcat(request, charUserPuzzleScore);
-    strcat(request, test4);
+
+    char request[]="SELECT * FROM Puzzle LEFT JOIN (SELECT * FROM Puzzle_done WHERE user_id=000) as Puzzle_done_change ON Puzzle.puzzle_id = Puzzle_done_change.puzzle_id WHERE (Puzzle_done_change.user_id is NULL) AND 0000>Puzzle.puzzle_score_min AND 0000<Puzzle.puzzle_score_max ORDER BY Puzzle.Puzzle_id LIMIT 1;";
+    char* pointeurRequest=request;
+    pointeurRequest[72]=48+(userIdConnected/100);
+    pointeurRequest[73]=48+((userIdConnected/10)%10);
+    pointeurRequest[74]=48+(userIdConnected%10);
+
+
+    pointeurRequest[197]=48+(puzzle_score/1000);
+    pointeurRequest[198]=48+((puzzle_score/100)%10);
+    pointeurRequest[199]=48+((puzzle_score%100)/10);
+    pointeurRequest[200]=48+(puzzle_score%10);
+    
+    pointeurRequest[230]=48+(puzzle_score/1000);
+    pointeurRequest[231]=48+((puzzle_score/100)%10);
+    pointeurRequest[232]=48+((puzzle_score%100)/10);
+    pointeurRequest[233]=48+(puzzle_score%10);
+
+
     SDL_Log(request);
     mysql_query(con, request);
     SDL_Log("Test after request");
     MYSQL_RES *result = mysql_store_result(con);
-    //int num_fields = mysql_num_fields(result);
-    //MYSQL_ROW row = mysql_fetch_row(result);
-    //SDL_Log(row[0]);
-    //puzzle_score = atoi(row[0]);
-    //mysql_free_result(result);
-    //mysql_close(con);
+    if (result == NULL)
+    {
+        SDL_Log("Error result");
+    }
+    int num_fields = mysql_num_fields(result);
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+
+    int actual_puzzle_id=atoi(row[0]);
+
+    char actual_puzzle_fen[strlen(row[1])];
+    char* pt_actual_puzzle_fen=actual_puzzle_fen;
+    for (int i=0; i<strlen(row[1]); i++)
+    {
+        pt_actual_puzzle_fen[i]=row[1][i];
+    }
+    pt_actual_puzzle_fen[strlen(row[1])]=0;
+
+    int average_puzzle_score= (atoi(row[2])+atoi(row[3]))/2;
+
+    char actual_move_list[strlen(row[4])];
+    char* pt_actual_move_list=actual_move_list;
+    for (int i=0; i<strlen(row[4]); i++)
+    {
+        pt_actual_move_list[i]=row[4][i];
+    }
+    pt_actual_move_list[strlen(row[4])]=0;
+
+    mysql_free_result(result);
+    mysql_close(con);
+
+    unsigned int chessBoard[64];
+    int rock=0;
+    int whoToPlay=0;
+    int enPassant=0;
+    //puzzlePage(window, render, nextPage, chessBoard, &rock, &whoToPlay, &enPassant, actual_puzzle_id);
 
 }
-
 
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
@@ -3045,6 +3235,12 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     TTF_Font * font=NULL;
     TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
+
+    SDL_AudioSpec wavSpec;
+    Uint32 wavLength;
+    Uint8 *wavBuffer;
+    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
@@ -3174,6 +3370,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 if (event.button.x >593 && event.button.y > 529 && event.button.x <1324 && event.button.y < 569)
                 {
+                    playSound(BoxSound)
                     openFonts()
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
@@ -3184,6 +3381,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >591 && event.button.y > 644 && event.button.x <1325 && event.button.y < 684)
                 {
+                    playSound(BoxSound)
                     openFonts()
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
@@ -3254,6 +3452,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         mysql_close(con);
                         if (boolean==1)
                         {
+                            playSound(ButtonSound)
                             SDL_Log("1");
                             *nextPage=5;
                             continuer=0;
@@ -3340,6 +3539,12 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+
+    SDL_AudioSpec wavSpec;
+    Uint32 wavLength;
+    Uint8 *wavBuffer;
+    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     SDL_Surface* imageInscriptionBackground = NULL;
     SDL_Texture* textureInscriptionBackground = NULL;
@@ -3514,6 +3719,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >593 && event.button.y > 347 && event.button.x <1322 && event.button.y < 385)
                 {
+                    playSound(BoxSound)
                     openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
@@ -3524,6 +3730,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >593 && event.button.y > 462 && event.button.x <919 && event.button.y < 500)
                 {
+                    playSound(BoxSound)
                     openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
@@ -3534,6 +3741,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >993 && event.button.y > 462 && event.button.x <1319 && event.button.y < 500)
                 {
+                    playSound(BoxSound)
                     openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
@@ -3544,6 +3752,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >595 && event.button.y > 578 && event.button.x <1324 && event.button.y < 616)
                 {
+                    playSound(BoxSound)
                     openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
@@ -3554,6 +3763,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >593 && event.button.y > 693 && event.button.x <1322 && event.button.y < 731)
                 {
+                    playSound(BoxSound)
                     openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
@@ -3564,6 +3774,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >593 && event.button.y > 803 && event.button.x <1322 && event.button.y < 841)
                 {
+                    playSound(BoxSound)
                     openFonts();
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
@@ -3756,6 +3967,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         *nextPage=4;
                         continuer=0;
+                        playSound(ButtonSound)
                     }
 
                 }
@@ -4424,6 +4636,11 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
     int slideAmis=0;
 
+    SDL_AudioSpec wavSpec;
+    Uint32 wavLength;
+    Uint8 *wavBuffer;
+    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
+    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     //Puzzle
     SDL_Surface* imageHoverPuzzleBackground = NULL;
@@ -4439,7 +4656,6 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Texture* texturePuzzleBackground = NULL;
     ALLImageINIT(imagePuzzleBackground, texturePuzzleBackground, PuzzleMainMenuBMP, render)
 
-
     //Jouer
     SDL_Surface* imageHoverJouerBackground = NULL;
     SDL_Texture* textureHoverJouerBackground = NULL;
@@ -4453,7 +4669,6 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Surface* imageJouerBackground = NULL;
     SDL_Texture* textureJouerBackground = NULL;
     ALLImageAndTransparencyINIT(imageJouerBackground, textureJouerBackground, JouerMainMenuBMP, render)
-
 
     //Amis
     SDL_Surface* imageHoverAmisBackground = NULL;
@@ -4469,7 +4684,6 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Texture* textureAmisBackground = NULL;
     ALLImageAndTransparencyINIT(imageAmisBackground, textureAmisBackground, AmisMainMenuBMP, render)
 
-
     //Options
     SDL_Surface* imageHoverOptionsBackground = NULL;
     SDL_Texture* textureHoverOptionsBackground = NULL;
@@ -4483,7 +4697,6 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Surface* imageOptionsBackground = NULL;
     SDL_Texture* textureOptionsBackground = NULL;
     ALLImageAndTransparencyINIT(imageOptionsBackground, textureOptionsBackground, OptionsMainMenuBMP, render)
-
 
     //Quitter
     SDL_Surface* imageHoverQuitterBackground = NULL;
@@ -5086,10 +5299,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     chessBoard[change-4]=0;
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
-                                    if (sound==1)
-                                    {
-                                        playSound(RockSound)
-                                    }
+                                    playSound(RockSound)
                                 }
                                 else
                                 {
@@ -5097,10 +5307,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     chessBoard[change+3]=0;
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
-                                    if (sound==1)
-                                    {
-                                        playSound(RockSound)
-                                    }
+                                    playSound(RockSound)
                                 }
                                 enPassant=0;
                             }
@@ -5111,20 +5318,14 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
                                     enPassant=caseNumber;
-                                    if (sound==1)
-                                    {
-                                        playSound(MoveSound)
-                                    }
+                                    playSound(MoveSound)
                                 }
                                 else if ((change-9==caseNumber || change+9==caseNumber || change-7==caseNumber || change+7==caseNumber ) && (chessBoard[caseNumber]==0))
                                 {
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
                                     chessBoard[enPassant]=0;
-                                    if(sound==1)
-                                    {
-                                        playSound(CaptureSound)
-                                    }
+                                    playSound(CaptureSound)
                                 }
                                 else if (caseNumber/8==0)//White promotion
                                 {
@@ -5142,16 +5343,13 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 }
                                 else
                                 {
-                                    if (sound==1)
+                                    if (chessBoard[caseNumber]!=0)
                                     {
-                                        if (chessBoard[caseNumber]!=0)
-                                        {
-                                            playSound(CaptureSound)
-                                        }
-                                        else
-                                        {
-                                            playSound(MoveSound)
-                                        }
+                                        playSound(CaptureSound)
+                                    }
+                                    else
+                                    {
+                                        playSound(MoveSound)
                                     }
                                     chessBoard[caseNumber] = chessBoard[change];
                                     chessBoard[change] = 0;
@@ -5162,10 +5360,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             {
                                 chessBoard[caseNumber] = chessBoard[change];
                                 chessBoard[change] = 0;
-                                if (sound==1)
-                                {
-                                    playSound(MoveSound)
-                                }
+                                playSound(MoveSound)
                                 enPassant=0;
                             }
                             //Change the moves in the previousMove array
@@ -5488,6 +5683,41 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 }
 
 
+int pagePuzzle(SDL_Window* window, SDL_Renderer* render, int* nextPage, unsigned int* chessBoard, int* rock, int* teamToPlay, int* enPassant)
+{
+    SDL_Surface* imageExitConfirmationBackground = NULL;
+    SDL_Texture* textureExitConfirmationBackground = NULL;
+    ALLImageAndTransparencyINIT(imageExitConfirmationBackground, textureExitConfirmationBackground, ExitConfirmationBMP, render)
+    SDL_RenderCopy(render, textureExitConfirmationBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>604 && event.button.x<1315 && event.button.y>386 && event.button.y<609)
+                {
+                    if (event.button.x>756 && event.button.x<901 && event.button.y>514 && event.button.y<566)
+                    {
+                        return 0;
+                    }
+                    else if (event.button.x>1019 && event.button.x<1164 && event.button.y>514 && event.button.y<566)
+                    {
+                        return 1;
+                    }
+                }
+                else
+                {
+                    return 0;
+                }
+                break;
+        }
+    }
+}
+
 int main(int argc, char* argv[])
 {
     /*//Initialisation socket and shits
@@ -5501,7 +5731,11 @@ int main(int argc, char* argv[])
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     int nextPage=5;
+=======
+    int nextPage=2;
+>>>>>>> Stashed changes
 =======
     int nextPage=2;
 >>>>>>> Stashed changes

@@ -8,145 +8,68 @@
 int main(int argc, char **argv)
 {
     MYSQL *con = mysql_init(NULL);
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-
-    char date[9];
-    int year=tm.tm_year+1900;
-    int month= tm.tm_mon + 1;
-    int day = tm.tm_mday;
-    date[0] = 48+(year/1000);
-    date[1] = 48+(year/100)%10;
-    date[2] = 48+(year/10)%10;
-    date[3] = 48+(year%10);
-    date[4] = 47;
-    date[5] = 48 + (month/10);
-    date[6] = 48 + (month%10);
-    date[7] = 47;
-    date[8] = 48 + (day/10);
-    date[9] = 48 + (day%10);
-
-    printf("now: %d-%d-%d\n", year, month, day);
-    if (con == NULL)
+    if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
     {
-        fprintf(stderr, "mysql_init() failed\n");
-        exit(1);
+        printf("Not connected");
     }
-
-    if (mysql_real_connect(con, "35.181.56.11", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+    else
     {
-        printf("Non connecte\n");
+        printf("Connected");
     }
+    int userIdConnected=1;
+    int puzzle_score=1000;
+    char request[]="SELECT * FROM Puzzle LEFT JOIN (SELECT * FROM Puzzle_done WHERE user_id=000) as Puzzle_done_change ON Puzzle.puzzle_id = Puzzle_done_change.puzzle_id WHERE (Puzzle_done_change.user_id is NULL) AND 0000>Puzzle.puzzle_score_min AND 0000<Puzzle.puzzle_score_max ORDER BY Puzzle.Puzzle_id LIMIT 1;";
+    char* pointeurRequest=request;
+    pointeurRequest[72]=48+(userIdConnected/100);
+    pointeurRequest[73]=48+((userIdConnected/10)%10);
+    pointeurRequest[74]=48+(userIdConnected%10);
 
-    char prenom[]= "Julien      ";
-    char* pointeurPrenom = prenom;
-    int cptPrenom=6;
 
-    char nom[]= "Chemillier      ";
-    char* pointeurNom = nom;
-    int cptNom=10;
+    pointeurRequest[197]=48+(puzzle_score/1000);
+    pointeurRequest[198]=48+((puzzle_score/100)%10);
+    pointeurRequest[199]=48+((puzzle_score%100)/10);
+    pointeurRequest[200]=48+(puzzle_score%10);
     
-    char password[]= "Password                              ";
-    char* pointeurPassword = password;
-    int cptPassword=8;
-    
-    char email[]= "Email                              ";
-    char* pointeurEmail = email;
-    int cptEmail=5;
-
-    char request[] = "INSERT INTO User Values (";
-    char endRequest[] = "', 0);";
-    char midRequest[] = "', 1000, 1000, 'francais', '";
-    int cptRequest=39;
+    pointeurRequest[230]=48+(puzzle_score/1000);
+    pointeurRequest[231]=48+((puzzle_score/100)%10);
+    pointeurRequest[232]=48+((puzzle_score%100)/10);
+    pointeurRequest[233]=48+(puzzle_score%10);
 
 
-
-    //char test[] = "SELECT Count(*) FROM User Where email='chemillier.julien@gmail.com' AND password=12345;                                   ";
-
-    mysql_query(con, "SELECT MAX(user_id) FROM User;");
+    printf("%s\n",request);
+    mysql_query(con, request);
     MYSQL_RES *result = mysql_store_result(con);
+    if (result == NULL)
+    {
+        printf("Error result");
+    }
     int num_fields = mysql_num_fields(result);
-    MYSQL_ROW row = mysql_fetch_row(result);
-    int user_id = atoi(row[0])+1;
-    int len = log10(user_id)+1;
-    char userIdChar[len];
-    itoa(user_id, userIdChar, 10);
-    printf("resultat %c", result);
+    MYSQL_ROW row;
+    row = mysql_fetch_row(result);
+
+    int actual_puzzle_id=atoi(row[0]);
+
+    char actual_puzzle_fen[strlen(row[1])];
+    char* pt_actual_puzzle_fen=actual_puzzle_fen;
+    for (int i=0; i<strlen(row[1]); i++)
+    {
+        pt_actual_puzzle_fen[i]=row[1][i];
+    }
+    pt_actual_puzzle_fen[strlen(row[1])]=0;
+
+    int average_puzzle_score= (atoi(row[2])+atoi(row[3]))/2;
+
+    char actual_move_list[strlen(row[4])];
+    char* pt_actual_move_list=actual_move_list;
+    for (int i=0; i<strlen(row[4]); i++)
+    {
+        pt_actual_move_list[i]=row[4][i];
+    }
+    pt_actual_move_list[strlen(row[4])]=0;
+
+    printf("len%d ->%s\n", strlen(row[4]), actual_move_list);
 
     mysql_free_result(result);
     mysql_close(con);
-
-
-
-
-
-    strcat(userIdChar, ",'");
-    strcat(request, userIdChar);
-
-    char newPrenom[cptPrenom];
-    for (int i=0; i<cptPrenom; i++)
-    {
-        newPrenom[i] = pointeurPrenom[i];
-    }
-    newPrenom[cptPrenom]=0;
-
-    char newNom[cptNom];
-    for (int i=0; i<cptNom; i++)
-    {
-        newNom[i] = pointeurNom[i];
-    }
-    newNom[cptNom]=0;
-
-
-    char newPassword[8];
-    for (int i=0; i<cptPassword; i++)
-    {
-        newPassword[i] = pointeurPassword[i];
-    }
-    newPassword[cptPassword]=0;
-    
-    char newEmail[cptEmail];
-    for (int i=0; i<cptEmail; i++)
-    {
-        newEmail[i] = pointeurEmail[i];
-    }
-    newEmail[cptEmail]=0;
-
-
-    strcat(newPrenom, "','");
-    strcat(newPrenom, newNom);
-    strcat(newPrenom, "','");
-    strcat(newPrenom, newPassword);
-    strcat(newPrenom, "','");
-    strcat(newPrenom, date);
-    strcat(newPrenom, "', 1000, 1000, 'francais', '");
-    
-    strcat(newEmail, "', 0);");
-    
-    strcat(newPrenom, newEmail);
-
-
-    strcat(request, newPrenom);
-
-
-    printf("request: %s\n", request);
-
-
-    MYSQL *con2 = mysql_init(NULL);
-
-    char test[] = "INSERT INTO User Values (2,'Julien','Chemillier', 192837465,'2021/06/15', 1000, 1000, 'francais', 'Email', 0);";
-    if (mysql_real_connect(con2, "35.181.56.11", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
-    {
-        printf("Non connecte\n");
-    }
-    if (mysql_query(con2, request))
-    {
-        fprintf(stderr, "%s\n", mysql_error(con2));
-        mysql_close(con2);
-        exit(1);
-    }
-
-
-    printf("finis sans erreurs");
     exit(0);
 }
