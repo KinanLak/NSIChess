@@ -336,18 +336,21 @@ int main(int argc, char* argv[])
     printf("\n Rock -> %d\n", rock);
     //shrinkChar(fen, 10);*/
 
-    int num;
-    FILE *fptr;
+    char cmd[100];  // to hold the command.
+    char to[] = "sample@example.com"; // email id of the recepient.
+    char body[] = "SO rocks";    // email body.
+    char tempFile[100];     // name of tempfile.
 
-    if ((fptr = fopen("save.txt","r")) != NULL)
-    {
-        fscanf(fptr,"%d", &num);
+    strcpy(tempFile,tempnam("/tmp","sendmail")); // generate temp file name.
 
-        printf("Value of n=%d", num);
-    }
+    FILE *fp = fopen(tempFile,"w"); // open it for writing.
+    fprintf(fp,"%s\n",body);        // write body to it.
+    fclose(fp);             // close it.
 
-    fclose(fptr);
+    sprintf(cmd,"sendmail %s < %s",to,tempFile); // prepare command.
+    system(cmd);     // execute it.
 
+    return 0;
 
     return 1;
 }
