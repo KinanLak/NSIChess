@@ -336,23 +336,47 @@ int main(int argc, char* argv[])
     printf("\n Rock -> %d\n", rock);
     //shrinkChar(fen, 10);*/
 
-    char cmd[100];  // to hold the command.
-    char to[] = "sample@example.com"; // email id of the recepient.
-    char body[] = "SO rocks";    // email body.
-    char tempFile[100];     // name of tempfile.
+    char *filename = "save.txt";
 
-    strcpy(tempFile,tempnam("/tmp","sendmail")); // generate temp file name.
+    if (1)
+    {
+        char user[] = "userId";
+        FILE *fp = fopen(filename, "w");
+        if (fp == NULL)
+        {
+            printf("Error opening the file %s", filename);
+            return -1;
+        }
+        // user_id
+        fprintf(fp, user);
 
-    FILE *fp = fopen(tempFile,"w"); // open it for writing.
-    fprintf(fp,"%s\n",body);        // write body to it.
-    fclose(fp);             // close it.
+        fprintf(fp, "\n");
 
-    sprintf(cmd,"sendmail %s < %s",to,tempFile); // prepare command.
-    system(cmd);     // execute it.
+        //puzzle_score
+        fprintf(fp, "puzzle_score");
 
+        fclose(fp);
+    }
+
+
+
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL)
+    {
+        printf("Error: could not open file %s", filename);
+        return 1;
+    }
+    const unsigned MAX_LENGTH = 256;
+    char buffer[MAX_LENGTH];
+
+    fgets(buffer, MAX_LENGTH, fp);
+    printf("%s", buffer);
+    fgets(buffer, MAX_LENGTH, fp);
+    printf("%s", buffer);
+
+    // close the file
+    fclose(fp);
     return 0;
-
-    return 1;
 }
 
 

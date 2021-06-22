@@ -1295,7 +1295,7 @@ int stayConnected=0;
 int typeChessboard=1;
 int sound=1;
 int typePieces=1;
-int puzzle_score=0;
+int puzzle_score=1243;
 int userIdConnected=1;
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
@@ -1370,11 +1370,14 @@ int userIdConnected=1;
 #define LocalSelectionImageBMP "images/main_menu/local.bmp"
 #define HoverLocalSelectionImageBMP "images/main_menu/hoverLocal.bmp"
 
-#define PseudoChoiceBGmageBMP "images/pseudos/choix_pseudo.bmp"
-#define PseudoRetourmageBMP "images/pseudos/retour.bmp"
-#define HoverPseudoRetourmageBMP "images/pseudos/hoverRetour.bmp"
-#define PseudoValidermageBMP "images/pseudos/valider.bmp"
-#define HoverPseudoValidermageBMP "images/pseudos/hoverValider.bmp"
+#define PseudoChoiceBGimageBMP "images/pseudos/choix_pseudo.bmp"
+#define PseudoRetourimageBMP "images/pseudos/retour.bmp"
+#define HoverPseudoRetourimageBMP "images/pseudos/hoverRetour.bmp"
+#define PseudoValiderimageBMP "images/pseudos/valider.bmp"
+#define HoverPseudoValiderimageBMP "images/pseudos/hoverValider.bmp"
+#define PseudoBlackWhiteimageBMP "images/pseudos/blackWhite.bmp"
+#define PseudoWhiteBlackimageBMP "images/pseudos/whiteBlack.bmp"
+#define PseudoRandomimageBMP "images/pseudos/random.bmp"
 
 
 
@@ -2898,6 +2901,15 @@ int optionNoTime(SDL_Renderer* render)
     else
     {
         SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
+    }
+
+    if (stayConnected==1)
+    {
+        SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch2);
+    }
+    else
+    {
+        SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch2);
     }
     SDL_RenderPresent(render);
     SDL_Event event;
@@ -5290,15 +5302,17 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         
                     }
                     else
-
                     {
-                        slideAmis=0;
-                        for (int i=16; i>-1; i--)
+                        if (!(event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637))
                         {
-                            rectButtonFriendListHider.x= -25*i;
-                            SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
-                            SDL_RenderPresent(render);
-                            SDL_Delay(5);
+                            slideAmis=0;
+                            for (int i=16; i>-1; i--)
+                            {
+                                rectButtonFriendListHider.x= -25*i;
+                                SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
+                                SDL_RenderPresent(render);
+                                SDL_Delay(5);
+                            }
                         }
                     }
                 }
@@ -5350,6 +5364,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             SDL_Delay(5);
                         }
                     }
+                    SDL_Delay(100);
                     //Amis
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>659 && event.button.y<752)
@@ -5482,9 +5497,23 @@ int issueOfTheGame(SDL_Renderer* render, int* nextPage, int win, int type)
     }
 }
 
+#define renderGoodColorChoice() if (colorChoice==0)\
+                                {\
+                                    SDL_RenderCopy(render, textureWhiteBlackColor, NULL, &rectColorChoice);\
+                                }\
+                                else if (colorChoice==1)\
+                                {\
+                                    SDL_RenderCopy(render, textureBlackWhiteColor, NULL, &rectColorChoice);\
+                                }\
+                                else\
+                                {\
+                                    SDL_RenderCopy(render, textureRandomColor, NULL, &rectColorChoice);\
+                                }
+
 int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     int focus=0;
+    int colorChoice=2;
     int leftShift=0;
     int rightShift=0;
     int leftAlt=0;
@@ -5522,11 +5551,11 @@ int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     char* strPointeurPseudo2=strPseudo2;
     SDL_Surface* imageBG = NULL;
     SDL_Texture* textureBG = NULL;
-    ALLImageAndTransparencyINIT(imageBG, textureBG, PseudoChoiceBGmageBMP, render)
+    ALLImageAndTransparencyINIT(imageBG, textureBG, PseudoChoiceBGimageBMP, render)
 
     SDL_Surface* imageHoverRetour = NULL;
     SDL_Texture* textureHoverRetour = NULL;
-    ALLImageAndTransparencyINIT(imageHoverRetour, textureHoverRetour, HoverPseudoRetourmageBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverRetour, textureHoverRetour, HoverPseudoRetourimageBMP, render)
     SDL_Rect rectRetour;
     rectRetour.x= 673;
     rectRetour.y= 622;
@@ -5535,11 +5564,11 @@ int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     
     SDL_Surface* imageRetour = NULL;
     SDL_Texture* textureRetour = NULL;
-    ALLImageAndTransparencyINIT(imageRetour, textureRetour, PseudoRetourmageBMP, render)
+    ALLImageAndTransparencyINIT(imageRetour, textureRetour, PseudoRetourimageBMP, render)
 
     SDL_Surface* imageHoverValider = NULL;
     SDL_Texture* textureHoverValider = NULL;
-    ALLImageAndTransparencyINIT(imageHoverValider, textureHoverValider, HoverPseudoValidermageBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverValider, textureHoverValider, HoverPseudoValiderimageBMP, render)
     SDL_Rect rectValider;
     rectValider.x= 995;
     rectValider.y= 622;
@@ -5548,9 +5577,27 @@ int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
     SDL_Surface* imageValider = NULL;
     SDL_Texture* textureValider = NULL;
-    ALLImageAndTransparencyINIT(imageValider, textureValider, PseudoValidermageBMP, render)
+    ALLImageAndTransparencyINIT(imageValider, textureValider, PseudoValiderimageBMP, render)
+
+    SDL_Surface* imageRandomColor = NULL;
+    SDL_Texture* textureRandomColor = NULL;
+    ALLImageAndTransparencyINIT(imageRandomColor, textureRandomColor, PseudoRandomimageBMP, render)
+
+    SDL_Surface* imageBlackWhiteColor = NULL;
+    SDL_Texture* textureBlackWhiteColor = NULL;
+    ALLImageAndTransparencyINIT(imageBlackWhiteColor, textureBlackWhiteColor, PseudoBlackWhiteimageBMP, render)
+
+    SDL_Surface* imageWhiteBlackColor = NULL;
+    SDL_Texture* textureWhiteBlackColor = NULL;
+    ALLImageAndTransparencyINIT(imageWhiteBlackColor, textureWhiteBlackColor, PseudoWhiteBlackimageBMP, render)
+    SDL_Rect rectColorChoice;
+    rectColorChoice.x= 923;
+    rectColorChoice.y= 520;
+    rectColorChoice.w= 76;
+    rectColorChoice.h= 43;
 
     SDL_RenderCopy(render, textureBG, NULL, NULL);
+    renderGoodColorChoice()
     SDL_RenderPresent(render);
 
     SDL_Event event;
@@ -5636,7 +5683,23 @@ int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x > 994 && event.button.x < 1249 && event.button.y > 621 && event.button.y < 696)
                 {
+                    if (colorChoice==2)
+                    {
+                        srand(time(NULL));
+                        colorChoice = rand()%2;  
+                    }
                     //Valider button
+                }
+                else if (event.button.x > 922 && event.button.x < 999 && event.button.y > 519 && event.button.y < 563)
+                {
+                    if (colorChoice==2)
+                    {
+                        colorChoice=0;
+                    }
+                    else
+                    {
+                        colorChoice+=1;
+                    }
                 }
                 else
                 {
@@ -5646,6 +5709,7 @@ int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 openFonts()
                 showTextesPseudo()
                 closeFonts()
+                renderGoodColorChoice()
                 SDL_RenderPresent(render);
                 break;
             case SDL_KEYDOWN: 
@@ -5685,6 +5749,7 @@ int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         {
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureBG, NULL, NULL);
+                            renderGoodColorChoice()
                             changeValuePseudo1()
                             focusPseudo1()
                             int x,y;
@@ -5703,6 +5768,7 @@ int pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         {
                             SDL_RenderClear(render);
                             SDL_RenderCopy(render, textureBG, NULL, NULL);
+                            renderGoodColorChoice()
                             changeValuePseudo2()
                             focusPseudo2()
                             int x,y;
@@ -6533,6 +6599,27 @@ int main(int argc, char* argv[])
     /*//Initialisation socket and shits
     WSADATA WSAData;
     WSAStartup(MAKEWORD(2, 0), &WSAData);*/
+    int nextPage;
+    char *filename = "save.txt";
+    FILE *fileOpen = fopen(filename, "r");
+    if (fileOpen == NULL)
+    {
+        nextPage=2;
+    }
+    else
+    {
+        const unsigned MAX_LENGTH = 256;
+        char buffer[MAX_LENGTH];
+
+        fgets(buffer, MAX_LENGTH, fileOpen);
+        userIdConnected = atoi(buffer);
+        fgets(buffer, MAX_LENGTH, fileOpen);
+        puzzle_score = atoi(buffer);
+
+        fclose(fileOpen);
+        nextPage=5;
+        stayConnected=1;
+    }
 
     //Initialisation of the window
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
@@ -6540,7 +6627,6 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    int nextPage=4;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
@@ -6589,6 +6675,32 @@ int main(int argc, char* argv[])
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
 
+    if (stayConnected==1)
+    {
+        FILE *fp = fopen(filename, "w");
+        if (fp == NULL)
+        {
+            SDL_Log("Error when writing in the document: 'save.txt'");
+            return -1;
+        }
+        // user_id
+        char userIdChar[3];
+        itoa(userIdConnected, userIdChar, 10);
+        fprintf(fp, userIdChar);
+
+        fprintf(fp, "\n");
+
+        //puzzle_score
+        char puzzleScoreChar[4];
+        itoa(puzzle_score, puzzleScoreChar, 10);
+        fprintf(fp, puzzleScoreChar);
+
+        fclose(fp);
+    }
+    else
+    {
+        remove("save.txt");
+    }
     return 1;
 }
 
