@@ -1,6 +1,12 @@
+f = open("C:/Users/Kinan/Desktop/text2.txt","w+")
+
+print("Avant module")
+
 import smtplib
-from email.message import EmailMessage
+from email.message import EmailMessage 
 import csv
+
+print("Après module")
 
 infos = []
 with open ('id.csv', 'r') as f:
@@ -14,11 +20,11 @@ email_mdp = 'Caca.123'
 msg = EmailMessage()
 msg['Subject'] = "Confirmation d'inscription"
 msg['From'] = 'NSI Chess'
-msg['To'] = infos[0]['mail']
+msg['To'] = 'kinan.lakh@gmail.com'
 
 msg.set_content("This is a plain text email")
 
-msg.add_alternative("""\
+msg.add_alternative("""
                     
 <!DOCTYPE html>
 <html>
@@ -261,9 +267,4 @@ msg.add_alternative("""\
 
 with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
     smtp.login(email_adress,email_mdp)
-    smtp.send_message(msg)  
-    
-"""   
-smtplib.SMTP("SSL0.OVH.NET", 587).login(email_adress,email_mdp)
-smtplib.SMTP("SSL0.OVH.NET", 587).send_message(msg) 
-"""
+    smtp.send_message(msg)

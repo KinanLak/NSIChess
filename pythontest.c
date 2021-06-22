@@ -1,13 +1,25 @@
-#include "Python.h"
+
+
+#include <stdio.h>
+#include <errno.h>
+#include <limits.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdlib.h>
+
+#define PY_SSIZE_T_CLEAN
+
+
+#include <Python.h>
+
+#define BUILDING_DLL
 
 int main(int argc, char *argv[])
 {
     // Get a reference to the main module.
     PyObject *main_module =
+
     PyImport_AddModule("__main__");
-    PyImport_AddModule("smtplib");
-    PyImport_AddModule("csv");
-    PyImport_AddModule("email.message");
 
     // Get the main module's dictionary
     // and make a copy of it.
