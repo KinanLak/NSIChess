@@ -336,46 +336,7 @@ int main(int argc, char* argv[])
     printf("\n Rock -> %d\n", rock);
     //shrinkChar(fen, 10);*/
 
-    char *filename = "save.txt";
-
-    if (1)
-    {
-        char user[] = "userId";
-        FILE *fp = fopen(filename, "w");
-        if (fp == NULL)
-        {
-            printf("Error opening the file %s", filename);
-            return -1;
-        }
-        // user_id
-        fprintf(fp, user);
-
-        fprintf(fp, "\n");
-
-        //puzzle_score
-        fprintf(fp, "puzzle_score");
-
-        fclose(fp);
-    }
-
-
-
-    FILE *fp = fopen(filename, "r");
-    if (fp == NULL)
-    {
-        printf("Error: could not open file %s", filename);
-        return 1;
-    }
-    const unsigned MAX_LENGTH = 256;
-    char buffer[MAX_LENGTH];
-
-    fgets(buffer, MAX_LENGTH, fp);
-    printf("%s", buffer);
-    fgets(buffer, MAX_LENGTH, fp);
-    printf("%s", buffer);
-
-    // close the file
-    fclose(fp);
+    char request[] = "SELECT user_id, puzzle_score FROM User Where email='admin@gmail.com'";
     return 0;
 }
 

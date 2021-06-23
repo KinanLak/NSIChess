@@ -3594,6 +3594,15 @@ void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, 
     }
 }
 
+void emptyChar(char* charName, int length)
+{
+    for (int i=0; i<length; i++)
+    {
+        charName[i]=32;
+    }
+    charName[length]=0;
+}
+
 //---------------------------------------------------------------------------------
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
@@ -3768,11 +3777,14 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
     //TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
 
-    char strConnexion1[38]="                                      ";
+    char strConnexion1[38];
+    emptyChar(strConnexion1, 38);
     char* strPointeurConnexion1 = strConnexion1;
-    char strConnexion2[38]="                                      ";
+    char strConnexion2[38];
+    emptyChar(strConnexion2, 38);
     char* strPointeurConnexion2 = strConnexion2;
-    char strConnexion2Hidder[38]="                                      ";
+    char strConnexion2Hidder[38];
+    emptyChar(strConnexion2Hidder, 38);
     char* strPointeurConnexion2Hidder = strConnexion2Hidder;
     int cptNumberOfValuesConnexion1 = 0;
     int cptNumberOfValuesConnexion2 = 0;
@@ -3881,18 +3893,10 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     }
                     else
                     {   
-                        MYSQL *con = mysql_init(NULL);
-                        if (mysql_real_connect(con, "15.188.183.249", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
-                        {
-                            SDL_Log("Error connexion database");
-                        }
-                        else
-                        {
-                            SDL_Log("connected database");
-                        }
+                        int boolean;
                         char request[] = "SELECT Count(*) FROM User Where email='";
-                        char requesttransition1[] = "' AND password='";
-                        char requesttransition3[] = "';";
+                        char requesttransitionmiddle[] = "' AND password='";
+                        char requesttransitionend[] = "';";
 
                         char newConnexion1[cptNumberOfValuesConnexion1];
                         for (int i=0; i<cptNumberOfValuesConnexion1; i++)
@@ -3907,24 +3911,64 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         newConnexion2[cptNumberOfValuesConnexion2]=0;
                         strcat(request, newConnexion1);
-                        strcat(requesttransition1,  newConnexion2);
-                        strcat(requesttransition1,  requesttransition3);
-                        strcat(request, requesttransition1);
+                        strcat(requesttransitionmiddle,  newConnexion2);
+                        strcat(requesttransitionmiddle,  requesttransitionend);
+                        strcat(request, requesttransitionmiddle);
 
-                        if (mysql_query(con, request))
+                        if (1)
                         {
-                            SDL_Log("Error, request connexion");
-                            SDL_Log(request);
-                        }
-                        MYSQL_RES *result = mysql_store_result(con);
-                        int num_fields = mysql_num_fields(result);
+                            MYSQL *con = mysql_init(NULL);
+                            if (mysql_real_connect(con, "15.188.183.249", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                            {
+                                SDL_Log("Error connexion database");
+                            }
+                            else
+                            {
+                                SDL_Log("connected database");
+                            }
+                            if (mysql_query(con, request))
+                            {
+                                SDL_Log("Error, request connexion");
+                                SDL_Log(request);
+                            }
+                            MYSQL_RES *result = mysql_store_result(con);
+                            int num_fields = mysql_num_fields(result);
 
-                        MYSQL_ROW row = mysql_fetch_row(result);
-                        int boolean = atoi(row[0]);
-                        mysql_free_result(result);
-                        mysql_close(con);
+                            MYSQL_ROW row = mysql_fetch_row(result);
+                            boolean = atoi(row[0]);
+                            mysql_free_result(result);
+                            mysql_close(con);
+                        }
                         if (boolean==1)
                         {
+                            MYSQL *con2 = mysql_init(NULL);
+                            if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                            {
+                                SDL_Log("Not connected");
+                            }
+                            else
+                            {
+                                SDL_Log("Connected");
+                            }
+                            char request2[] = "SELECT user_id, puzzle_score FROM User Where email='";
+                            strcat(request2, newConnexion1);
+                            strcat(request2, requesttransitionend);
+
+                            if (mysql_query(con2, request2))
+                            {
+                                SDL_Log(mysql_error(con2));
+                                SDL_Log(request2);
+                            }
+                            MYSQL_RES *result2 = mysql_store_result(con2);
+                            int num_fields2 = mysql_num_fields(result2);
+
+                            MYSQL_ROW row2;
+                            row2 = mysql_fetch_row(result2);
+                            userIdConnected = atoi(row2[0]);
+                            puzzle_score = atoi(row2[1]);
+                            mysql_free_result(result2);
+                            mysql_close(con2);
+                            
                             playSound(ButtonSound)
                             SDL_Log("1");
                             *nextPage=5;
@@ -4104,21 +4148,29 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_RenderCopy(render, textureInscription6, NULL, &sdlRectInscription6);
     closeFonts();
     
-    char strInscription1[38]="                                      ";
+    char strInscription1[38];
+    emptyChar(strInscription1, 38);
     char* strPointeurInscription1 = strInscription1;
-    char strInscription2[38]="                                      ";
+    char strInscription2[38];
+    emptyChar(strInscription2, 38);
     char* strPointeurInscription2 = strInscription2;
-    char strInscription3[38]="                                      ";
+    char strInscription3[38];
+    emptyChar(strInscription3, 38);
     char* strPointeurInscription3 = strInscription3;
-    char strInscription4[38]="                                      ";
+    char strInscription4[38];
+    emptyChar(strInscription4, 38);
     char* strPointeurInscription4 = strInscription4;
-    char strInscription5[38]="                                      ";
+    char strInscription5[38];
+    emptyChar(strInscription5, 38);
     char* strPointeurInscription5 = strInscription5;
-    char strInscription5Hidder[38]="                                      ";
+    char strInscription5Hidder[38];
+    emptyChar(strInscription5Hidder, 38);
     char* strPointeurInscription5Hidder = strInscription5Hidder;
-    char strInscription6[38]="                                      ";
+    char strInscription6[38];
+    emptyChar(strInscription6, 38);
     char* strPointeurInscription6 = strInscription6;
-    char strInscription6Hidder[38]="                                      ";
+    char strInscription6Hidder[38];
+    emptyChar(strInscription6Hidder, 38);
     char* strPointeurInscription6Hidder = strInscription6Hidder;
 
     int cptNumberOfValuesInscription1 = 0;
@@ -6612,6 +6664,8 @@ int main(int argc, char* argv[])
         char buffer[MAX_LENGTH];
 
         fgets(buffer, MAX_LENGTH, fileOpen);
+        sound = atoi(buffer);
+        fgets(buffer, MAX_LENGTH, fileOpen);
         userIdConnected = atoi(buffer);
         fgets(buffer, MAX_LENGTH, fileOpen);
         puzzle_score = atoi(buffer);
@@ -6683,6 +6737,13 @@ int main(int argc, char* argv[])
             SDL_Log("Error when writing in the document: 'save.txt'");
             return -1;
         }
+        // sound
+        char soundChar[1];
+        itoa(sound, soundChar, 10);
+        fprintf(fp, soundChar);
+
+        fprintf(fp, "\n");
+
         // user_id
         char userIdChar[3];
         itoa(userIdConnected, userIdChar, 10);
