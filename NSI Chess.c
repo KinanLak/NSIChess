@@ -5949,7 +5949,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     endTime += 100;
     
     int leftOverTimeWhite = 100;
-    int leftOverTimeBlack = 20;
+    int leftOverTimeBlack = 100;
     char stringTimeToShowWhite[6]="1:40";
     char stringTimeToShowBlack[6]="1:40";
     SDL_Surface * surfaceTimerWhite = TTF_RenderText_Solid(font,stringTimeToShowWhite, color);
