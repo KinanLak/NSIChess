@@ -6010,6 +6010,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     }
                     else
                     {
+                        initAllBoardImages()
                         SDL_RenderClear(render);
                         SDL_RenderCopy(render, textureBackground, NULL, NULL);
                         showPreviousMoves()
@@ -6674,7 +6675,6 @@ int main(int argc, char* argv[])
         nextPage=5;
         stayConnected=1;
     }
-
     //Initialisation of the window
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     SDL_Window* window = NULL;
