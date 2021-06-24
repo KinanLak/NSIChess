@@ -4547,7 +4547,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     if (resterConnecte==1)
                     {
                         resterConnecte=0;
-                        SDL_RenderCopy(render, texturHoverResterConnecte, NULL, &rectResterConnecte);
+                        SDL_RenderCopy(render, textureHoverResterConnecte, NULL, &rectResterConnecte);
                     }
                     else
                     {
