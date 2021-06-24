@@ -13,10 +13,12 @@ during:
 init nbInt=0
 init fail=0
 init intCase=-1
+init isBegin=0
 
 
 
 after each move:
+isBegin=1;
 check if the move is correct if:
     make it
     upte list moves

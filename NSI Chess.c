@@ -3319,6 +3319,7 @@ int optionGame(SDL_Renderer* render, int timeLeftOver)
                 {
                     if (event.button.x>504 && event.button.x<569 && event.button.y>331 && event.button.y<398)
                     {
+                        SDL_Delay(250);
                         return 0;
                         //Back button
                     }
@@ -3336,6 +3337,7 @@ int optionGame(SDL_Renderer* render, int timeLeftOver)
                             SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
                             SDL_RenderPresent(render);
                         }
+                        SDL_Delay(250);
                         //switch1
                     }
                     else if (event.button.x>892 && event.button.x<1007 && event.button.y>624 && event.button.y<680)
@@ -3352,6 +3354,7 @@ int optionGame(SDL_Renderer* render, int timeLeftOver)
                             SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch2);
                             SDL_RenderPresent(render);
                         }
+                        SDL_Delay(250);
                         //switch2
                     }
                     else if (event.button.x>520 && event.button.x<789 && event.button.y>766 && event.button.y<848)
@@ -3371,6 +3374,7 @@ int optionGame(SDL_Renderer* render, int timeLeftOver)
                         }
                         showTypePieces()
                         SDL_RenderPresent(render);
+                        SDL_Delay(250);
                         //leftArrow1
                     }
                     else if (event.button.x>1046 && event.button.x<1074 && event.button.y>791 && event.button.y<822)
@@ -3385,6 +3389,7 @@ int optionGame(SDL_Renderer* render, int timeLeftOver)
                         }
                         showTypePieces()
                         SDL_RenderPresent(render);
+                        SDL_Delay(250);
                         //rightArrow1
                     }
                     else if (event.button.x>1198 && event.button.x<1226 && event.button.y>791 && event.button.y<822)
@@ -3399,6 +3404,7 @@ int optionGame(SDL_Renderer* render, int timeLeftOver)
                         }
                         showTypeChessboard()
                         SDL_RenderPresent(render);
+                        SDL_Delay(250);
                         //leftArrow2
                     }
                     else if (event.button.x>1287 && event.button.x<1315 && event.button.y>791 && event.button.y<822)
@@ -3413,6 +3419,7 @@ int optionGame(SDL_Renderer* render, int timeLeftOver)
                         }
                         showTypeChessboard()
                         SDL_RenderPresent(render);
+                        SDL_Delay(250);
                         //rightArrow2
                     }
                 }
@@ -3607,6 +3614,24 @@ void emptyChar(char* charName, int length)
 //------------------------------------All Pages------------------------------------
 //---------------------------------------------------------------------------------
 
+int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoard, int* rock, int reverse, int whoToPlay, int* enPassant, int actual_puzzle_id)
+{
+    int nbInt=0;
+    int fail=0;
+    int intCase=-1;
+    int isBegin=0;
+
+    SDL_RenderClear(render);
+    initAllSurfaces()
+    initAllTextures()
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
+
+    //Create all images
+    initAllBoardImages()
+
+    SDL_Rect dstrect;
+    int previousMove[2]={NOTHING, NOTHING};
+}
 
 void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
@@ -3713,8 +3738,27 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     int rock=0;
     int whoToPlay=0;
     int enPassant=0;
-    //puzzlePage(window, render, nextPage, chessBoard, &rock, &whoToPlay, &enPassant, actual_puzzle_id);
+    FENToList(actual_puzzle_fen, chessBoard, &rock, &whoToPlay, &enPassant);
 
+    int nextPageChoice = puzzlePage(window, render, chessBoard, &rock, whoToPlay, whoToPlay, &enPassant, actual_puzzle_id);
+
+    if (nextPageChoice==0)//Quit the app
+    {
+        *nextPage=1;
+    }
+    else if (nextPageChoice==1)//Deconnexion
+    {
+        stayConnected=0;
+        *nextPage=2;
+    }
+    else if (nextPageChoice==2)//Go back in the menu
+    {
+        *nextPage=5;
+    }
+    else if (nextPageChoice==3)//New Puzzle
+    {
+        *nextPage=8;
+    }
 }
 
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
@@ -6681,6 +6725,7 @@ int main(int argc, char* argv[])
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
+    nextPage=10;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
