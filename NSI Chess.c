@@ -4018,7 +4018,7 @@ int defeatPuzzle(SDL_Window* window, SDL_Renderer* render)
 
 int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int scorePuzzle, int myScore, int time)
 {
-    TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
+    TTF_Font * fontInformations;
     SDL_Color color = { 0, 0, 0};
     SDL_Surface* imageVictoryPuzzleBg = NULL;
     SDL_Texture* textureVictoryPuzzleBg = NULL;
@@ -4027,7 +4027,9 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
 
     char charPuzzleId[4];
     itoa(puzzleId, charPuzzleId, 10);
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
     SDL_Surface * surfacePuzzleId = TTF_RenderText_Solid(fontInformations, charPuzzleId, color);
+    TTF_CloseFont(fontInformations);
     SDL_Texture * texturePuzzleId = SDL_CreateTextureFromSurface(render, surfacePuzzleId);
     int texWPuzzleId, texHPuzzleId;
     SDL_QueryTexture(texturePuzzleId, NULL, NULL, &texWPuzzleId, &texHPuzzleId);
@@ -4044,7 +4046,9 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
     strcat(stringStopwatch, stringTens);
     strcat(stringStopwatch, stringUnity);
 
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
     SDL_Surface * surfaceStopwatch = TTF_RenderText_Solid(fontInformations,stringStopwatch, color);
+    TTF_CloseFont(fontInformations);
     SDL_Texture * textureStopwatch = SDL_CreateTextureFromSurface(render, surfaceStopwatch);
     int texWStopwatch, texHStopwatch;
     SDL_QueryTexture(textureStopwatch, NULL, NULL, &texWStopwatch, &texHStopwatch);
@@ -4053,7 +4057,9 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
     char charMyPuzzleScore[4];
     itoa(myScore, charMyPuzzleScore, 10);
     SDL_Log(charMyPuzzleScore);
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
     SDL_Surface * surfaceMyPuzzleScore = TTF_RenderText_Solid(fontInformations, charMyPuzzleScore, color);
+    TTF_CloseFont(fontInformations);
     SDL_Texture * textureMyPuzzleScore = SDL_CreateTextureFromSurface(render, surfaceMyPuzzleScore);
     int texWMyPuzzleScore, texHMyPuzzleScore;
     SDL_QueryTexture(textureMyPuzzleScore, NULL, NULL, &texWMyPuzzleScore, &texHMyPuzzleScore);
@@ -4062,7 +4068,9 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
     
     char charPuzzleScore[4];
     itoa(scorePuzzle, charPuzzleScore, 10);
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
     SDL_Surface * surfacePuzzleScore = TTF_RenderText_Solid(fontInformations, charPuzzleScore, color);
+    TTF_CloseFont(fontInformations);
     SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
     int texWPuzzleScore, texHPuzzleScore;
     SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
@@ -4250,7 +4258,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     SDL_Texture * texturePuzzleId = SDL_CreateTextureFromSurface(render, surfacePuzzleId);
     int texWPuzzleId, texHPuzzleId;
     SDL_QueryTexture(texturePuzzleId, NULL, NULL, &texWPuzzleId, &texHPuzzleId);
-    SDL_Rect sdlRectPuzzleId = {1639, 480, texWPuzzleId, texHPuzzleId};
+    SDL_Rect sdlRectPuzzleId = {1800, 480, texWPuzzleId, texHPuzzleId};
 
     char charPuzzleScore[4];
     itoa(actual_puzzle_score, charPuzzleScore, 10);
@@ -4258,7 +4266,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
     int texWPuzzleScore, texHPuzzleScore;
     SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
-    SDL_Rect sdlRectPuzzleScore = {1608, 519, texWPuzzleScore, texHPuzzleScore};
+    SDL_Rect sdlRectPuzzleScore = {1800, 519, texWPuzzleScore, texHPuzzleScore};
 
     char charMyPuzzleScore[4];
     itoa(puzzle_score, charMyPuzzleScore, 10);
@@ -7455,8 +7463,8 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage, int color
 {
     int xMinBoard = 488;
     int xMaxBoard = 1432;
-    int yMinBoard = 69;
-    int yMaxBoard = 1013;
+    int yMinBoard = 70;
+    int yMaxBoard = 1014;
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
     initAllSurfaces()
