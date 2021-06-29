@@ -15,7 +15,7 @@ with open ('id.csv', 'r') as f:
             infos.append(dict(row))
 
 email_adress = 'nsichess@gmail.com'
-email_mdp = 'Caca.123'
+email_mdp = 'qX58rn^qwXeA&o1k=s?Hf2!aFdF?RWdA'
 
 msg = EmailMessage()
 msg['Subject'] = "Confirmation d'inscription"

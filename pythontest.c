@@ -16,6 +16,7 @@
 
 int main(int argc, char *argv[])
 {
+    /*
     // Get a reference to the main module.
     PyObject *main_module =
 
@@ -31,5 +32,8 @@ int main(int argc, char *argv[])
     Py_Initialize();
     PyRun_File(mail, "mail.py", Py_file_input, main_dict_copy, main_dict_copy);
     Py_Finalize();
+    return 0;
+    */
+    system("python \"mail.py\"");
     return 0;
 }
