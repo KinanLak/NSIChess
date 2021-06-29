@@ -6970,9 +6970,9 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     ALLImageAndTransparencyINIT(imageFriendListHiderBackground, textureFriendListHiderBackground, FriendListHiderMainMenuBMP, render)
     SDL_Rect rectButtonFriendListHider;
     rectButtonFriendListHider.x= 0;
-    rectButtonFriendListHider.y= 0;
+    rectButtonFriendListHider.y= 45;
     rectButtonFriendListHider.w= 402;
-    rectButtonFriendListHider.h= 1080;
+    rectButtonFriendListHider.h= 1035;
     
     SDL_Event event;
     int continuer = 1;
