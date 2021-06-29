@@ -12,6 +12,7 @@ struct MoveStructure
 {
     int departureCase;
     int arrivalCase;
+    int bonus;
     MoveStructure *nextMove;
 };
 
@@ -24,7 +25,7 @@ struct FileMoveStructure
 
 //Creation of the prototypes
 FileMoveStructure *initialise(void);
-void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase);
+void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase, int bonus);
 void storeAllMovesSQL(FileMoveStructure *file);
 
 
@@ -37,7 +38,7 @@ FileMoveStructure *initialise()
 }
 
 
-void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase)
+void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase, int bonus)
 {
     MoveStructure *new = malloc(sizeof(*new));
     if (file == NULL || new == NULL)
@@ -47,6 +48,7 @@ void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCa
 
     new->departureCase = newDepartureCase;
     new->arrivalCase = newArrivalCase;
+    new->bonus = bonus;
     new->nextMove = NULL;
 
     if (file->firstMove != NULL)
@@ -64,6 +66,19 @@ void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCa
     }
 }
 
+int deleteMoveFile(FileMoveStructure *file)
+{
+    if (file->firstMove!=NULL)
+    {
+        file->firstMove = (file->firstMove)->nextMove;
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
 void storeAllMovesSQL(FileMoveStructure *file)
 {
     if (file == NULL)
@@ -78,7 +93,7 @@ void storeAllMovesSQL(FileMoveStructure *file)
 
     while (MoveStructure != NULL)
     {
-        printf("%d -> %d \n", MoveStructure->departureCase, MoveStructure->arrivalCase);
+        printf("%d -> %d (%d)\n", MoveStructure->departureCase, MoveStructure->arrivalCase, MoveStructure->bonus);
         //Manque la requête qui ajoute le mouvement
         // INSERT INTO table_name
         // VALUES (moveId, MoveStructure->departureCase, MoveStructure->arrivalCase, gameId);
@@ -90,7 +105,7 @@ void storeAllMovesSQL(FileMoveStructure *file)
 
 
 
-/*void listMovesToFile(FileMoveStructure* file, char* listMoves)
+void listMovesToFile(FileMoveStructure* file, char* listMoves)
 {
     int cpt=0;
     int departure=0;
@@ -102,13 +117,38 @@ void storeAllMovesSQL(FileMoveStructure *file)
         cpt+=2;
 
         arrival = ((8-(listMoves[cpt+1]-48))*8) + (listMoves[cpt]-97);
-        cpt+=3;
-
-        addMoveFile(file, departure, arrival);
+        cpt+=2;
+        if (listMoves[cpt]==32)
+        {
+            cpt+=1;
+            addMoveFile(file, departure, arrival, 0);
+        }
+        else
+        {
+            int BonusNB=0;
+            if (listMoves[cpt]==113)
+            {
+                BonusNB=6;
+            }
+            else if (listMoves[cpt]==114)
+            {
+                BonusNB=4;
+            }
+            else if (listMoves[cpt]==110)
+            {
+                BonusNB=3;
+            }
+            else if (listMoves[cpt]==98)
+            {
+                BonusNB=2;
+            }
+            addMoveFile(file, departure, arrival, BonusNB);
+            cpt+=2;
+        }
     }
 }
 
-void fileToListMoves(FileMoveStructure* file, int numberMoves)
+/*void fileToListMoves(FileMoveStructure* file, int numberMoves)
 {
     //
     //
@@ -324,19 +364,53 @@ void shrinkChar(char* longChar, int sizeNewChar)
     printf("%s", newChar);
 }
 
+int maxValueList(int* charValues, int lengthChar)
+{
+    int max=0; //all values of int >0
+    for (int i=0; i<lengthChar; i++)
+    {
+        if (max<charValues[i])
+        {
+            max=charValues[i];
+        }
+    }
+    return max;
+}
+
+int minValueList(int* charValues, int lengthChar)
+{
+    int min=10000; //all values of int <10 000
+    for (int i=0; i<lengthChar; i++)
+    {
+        if (min>charValues[i])
+        {
+            min=charValues[i];
+        }
+    }
+    return min;
+}
 int main(int argc, char* argv[])
 {
     /*unsigned int chessBoard[64];
     int rock=0;
     int whoToPlay=0;
     int enPassant=0;
-    char fen[]="rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1";
+    char fen[]="2r5/6pk/5p1p/5P2/3P1P1N/bP4P1/P2q3P/1K1R4 w - - 0 41";
     FENToList(fen, chessBoard, &rock, &whoToPlay, &enPassant);
     printBoard(chessBoard);
-    printf("\n Rock -> %d\n", rock);
-    //shrinkChar(fen, 10);*/
+    printf("\n Rock -> %d\n", rock);*/
+    //shrinkChar(fen, 10);
+    int x=800;
+    for (int i=0; i<31; i++)
+    {
+        x+=rand()%4;
+        if (i%5==0)
+        {
+            printf("\n");
+        }
+        printf("%d, ", x);
+    }
 
-    char request[] = "SELECT user_id, puzzle_score FROM User Where email='admin@gmail.com'";
     return 0;
 }
 
