@@ -6026,6 +6026,17 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         newEmail[cptNumberOfValuesInscription4]=0;
 
+
+                        
+                        char *filename = "id.csv";
+                        FILE *fp = fopen(filename, "w");
+                        SDL_Log(newEmail);
+                        SDL_Log(newPrenom);
+                        fprintf(fp, newEmail);
+                        fprintf(fp, ";");
+                        fprintf(fp, newPrenom);
+                        fprintf(fp, ";");
+                        fclose(fp);
                         strcat(newPrenom, "','");
                         strcat(newPrenom, newNom);
                         strcat(newPrenom, "','");
@@ -6040,7 +6051,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         MYSQL *con2 = mysql_init(NULL);
                         char* requestpointeur=request;
                         requestpointeur[0]=73;
-                        if (mysql_real_connect(con2, "15.188.183.249", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
+                        if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
                         {
                             SDL_Log("Non connecte2");
                         }
@@ -6048,6 +6059,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         {
                             exit(1);
                         }
+
                         *nextPage=4;
                         continuer=0;
                         playSound(ButtonSound)
@@ -6748,26 +6760,38 @@ int statsPage(SDL_Renderer* render)
     SDL_RenderDrawLine(render, x, 600, 1364, 600);
 
 
-    TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
-    SDL_Color color = { 0, 0, 0};
+    TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 15);
+    SDL_Color color = {255, 255, 255};
     int legende1=minValue+((637-420)*valuePerPixel);
     char charLegende1[4];
     itoa(legende1, charLegende1, 10);
     SDL_Surface * surfaceLegende1 = TTF_RenderText_Solid(fontInformations, charLegende1, color);
-    TTF_CloseFont(fontInformations);
     SDL_Texture * textureLegende1 = SDL_CreateTextureFromSurface(render, surfaceLegende1);
     int texWLegende1, texHLegende1;
     SDL_QueryTexture(textureLegende1, NULL, NULL, &texWLegende1, &texHLegende1);
-    SDL_Rect sdlRectLegende1 = {1058, 437, texWLegende1, texHLegende1};
+    SDL_Rect sdlRectLegende1 = {517, 412, texWLegende1, texHLegende1};
     SDL_RenderCopy(render, textureLegende1, NULL, &sdlRectLegende1);
 
     int legende2=minValue+((637-510)*valuePerPixel);
     char charLegende2[4];
     itoa(legende2, charLegende2, 10);
+    SDL_Surface * surfaceLegende2 = TTF_RenderText_Solid(fontInformations, charLegende2, color);
+    SDL_Texture * textureLegende2 = SDL_CreateTextureFromSurface(render, surfaceLegende2);
+    int texWLegende2, texHLegende2;
+    SDL_QueryTexture(textureLegende2, NULL, NULL, &texWLegende2, &texHLegende2);
+    SDL_Rect sdlRectLegende2 = {517, 502, texWLegende2, texHLegende2};
+    SDL_RenderCopy(render, textureLegende2, NULL, &sdlRectLegende2);
 
     int legende3=minValue+((637-600)*valuePerPixel);
     char charLegende3[4];
     itoa(legende3, charLegende3, 10);
+    SDL_Surface * surfaceLegende3 = TTF_RenderText_Solid(fontInformations, charLegende3, color);
+    SDL_Texture * textureLegende3 = SDL_CreateTextureFromSurface(render, surfaceLegende3);
+    int texWLegende3, texHLegende3;
+    SDL_QueryTexture(textureLegende3, NULL, NULL, &texWLegende3, &texHLegende3);
+    SDL_Rect sdlRectLegende3 = {517, 592, texWLegende3, texHLegende3};
+    SDL_RenderCopy(render, textureLegende3, NULL, &sdlRectLegende3);
+
 
 
     for (int i=1; i<31; i++)
@@ -8902,7 +8926,15 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int leftAlt=0;
     int limitCharDate=6;
 
+
+    
+
+
+
+
     //Generation of the code
+    char charCodeConfirmation[6];
+    char* ptcharCodeConfirmation=charCodeConfirmation;
     int codeConfirmation=0;
     srand(time(NULL));
     for (int x=0; x<6; x++)
@@ -8915,6 +8947,20 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         }
         codeConfirmation+=pow*r;
     }
+
+    charCodeConfirmation[0]=48 + (codeConfirmation/100000);
+    charCodeConfirmation[1]=48 + ((codeConfirmation/10000)%10);
+    charCodeConfirmation[2]=48 + ((codeConfirmation/1000)%10);
+    charCodeConfirmation[3]=48 + ((codeConfirmation/100)%10);
+    charCodeConfirmation[4]=48 + ((codeConfirmation/10)%10);
+    charCodeConfirmation[5]=48 + (codeConfirmation%10);
+    charCodeConfirmation[6]=0;
+
+    char *filename = "id.csv";
+    FILE *fp = fopen(filename, "a");
+    SDL_Log(charCodeConfirmation);
+    fprintf(fp, charCodeConfirmation);
+    fclose(fp);
 
     //Executing python code and sending confirmation mail
     system("python \"mail.py\"");
@@ -8957,7 +9003,7 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 if (event.button.x>832 && event.button.x<1087 && event.button.y>669 && event.button.y<744)
                 {
-                    if (intAndCharSame(codeConfirmation, strPointeurCodeConfirmation, cptNumberOfValuesConfirmation)==0)
+                    if (intAndCharSame(codeConfirmation, strPointeurCodeConfirmation, 6)==0)
                     {
                         SDL_Color color = {230, 20, 20};
                         TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 33);
