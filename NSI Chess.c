@@ -5,6 +5,7 @@
 #include <SDL2/SDL_ttf.h>
 #include <mysql.h>
 #include <math.h>
+#include <winuser.h>
 //#include <SDL2/SDL_image.h>
 //#include <winsock2.h>
 
@@ -8634,6 +8635,9 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         }
         codeConfirmation+=pow*r;
     }
+
+    //Executing python code and sending confirmation mail
+    system("python \"mail.py\"");
 
     SDL_RenderCopy(render, textureMailConfirmationBackground, NULL, NULL);
     SDL_RenderPresent(render);

@@ -1,12 +1,8 @@
 f = open("C:/Users/Kinan/Desktop/text2.txt","w+")
 
-print("Avant module")
-
 import smtplib
 from email.message import EmailMessage 
 import csv
-
-print("Après module")
 
 infos = []
 with open ('id.csv', 'r') as f:
