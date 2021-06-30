@@ -1439,6 +1439,7 @@ int userIdConnected=1;
 #define WhiteBishopImageBMP "/white/bishop.bmp"
 
 //Definition of files path
+#define WrongAnswerSound "sounds/wrongAnswer.wav"
 #define BoxSound "sounds/boxSound.wav"
 #define ButtonSound "sounds/buttonSound.wav"
 #define MoveSound "sounds/move.wav"
@@ -1564,7 +1565,6 @@ int userIdConnected=1;
 #define CreateRenderInNewWindow(window, render) window = SDL_CreateWindow("Logames", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_SWSURFACE);\
     render = SDL_CreateRenderer(window, NOTHING, 0);
 
-
 #define departPosition { \
     4,2,3,6,7,3,2,4, \
     1,1,1,1,1,1,1,1,\
@@ -1650,10 +1650,11 @@ int userIdConnected=1;
 
 #define showPreviousMovesInversed()  if (previousMove[0]!=NOTHING)\
                         {\
-                            SDL_Log("PreviousMove inversed");\
                             SDL_Rect rectPreviousMove;\
-                            drawFullSquarePreviousMove(63-previousMove[0], render);\
-                            drawFullSquarePreviousMove(63-previousMove[1], render);\
+                            int a1=63-previousMove[0];\
+                            int a2=63-previousMove[1];\
+                            drawFullSquarePreviousMove(a1, render);\
+                            drawFullSquarePreviousMove(a2, render);\
                         }
 
 #define showPreviousMoves() if (inverse==1)\
@@ -1675,7 +1676,8 @@ int userIdConnected=1;
 #define showHintInversed()  if (hintCase!=NOTHING)\
                         {\
                             SDL_Rect rectHint;\
-                            drawFullSquareHint(63-hintCase, render);\
+                            int b1=63-hintCase;\
+                            drawFullSquareHint(b1, render);\
                         }
 
 #define showHint() if (inverse==1)\
@@ -2805,33 +2807,34 @@ int intAndCharSame(int codeConfirmation, char* string, int sizeString)
     rectHint.h = lenSquare;\
     SDL_RenderFillRect(render, &rectHint)
 
-#define drawSquarePlayer(squareNumber, render, inverse) if (inverse==1)\
+#define drawSquarePlayer(squareNumber, render, inverse) int testA=squareNumber;\
+    if (inverse==1)\
     {\
-        squareNumber = 63-squareNumber;\
+        testA = 63-squareNumber;\
     }\
     SDL_Rect rect;\
-    rect.x = (xMinBoard+(squareNumber%8)*lenSquare);\
-    rect.y = (yMinBoard+(squareNumber/8)*lenSquare);\
+    rect.x = (xMinBoard+(testA%8)*lenSquare);\
+    rect.y = (yMinBoard+(testA/8)*lenSquare);\
     rect.w = lenSquare;\
     rect.h = lenSquare;\
     SDL_RenderDrawRect(render, &rect);\
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+1);\
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+1);\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+1);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare+1);\
     rect.w = lenSquare-2;\
     rect.h = lenSquare-2;\
     SDL_RenderDrawRect(render, &rect);\
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+2);\
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare)+2;\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+2);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare)+2;\
     rect.w = lenSquare-4;\
     rect.h = lenSquare-4;\
     SDL_RenderDrawRect(render, &rect);\
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+3);\
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+3);\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+3);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare+3);\
     rect.w = lenSquare-6;\
     rect.h = lenSquare-6;\
     SDL_RenderDrawRect(render, &rect);\
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+4);\
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+4);\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+4);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare+4);\
     rect.w = lenSquare-8;\
     rect.h = lenSquare-8;\
     SDL_RenderDrawRect(render, &rect);
@@ -3671,7 +3674,7 @@ int nextMoveFile(FileMoveStructure *file)
     }
 }
 
-void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, int* enPassant)
+void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, int* inverse, int* enPassant)
 {
     int cptStr=0;
     int cptChessBoard=0;
@@ -3760,10 +3763,12 @@ void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, 
     if (fen[cptStr]==119)
     {
         *teamToPlay=1;
+        *inverse=0;
     }
     else
     {
         *teamToPlay=0;
+        *inverse=1;
     }
     cptStr+=2;
     if (fen[cptStr]==45)
@@ -3917,10 +3922,6 @@ int minValueList(int* charValues, int lengthChar)
                             else\
                             {\
                                 chessBoard[arrivalCase] = chessBoard[departureCase];\
-                                for (int i=0; i<arrivalCase; i++)\
-                                {\
-                                    SDL_Log("Move Make");\
-                                }\
                                 chessBoard[departureCase] = 0;\
                                 playSound(MoveSound)\
                                 enPassant=0;\
@@ -4037,7 +4038,7 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
     SDL_Rect sdlRectPuzzleId = {1058, 437, texWPuzzleId, texHPuzzleId};
 
 
-    char stringStopwatch[6]="0:00";
+    char stringStopwatch[]="";
     itoa(time/60, stringStopwatch, 10);
     strcat(stringStopwatch, ":");
     char stringTens[1];
@@ -4057,7 +4058,6 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
 
     char charMyPuzzleScore[4];
     itoa(myScore, charMyPuzzleScore, 10);
-    SDL_Log(charMyPuzzleScore);
     fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
     SDL_Surface * surfaceMyPuzzleScore = TTF_RenderText_Solid(fontInformations, charMyPuzzleScore, color);
     TTF_CloseFont(fontInformations);
@@ -4198,7 +4198,6 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     
     initAllSurfaces()
     initAllTextures()
-    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
     //Create all images
     initAllBoardImages()
@@ -4283,7 +4282,6 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     int texWStopwatch, texHStopwatch;
     SDL_QueryTexture(textureStopwatch, NULL, NULL, &texWStopwatch, &texHStopwatch);
     SDL_Rect sdlRectStopwatch = {1425, 233, texWStopwatch, texHStopwatch};
-    chessBoard[49]=1;
     makeMovePuzzle((fileMoves->firstMove)->departureCase, (fileMoves->firstMove)->arrivalCase, (fileMoves->firstMove)->bonus)
     nextMoveFile(fileMoves);
     SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
@@ -4394,7 +4392,6 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                         showPreviousMoves()
                         showHint()
                         displayAllpiecesInRender()
-                        SDL_RenderPresent(render);
                         SDL_Delay(200);
                     }
                 }
@@ -4403,7 +4400,8 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                     int caseNumber=0;
                     if (inverse)
                     {
-                        caseNumber = 63-(giveCaseNumberPlayer());
+                        caseNumber=63;
+                        caseNumber -= (giveCaseNumberPlayer());
                     }
                     else
                     {
@@ -4470,6 +4468,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                             else
                             {
                                 fail+=1;
+                                playSound(WrongAnswerSound)
                                 change=NOTHING;
                                 noPromotion=NOTHING;
                                 SDL_RenderClear(render);
@@ -4540,6 +4539,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                             else
                             {
                                 fail+=1;
+                                playSound(WrongAnswerSound)
                                 change=NOTHING;
                                 noPromotion=NOTHING;
                                 SDL_RenderClear(render);
@@ -4572,31 +4572,27 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                         }
                         else if (chessBoard[caseNumber]!=0)
                         {
-                            char test[100];
-                            itoa(caseNumber, test, 10);
-                            itoa(chessBoard[caseNumber], test, 10);
-                            SDL_RenderClear(render);
+                            change = caseNumber;
                             SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
                             showPuzzleInformations()
                             showPreviousMoves()
                             showHint()
-                            change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquarePlayer(change, render, inverse);
+                            drawSquarePlayer(change, render, inverse)
                             file = initialise(); 
                             legalMovePiece(chessBoard, change, enPassant,  &rock, file);
-                            MoveStructure *actualMove= file->firstMove;
+                            MoveStructure *actualMove=file->firstMove;
                             displayAllpiecesInRender()
                             while (actualMove!=NULL)
                             {
                                 if (inverse==1)
                                 {
-                                    int a=63 - (actualMove->arrivalCase);
+                                    int a=63-(actualMove->arrivalCase);
                                     DrawImage(dstrect, &dstrect, a, texturePoint)
                                 }
                                 else
                                 {
-                                    DrawImage(dstrect, &dstrect, actualMove->arrivalCase, texturePoint)
+                                    DrawImage(dstrect, &dstrect, (actualMove->arrivalCase), texturePoint)
                                 }
                                 actualMove = actualMove->nextMove;
                             };
@@ -4615,13 +4611,12 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                             displayAllpiecesInRender()
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquarePlayer(change, render, inverse);
+                            drawSquarePlayer(change, render, inverse)
                             file = initialise();
                             legalMovePiece(chessBoard, change, enPassant, &rock, file);
                             MoveStructure *actualMove= file->firstMove;
                             while (actualMove!=NULL)
                             {
-
                                 if (inverse==1)
                                 {
                                     int a=63 - (actualMove->arrivalCase);
@@ -4642,6 +4637,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                             else
                             {
                                 fail+=1;
+                                playSound(WrongAnswerSound)
                                 change=NOTHING;
                                 SDL_RenderClear(render);
                                 SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
@@ -4761,6 +4757,25 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                             {
                                 end=1;
                             }
+                            else
+                            {
+                                makeMovePuzzle((fileMoves->firstMove)->departureCase, (fileMoves->firstMove)->arrivalCase, (fileMoves->firstMove)->bonus)
+                                nextMoveFile(fileMoves);
+                                SDL_RenderClear(render);
+                                //Show the background
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+
+                                showPuzzleInformations()
+
+                                //Show the previous move
+                                showPreviousMoves()
+
+                                //Show Hint
+                                showHint()
+
+                                //Show all the pieces
+                                displayAllpiecesInRender()
+                            }
 
                         }
                         else
@@ -4813,6 +4828,159 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
         SDL_RenderPresent(render);
         if (end==1)
         {
+            int diff=0;
+            if (chrono<5)
+            {
+                diff+=10;
+            }
+            else if (chrono<10)
+            {
+                diff+=8;
+            }
+            else if (chrono<15)
+            {
+                diff+=5;
+            }
+            else if (chrono<20)
+            {
+                diff+=2;
+            }
+            else if (chrono<25)
+            {
+                diff+=0;
+            }
+            else if (chrono<30)
+            {
+                diff-=2;
+            }
+            else
+            {
+                diff-=5;
+            }
+
+            
+            if (fail>4)
+            {
+                diff-=30;
+            }
+            else if (fail>2)
+            {
+                diff-=20;
+            }
+            else if (nbHint>0 && fail==0)
+            {
+                diff-=5;
+            }
+            else if (nbHint==0 && fail>0)
+            {
+                diff-=10;
+            }
+            else if (nbHint==0 && fail==0)
+            {
+                diff+=15;
+            }
+
+            puzzle_score+=diff;
+
+            if (1)
+            {
+                MYSQL *con = mysql_init(NULL);
+                if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                {
+                    SDL_Log("Not connected");
+                }
+                else
+                {
+                    SDL_Log("Connected");
+                }//Update User set puzzle_score=1200 where user_id=12;
+                char request[]="Update User Set puzzle_score=0000 where user_id=000;";
+
+                char* pointeurRequest=request;
+
+                pointeurRequest[29]=48+(puzzle_score/1000);
+                pointeurRequest[30]=48+((puzzle_score/100)%10);
+                pointeurRequest[31]=48+((puzzle_score%100)/10);
+                pointeurRequest[32]=48+(puzzle_score%10);
+
+                pointeurRequest[48]=48+(userIdConnected/100);
+                pointeurRequest[49]=48+((userIdConnected/10)%10);
+                pointeurRequest[50]=48+(userIdConnected%10);
+
+                if (mysql_query(con, request))
+                {
+                    SDL_Log("Error request");
+                    SDL_Log(request);
+                }
+                mysql_close(con);
+            }
+            if (1)
+            {
+                MYSQL *con = mysql_init(NULL);
+                if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                {
+                    SDL_Log("Not connected");
+                }
+                else
+                {
+                    SDL_Log("Connected");
+                }//Update User set puzzle_score=1200 where user_id=12;
+                char request[]="Insert Into Puzzle_done Values(0000000, 000, 0, '0000/00/00', 0000);";
+
+                char* pointeurRequest=request;
+
+                pointeurRequest[31]=48+(actual_puzzle_id/1000000);
+                pointeurRequest[32]=48+((actual_puzzle_id/100000)%10);
+                pointeurRequest[33]=48+((actual_puzzle_id/10000)%10);
+                pointeurRequest[34]=48+((actual_puzzle_id/1000)%10);
+                pointeurRequest[35]=48+((actual_puzzle_id/100)%10);
+                pointeurRequest[36]=48+((actual_puzzle_id/10)%10);
+                pointeurRequest[37]=48+(actual_puzzle_id%10);
+
+                pointeurRequest[40]=48+(userIdConnected/100);
+                pointeurRequest[41]=48+((userIdConnected/10)%10);
+                pointeurRequest[42]=48+(userIdConnected%10);
+
+                
+                if (diff>0)
+                {
+                    pointeurRequest[45]=49;
+                }
+                else
+                {
+                    pointeurRequest[45]=48;
+                }
+
+                time_t t = time(NULL);
+                struct tm tm = *localtime(&t);
+                int year=tm.tm_year+1900;
+                int month= tm.tm_mon + 1;
+                int day = tm.tm_mday;
+                pointeurRequest[49] = 48+(year/1000);
+                pointeurRequest[50] = 48+(year/100)%10;
+                pointeurRequest[51] = 48+(year/10)%10;
+                pointeurRequest[52] = 48+(year%10);
+                pointeurRequest[54] = 48 + (month/10);
+                pointeurRequest[55] = 48 + (month%10);
+                pointeurRequest[57] = 48 + (day/10);
+                pointeurRequest[58] = 48 + (day%10);
+
+                pointeurRequest[62]=48+(puzzle_score/1000);
+                pointeurRequest[63]=48+((puzzle_score/100)%10);
+                pointeurRequest[64]=48+((puzzle_score%100)/10);
+                pointeurRequest[65]=48+(puzzle_score%10);
+
+
+
+                SDL_Log(request);
+                if (mysql_query(con, request))
+                {
+                    SDL_Log("Error request");
+                    SDL_Log(request);
+                }
+                mysql_close(con);
+            }
+
+
             int res=victoryPuzzle(window, render, actual_puzzle_id, actual_puzzle_score, puzzle_score, chrono);
             while (res==9)
             {
@@ -4933,9 +5101,10 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     int rock=0;
     int whoToPlay=0;
     int enPassant=0;
-    FENToList(actual_puzzle_fen, chessBoard, &rock, &whoToPlay, &enPassant);
+    int inverse=0;
+    FENToList(actual_puzzle_fen, chessBoard, &rock, &whoToPlay, &inverse, &enPassant);
 
-    int nextPageChoice = puzzlePage(window, render, chessBoard, rock, whoToPlay, whoToPlay, enPassant, actual_puzzle_id, average_puzzle_score, file);
+    int nextPageChoice = puzzlePage(window, render, chessBoard, rock, 0, whoToPlay, enPassant, actual_puzzle_id, average_puzzle_score, file);
 
     if (nextPageChoice==0)//Quit the app
     {
@@ -6463,12 +6632,97 @@ int statsPage(SDL_Renderer* render)
     int data[]={
     801, 804, 806, 806, 807, 
     807, 809, 811, 813, 813, 
-    814, 815, 816, 819, 820, 
+    814, 815, 600, 819, 820, 
     823, 826, 828, 831, 831, 
     834, 834, 836, 837, 837, 
     839, 840, 840, 842, 845, 
     848
     };
+
+    if (1)
+    {
+        MYSQL *con = mysql_init(NULL);
+        mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0);
+        char request[]="SELECT Max(puzzle_score)  FROM Puzzle_done Where date='0000/00/00' AND user_id=000;";
+        time_t t = time(NULL) - (30*(24 * 60 * 60));
+        struct tm tm = *localtime(&t);
+        int year=tm.tm_year+1900;
+        int month= tm.tm_mon + 1;
+        int day = tm.tm_mday;
+        request[55] = 48+(year/1000);
+        request[56] = 48+(year/100)%10;
+        request[57] = 48+(year/10)%10;
+        request[58] = 48+(year%10);
+        request[60] = 48 + (month/10);
+        request[61] = 48 + (month%10);
+        request[63] = 48 + (day/10);
+        request[64] = 48 + (day%10);
+
+        request[79] = 48 + (userIdConnected/100);
+        request[80] = 48 + ((userIdConnected/10)%10);
+        request[81] = 48 + (userIdConnected%10);
+
+        mysql_query(con, request);
+        MYSQL_RES *result = mysql_store_result(con);
+        int num_fields = mysql_num_fields(result);
+        MYSQL_ROW row = mysql_fetch_row(result);
+        int value = atoi(row[0]);
+        mysql_free_result(result);
+        mysql_close(con);
+        if (value==0)
+        {
+            data[0]=1000;
+        }
+        else
+        {
+            data[0]=value;
+            printf("%d", value);
+        }
+    }
+    
+    for (int i=29; i>=0; i--)
+    {
+        MYSQL *con = mysql_init(NULL);
+        mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0);
+        char request[]="SELECT Max(puzzle_score)  FROM Puzzle_done Where date='0000/00/00' AND user_id=000;";
+        time_t t = time(NULL) - (i*(24 * 60 * 60));
+        struct tm tm = *localtime(&t);
+        int year=tm.tm_year+1900;
+        int month= tm.tm_mon + 1;
+        int day = tm.tm_mday;
+        request[55] = 48+(year/1000);
+        request[56] = 48+(year/100)%10;
+        request[57] = 48+(year/10)%10;
+        request[58] = 48+(year%10);
+        request[60] = 48 + (month/10);
+        request[61] = 48 + (month%10);
+        request[63] = 48 + (day/10);
+        request[64] = 48 + (day%10);
+
+        request[79] = 48 + (userIdConnected/100);
+        request[80] = 48 + ((userIdConnected/10)%10);
+        request[81] = 48 + (userIdConnected%10);
+
+        mysql_query(con, request);
+        MYSQL_RES *result = mysql_store_result(con);
+        int num_fields = mysql_num_fields(result);
+        MYSQL_ROW row = mysql_fetch_row(result);
+        int value = atoi(row[0]);
+        mysql_free_result(result);
+        mysql_close(con);
+        if (i==0)
+        {
+            printf("\n\n value ->%d\n%s\n", value, request);
+        }
+        if (value==0)
+        {
+            data[30-i]=data[29-i];
+        }
+        else
+        {
+            data[30-i]=value;
+        }
+    }
 
     int maxValue = maxValueList(data, 31);
     int minValue = minValueList(data, 31);
@@ -6487,6 +6741,35 @@ int statsPage(SDL_Renderer* render)
     int x=555;
     int y=637;
     int lastY=y-((data[0]-minValue)/valuePerPixel);
+
+    SDL_SetRenderDrawColor(render, 170, 170, 170, 255);
+    SDL_RenderDrawLine(render, x, 420, 1364, 420);
+    SDL_RenderDrawLine(render, x, 510, 1364, 510);
+    SDL_RenderDrawLine(render, x, 600, 1364, 600);
+
+
+    TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
+    SDL_Color color = { 0, 0, 0};
+    int legende1=minValue+((637-420)*valuePerPixel);
+    char charLegende1[4];
+    itoa(legende1, charLegende1, 10);
+    SDL_Surface * surfaceLegende1 = TTF_RenderText_Solid(fontInformations, charLegende1, color);
+    TTF_CloseFont(fontInformations);
+    SDL_Texture * textureLegende1 = SDL_CreateTextureFromSurface(render, surfaceLegende1);
+    int texWLegende1, texHLegende1;
+    SDL_QueryTexture(textureLegende1, NULL, NULL, &texWLegende1, &texHLegende1);
+    SDL_Rect sdlRectLegende1 = {1058, 437, texWLegende1, texHLegende1};
+    SDL_RenderCopy(render, textureLegende1, NULL, &sdlRectLegende1);
+
+    int legende2=minValue+((637-510)*valuePerPixel);
+    char charLegende2[4];
+    itoa(legende2, charLegende2, 10);
+
+    int legende3=minValue+((637-600)*valuePerPixel);
+    char charLegende3[4];
+    itoa(legende3, charLegende3, 10);
+
+
     for (int i=1; i<31; i++)
     {
         int newY=y-((data[i]-minValue)/valuePerPixel); 
@@ -6496,17 +6779,14 @@ int statsPage(SDL_Renderer* render)
             SDL_SetRenderDrawColor(render, 107, 175, 217, 255);
             SDL_RenderDrawPoint(render, x+cpt, temporarY);
             SDL_RenderDrawPoint(render, x+cpt, temporarY-1);
+            SDL_RenderDrawPoint(render, x+cpt, temporarY-2);
             SDL_SetRenderDrawColor(render, 80, 121, 141, 255);
             SDL_RenderDrawLine(render, x+cpt, 657, x+cpt, temporarY+1);
-        }
-        if (i!=1)
-        {
-            SDL_SetRenderDrawColor(render, WHITE);
-            SDL_RenderDrawLine(render, x, 647, x, 657);
         }
         lastY=newY;
         x+=27;
     }
+
     SDL_RenderPresent(render);
     SDL_Event event;
     int continuer = 1;
@@ -7894,7 +8174,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage, int color
                             showPreviousMoves()
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquarePlayer(change, render, inverse);
+                            drawSquarePlayer(change, render, inverse)
                             file = initialise(); 
                             legalMovePiece(chessBoard, change, enPassant,  &rock, file);
                             MoveStructure *actualMove= file->firstMove;
@@ -7934,7 +8214,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage, int color
                             displayAllpiecesInRender()
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquarePlayer(change, render, inverse);
+                            drawSquarePlayer(change, render, inverse)
                             file = initialise();
                             legalMovePiece(chessBoard, change, enPassant, &rock, file);
                             MoveStructure *actualMove= file->firstMove;

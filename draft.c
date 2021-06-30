@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <mysql.h>
 #include "sqlite3.h"
 
 
@@ -400,18 +401,14 @@ int main(int argc, char* argv[])
     printBoard(chessBoard);
     printf("\n Rock -> %d\n", rock);*/
     //shrinkChar(fen, 10);
-    int x=800;
-    for (int i=0; i<31; i++)
-    {
-        x+=rand()%4;
-        if (i%5==0)
-        {
-            printf("\n");
-        }
-        printf("%d, ", x);
-    }
+    float valuePerPixel=1.25;
+    int legende1=1000+((637-420)*valuePerPixel);
+    int legende2=1000+((637-510)*valuePerPixel);
+    int legende3=1000+((637-600)*valuePerPixel);
 
-    return 0;
+    printf("%d %d %d", legende1, legende2, legende3);
+
+    return 1;
 }
 
 
