@@ -4228,7 +4228,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     SDL_Texture * texturePuzzleId = SDL_CreateTextureFromSurface(render, surfacePuzzleId);
     int texWPuzzleId, texHPuzzleId;
     SDL_QueryTexture(texturePuzzleId, NULL, NULL, &texWPuzzleId, &texHPuzzleId);
-    SDL_Rect sdlRectPuzzleId = {1800, 480, texWPuzzleId, texHPuzzleId};
+    SDL_Rect sdlRectPuzzleId = {1650, 480, texWPuzzleId, texHPuzzleId};
 
     char charPuzzleScore[4];
     itoa(actual_puzzle_score, charPuzzleScore, 10);
@@ -4236,7 +4236,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
     int texWPuzzleScore, texHPuzzleScore;
     SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
-    SDL_Rect sdlRectPuzzleScore = {1800, 519, texWPuzzleScore, texHPuzzleScore};
+    SDL_Rect sdlRectPuzzleScore = {1650, 519, texWPuzzleScore, texHPuzzleScore};
 
     char charMyPuzzleScore[4];
     itoa(puzzle_score, charMyPuzzleScore, 10);
@@ -6086,7 +6086,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         strcat(newPrenom, newPassword);
                         strcat(newPrenom, "','");
                         strcat(newPrenom, date);
-                        strcat(newPrenom, "', 1000, 1000, 'francais', '");
+                        strcat(newPrenom, "', 700, 700, 'francais', '");
                         strcat(newEmail, "', 0);");
                         strcat(newPrenom, newEmail);
                         strcat(request, newPrenom);
@@ -6726,7 +6726,7 @@ int statsPage(SDL_Renderer* render)
         mysql_close(con);
         if (value==0)
         {
-            data[0]=1000;
+            data[0]=700;
         }
         else
         {
@@ -7386,6 +7386,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 {
                     *nextPage=1;
                     continuer=0;
+                    continue;
                 }
                 else
                 {
@@ -7422,6 +7423,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     {
                         *nextPage=1;
                         continuer=0;
+                        continue;
                     }
                     else
                     {
