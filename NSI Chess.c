@@ -4235,7 +4235,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     int texWPuzzleScore=100;
     int texHPuzzleScore=100;
     SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
-    SDL_Rect sdlRectPuzzleScore = {1700, 519, texWPuzzleScore, texHPuzzleScore};
+    SDL_Rect sdlRectPuzzleScore = {1800, 519, texWPuzzleScore, texHPuzzleScore};
 
     char charMyPuzzleScore[4];
     itoa(puzzle_score, charMyPuzzleScore, 10);
