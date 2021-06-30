@@ -4008,15 +4008,12 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
     SDL_Rect sdlRectPuzzleId = {1058, 437, texWPuzzleId, texHPuzzleId};
 
 
-    char stringStopwatch[]="";
-    itoa(time/60, stringStopwatch, 10);
-    strcat(stringStopwatch, ":");
-    char stringTens[1];
-    itoa((time%60)/10, stringTens, 10);
-    char stringUnity[2];
-    itoa((time%60)%10, stringUnity, 10);
-    strcat(stringStopwatch, stringTens);
-    strcat(stringStopwatch, stringUnity);
+    char stringStopwatch[]="00:00";
+    char* ptstringStopwatch=stringStopwatch;
+    stringStopwatch[0]=48+(time/600);
+    stringStopwatch[1]=48+((time/60)%10);
+    stringStopwatch[3]=48+((time%60)/10);
+    stringStopwatch[4]=48+(time%10);
 
     fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
     SDL_Surface * surfaceStopwatch = TTF_RenderText_Solid(fontInformations,stringStopwatch, color);
@@ -4024,7 +4021,7 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
     SDL_Texture * textureStopwatch = SDL_CreateTextureFromSurface(render, surfaceStopwatch);
     int texWStopwatch, texHStopwatch;
     SDL_QueryTexture(textureStopwatch, NULL, NULL, &texWStopwatch, &texHStopwatch);
-    SDL_Rect sdlRectStopwatch = {889, 641, texWStopwatch, texHStopwatch};
+    SDL_Rect sdlRectStopwatch = {920, 641, texWStopwatch, texHStopwatch};
 
     char charMyPuzzleScore[4];
     itoa(myScore, charMyPuzzleScore, 10);
@@ -4034,7 +4031,7 @@ int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int sc
     SDL_Texture * textureMyPuzzleScore = SDL_CreateTextureFromSurface(render, surfaceMyPuzzleScore);
     int texWMyPuzzleScore, texHMyPuzzleScore;
     SDL_QueryTexture(textureMyPuzzleScore, NULL, NULL, &texWMyPuzzleScore, &texHMyPuzzleScore);
-    SDL_Rect sdlRectMyPuzzleScore = {976, 577, texWMyPuzzleScore, texHMyPuzzleScore};
+    SDL_Rect sdlRectMyPuzzleScore = {1000, 577, texWMyPuzzleScore, texHMyPuzzleScore};
 
     
     char charPuzzleScore[4];
@@ -4226,17 +4223,19 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     itoa(actual_puzzle_id, charPuzzleId, 10);
     SDL_Surface * surfacePuzzleId = TTF_RenderText_Solid(fontInformations, charPuzzleId, color);
     SDL_Texture * texturePuzzleId = SDL_CreateTextureFromSurface(render, surfacePuzzleId);
-    int texWPuzzleId, texHPuzzleId;
+    int texWPuzzleId=100;
+    int texHPuzzleId=100;
     SDL_QueryTexture(texturePuzzleId, NULL, NULL, &texWPuzzleId, &texHPuzzleId);
-    SDL_Rect sdlRectPuzzleId = {1650, 480, texWPuzzleId, texHPuzzleId};
+    SDL_Rect sdlRectPuzzleId = {1800, 480, texWPuzzleId, texHPuzzleId};
 
     char charPuzzleScore[4];
     itoa(actual_puzzle_score, charPuzzleScore, 10);
     SDL_Surface * surfacePuzzleScore = TTF_RenderText_Solid(fontInformations, charPuzzleScore, color);
     SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
-    int texWPuzzleScore, texHPuzzleScore;
+    int texWPuzzleScore=100;
+    int texHPuzzleScore=100;
     SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
-    SDL_Rect sdlRectPuzzleScore = {1650, 519, texWPuzzleScore, texHPuzzleScore};
+    SDL_Rect sdlRectPuzzleScore = {1700, 519, texWPuzzleScore, texHPuzzleScore};
 
     char charMyPuzzleScore[4];
     itoa(puzzle_score, charMyPuzzleScore, 10);
