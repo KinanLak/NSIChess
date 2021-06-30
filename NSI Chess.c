@@ -3823,7 +3823,95 @@ int minValueList(int* charValues, int lengthChar)
     return min;
 }
 
-#define makeMovePuzzle(departureCase, arrivalCase, bonusValue) if ((chessBoard[departureCase]==7 || chessBoard[departureCase]==15) && (departureCase-2==arrivalCase || departureCase+2==arrivalCase))\
+#define makeMovePuzzle(departureCase, arrivalCase, bonusValue) SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);\
+                            SDL_RenderCopy(render, textureStopwatch, NULL, &sdlRectStopwatch);SDL_RenderPresent(render);\
+                            SDL_Delay(1000);\
+                            if ((chessBoard[departureCase]==7 || chessBoard[departureCase]==15) && (departureCase-2==arrivalCase || departureCase+2==arrivalCase))\
+                            {\
+                                if (departureCase-2==arrivalCase)\
+                                {\
+                                    chessBoard[departureCase-1]=chessBoard[departureCase-4];\
+                                    chessBoard[departureCase-4]=0;\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    playSound(RockSound)\
+                                }\
+                                else\
+                                {\
+                                    chessBoard[departureCase+1]=chessBoard[departureCase+3];\
+                                    chessBoard[departureCase+3]=0;\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    playSound(RockSound)\
+                                }\
+                                enPassant=0;\
+                            }\
+                            else if (chessBoard[departureCase]==1 || chessBoard[departureCase]==9)\
+                            {\
+                                if (departureCase+16==arrivalCase || departureCase==arrivalCase+16)\
+                                {\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    enPassant=arrivalCase;\
+                                    playSound(MoveSound)\
+                                }\
+                                else if ((departureCase-9==arrivalCase || departureCase+9==arrivalCase || departureCase-7==arrivalCase || departureCase+7==arrivalCase ) && (chessBoard[arrivalCase]==0))\
+                                {\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    chessBoard[enPassant]=0;\
+                                    playSound(CaptureSound)\
+                                    enPassant=0;\
+                                }\
+                                else if (arrivalCase/8==0)\
+                                {\
+                                    chessBoard[arrivalCase]=8+bonusValue;\
+                                    chessBoard[departureCase]=0;\
+                                    playSound(MoveSound)\
+                                    enPassant=0;\
+                                }\
+                                else if (arrivalCase/8==7)\
+                                {\
+                                    chessBoard[arrivalCase]=bonusValue;\
+                                    chessBoard[departureCase]=0;\
+                                    playSound(MoveSound)\
+                                    enPassant=0;\
+                                }\
+                                else\
+                                {\
+                                    if (chessBoard[arrivalCase]!=0)\
+                                    {\
+                                        playSound(CaptureSound)\
+                                    }\
+                                    else\
+                                    {\
+                                        playSound(MoveSound)\
+                                    }\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    enPassant=0;\
+                                }\
+                            }\
+                            else\
+                            {\
+                                chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                chessBoard[departureCase] = 0;\
+                                playSound(MoveSound)\
+                                enPassant=0;\
+                            }\
+                            if (teamToPlay==1)\
+                            {\
+                                teamToPlay=0;\
+                            }\
+                            else\
+                            {\
+                                teamToPlay=1;\
+                            }\
+                            previousMove[0] = departureCase;\
+                            previousMove[1] = arrivalCase;
+
+
+#define makeMovePuzzleDeparture(departureCase, arrivalCase, bonusValue) if ((chessBoard[departureCase]==7 || chessBoard[departureCase]==15) && (departureCase-2==arrivalCase || departureCase+2==arrivalCase))\
                             {\
                                 if (departureCase-2==arrivalCase)\
                                 {\
@@ -4214,10 +4302,18 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
 
     int noPromotion = NOTHING;
     //Be careful
-    TTF_Font * font = TTF_OpenFont("fonts/Rounded_Elegance.ttf", 50);
+    TTF_Font * font = TTF_OpenFont("fonts/digital-7.ttf", 80);
     TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 20);
     SDL_Color color = { 0, 0, 0};
 
+    char stringStopwatch[6]="0:00";
+    SDL_Surface * surfaceStopwatch = TTF_RenderText_Solid(font,stringStopwatch, color);
+    SDL_Texture * textureStopwatch = SDL_CreateTextureFromSurface(render, surfaceStopwatch);
+    int texWStopwatch, texHStopwatch;
+    SDL_QueryTexture(textureStopwatch, NULL, NULL, &texWStopwatch, &texHStopwatch);
+    SDL_Rect sdlRectStopwatch = {1425, 233, texWStopwatch, texHStopwatch};
+
+    
     //Init all puzzle informations
     char charPuzzleId[4];
     itoa(actual_puzzle_id, charPuzzleId, 10);
@@ -4226,16 +4322,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     int texWPuzzleId=100;
     int texHPuzzleId=100;
     SDL_QueryTexture(texturePuzzleId, NULL, NULL, &texWPuzzleId, &texHPuzzleId);
-    SDL_Rect sdlRectPuzzleId = {1800, 480, texWPuzzleId, texHPuzzleId};
-
-    char charPuzzleScore[4];
-    itoa(actual_puzzle_score, charPuzzleScore, 10);
-    SDL_Surface * surfacePuzzleScore = TTF_RenderText_Solid(fontInformations, charPuzzleScore, color);
-    SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
-    int texWPuzzleScore=100;
-    int texHPuzzleScore=100;
-    SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
-    SDL_Rect sdlRectPuzzleScore = {1800, 519, texWPuzzleScore, texHPuzzleScore};
+    SDL_Rect sdlRectPuzzleId = {1620, 480, texWPuzzleId, texHPuzzleId};
 
     char charMyPuzzleScore[4];
     itoa(puzzle_score, charMyPuzzleScore, 10);
@@ -4245,13 +4332,18 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
     SDL_QueryTexture(textureMyPuzzleScore, NULL, NULL, &texWMyPuzzleScore, &texHMyPuzzleScore);
     SDL_Rect sdlRectMyPuzzleScore = {1575, 557, texWMyPuzzleScore, texHMyPuzzleScore};
 
-    char stringStopwatch[6]="0:00";
-    SDL_Surface * surfaceStopwatch = TTF_RenderText_Solid(font,stringStopwatch, color);
-    SDL_Texture * textureStopwatch = SDL_CreateTextureFromSurface(render, surfaceStopwatch);
-    int texWStopwatch, texHStopwatch;
-    SDL_QueryTexture(textureStopwatch, NULL, NULL, &texWStopwatch, &texHStopwatch);
-    SDL_Rect sdlRectStopwatch = {1425, 233, texWStopwatch, texHStopwatch};
-    makeMovePuzzle((fileMoves->firstMove)->departureCase, (fileMoves->firstMove)->arrivalCase, (fileMoves->firstMove)->bonus)
+    char charPuzzleScore[4];
+    itoa(actual_puzzle_score, charPuzzleScore, 10);
+    SDL_Surface * surfacePuzzleScore = TTF_RenderText_Solid(fontInformations, charPuzzleScore, color);
+    SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
+    int texWPuzzleScore=100;
+    int texHPuzzleScore=100;
+    SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
+    SDL_Rect sdlRectPuzzleScore = {1600, 519, texWPuzzleScore, texHPuzzleScore};
+
+
+
+    makeMovePuzzleDeparture((fileMoves->firstMove)->departureCase, (fileMoves->firstMove)->arrivalCase, (fileMoves->firstMove)->bonus)
     nextMoveFile(fileMoves);
     SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
     showPuzzleInformations()
@@ -6684,16 +6776,16 @@ int statsPage(SDL_Renderer* render)
     ALLImageINIT(imageStatsBackground, textureStatsBackground, StatsBGImageBMP, render)
 
     int data[]={
-    801, 804, 806, 806, 807, 
-    807, 809, 811, 813, 813, 
-    814, 815, 600, 819, 820, 
-    823, 826, 828, 831, 831, 
-    834, 834, 836, 837, 837, 
-    839, 840, 840, 842, 845, 
-    848
+    801, 840, 860, 865, 866, 
+    850, 870, 900, 900, 900, 
+    910, 960, 1020, 1010, 1020, 
+    1050, 1050, 1050, 1050, 1000, 
+    1100, 1200, 1250, 1240, 1230, 
+    1260, 1260, 1260, 1260, 1240, 
+    1260
     };
 
-    if (1)
+    /*if (1)
     {
         MYSQL *con = mysql_init(NULL);
         mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0);
@@ -6776,8 +6868,19 @@ int statsPage(SDL_Renderer* render)
         {
             data[30-i]=value;
         }
+    }*/
+    TTF_Font * fontOldPuzzle = TTF_OpenFont("fonts/arialbd.ttf", 25);
+    SDL_Color color = {255, 255, 255};
+    SDL_RenderCopy(render, textureStatsBackground, NULL, NULL);
+    for (int i=0; i<3; i++)
+    {
+        SDL_Surface * surfacePreviousPuzzle = TTF_RenderText_Solid(fontOldPuzzle, "Aucun puzzle joue recemment", color);
+        SDL_Texture * texturePreviousPuzzle = SDL_CreateTextureFromSurface(render, surfacePreviousPuzzle);
+        int texWPreviousPuzzle, texHPreviousPuzzle;
+        SDL_QueryTexture(texturePreviousPuzzle, NULL, NULL, &texWPreviousPuzzle, &texHPreviousPuzzle);
+        SDL_Rect sdlRectPreviousPuzzle = {800, 755+(60*i), texWPreviousPuzzle, texHPreviousPuzzle};
+        SDL_RenderCopy(render, texturePreviousPuzzle, NULL, &sdlRectPreviousPuzzle);
     }
-
     int maxValue = maxValueList(data, 31);
     int minValue = minValueList(data, 31);
     float valuePerPixel = (maxValue-minValue)/(float)240;
@@ -6791,7 +6894,6 @@ int statsPage(SDL_Renderer* render)
     }
 
 
-    SDL_RenderCopy(render, textureStatsBackground, NULL, NULL);
     int x=555;
     int y=637;
     int lastY=y-((data[0]-minValue)/valuePerPixel);
@@ -6801,9 +6903,8 @@ int statsPage(SDL_Renderer* render)
     SDL_RenderDrawLine(render, x, 510, 1364, 510);
     SDL_RenderDrawLine(render, x, 600, 1364, 600);
 
-
+    SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
     TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 15);
-    SDL_Color color = {255, 255, 255};
     int legende1=minValue+((637-420)*valuePerPixel);
     char charLegende1[4];
     itoa(legende1, charLegende1, 10);
@@ -6833,6 +6934,8 @@ int statsPage(SDL_Renderer* render)
     SDL_QueryTexture(textureLegende3, NULL, NULL, &texWLegende3, &texHLegende3);
     SDL_Rect sdlRectLegende3 = {517, 592, texWLegende3, texHLegende3};
     SDL_RenderCopy(render, textureLegende3, NULL, &sdlRectLegende3);
+    TTF_CloseFont(fontOldPuzzle);
+    TTF_CloseFont(fontInformations);
 
 
 
@@ -7533,7 +7636,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 int issueOfTheGameLocal(SDL_Renderer* render, int* nextPage, int type, char* pseudoWhite, char* pseudoBlack, int leftOverTimeWhite, int leftOverTimeBlack, int nbMoveWhite, int nbMoveBlack, int whiteWin, unsigned int* chessBoard)
 {
 
-    TTF_Font * font = TTF_OpenFont("fonts/Rounded_Elegance.ttf", 50);
+    TTF_Font * font = TTF_OpenFont("fonts/digital-7.ttf", 50);
     SDL_Color color = {0, 0, 0};
     SDL_Surface* imageBackground = NULL;
     SDL_Texture* textureBackground = NULL;
@@ -7836,8 +7939,8 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage, int color
     rectTimer.h= 118;
 
     //Initialisation of the name of the 2 players
-    TTF_Font * font = TTF_OpenFont("fonts/Rounded_Elegance.ttf", 50);
-    TTF_Font * fontName = TTF_OpenFont("fonts/Rounded_Elegance.ttf", 25);
+    TTF_Font * font = TTF_OpenFont("fonts/digital-7.ttf", 50);
+    TTF_Font * fontName = TTF_OpenFont("fonts/digital-7.ttf", 25);
     SDL_Color colorNameWhite = {0, 0, 0};
     SDL_Color colorNameBlack = {255, 255, 255};
     SDL_Surface * surfaceNameWhite;
