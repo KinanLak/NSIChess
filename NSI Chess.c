@@ -9128,7 +9128,7 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Log(charCodeConfirmation);
 
     //Executing python code and sending confirmation mail
-    system("python \"mail.py\"");
+    WinExec("python \"mail.py\"", SW_HIDE);
 
     SDL_RenderCopy(render, textureMailConfirmationBackground, NULL, NULL);
     SDL_RenderPresent(render);
