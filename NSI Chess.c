@@ -6785,7 +6785,7 @@ int statsPage(SDL_Renderer* render)
     1260
     };
 
-    /*if (1)
+    if (1)
     {
         MYSQL *con = mysql_init(NULL);
         mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0);
@@ -6868,7 +6868,7 @@ int statsPage(SDL_Renderer* render)
         {
             data[30-i]=value;
         }
-    }*/
+    }
     TTF_Font * fontOldPuzzle = TTF_OpenFont("fonts/arialbd.ttf", 25);
     SDL_Color color = {255, 255, 255};
     SDL_RenderCopy(render, textureStatsBackground, NULL, NULL);
