@@ -2,3 +2,5 @@ my.rc
 *.json
 *.db
 *.exe
+id.csv
+save.txt
