@@ -401,12 +401,46 @@ int main(int argc, char* argv[])
     printBoard(chessBoard);
     printf("\n Rock -> %d\n", rock);*/
     //shrinkChar(fen, 10);
-    float valuePerPixel=1.25;
-    int legende1=1000+((637-420)*valuePerPixel);
-    int legende2=1000+((637-510)*valuePerPixel);
-    int legende3=1000+((637-600)*valuePerPixel);
+    char newConnexion1[]="admin@gmail.com";
+    char* pt=newConnexion1;
+    int len = strlen(newConnexion1);
+    char newEnd[len+2];
+    char* ptnewEnd=newEnd;
+    for (int i=0; i>len; i++)
+    {
+        printf("1%c\n", newConnexion1[i]);
+        ptnewEnd[i]=newConnexion1[i];
+    }
+    ptnewEnd[len]=39;
+    ptnewEnd[len+1]=59;
+    ptnewEnd[len+2]=0;
 
-    printf("%d %d %d", legende1, legende2, legende3);
+    MYSQL *con2 = mysql_init(NULL);
+    if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+    {
+        printf("Not connected");
+    }
+    else
+    {
+        printf("Connected");
+    }
+    char request2[] = "SELECT prenom FROM User Where email='";
+    printf("\n%s\n", newEnd);
+    strcat(request2, newEnd);
+    printf("\n%s\n", request2);
+
+    if (mysql_query(con2, request2))
+    {
+        printf("error");
+    }
+    /*MYSQL_RES *result2 = mysql_store_result(con2);
+    int num_fields2 = mysql_num_fields(result2);
+
+    MYSQL_ROW row2;
+    row2 = mysql_fetch_row(result2);
+    printf("Prenom-> %s", row2[0]);
+    mysql_free_result(result2);
+    mysql_close(con2);*/
 
     return 1;
 }

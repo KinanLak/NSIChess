@@ -2328,18 +2328,7 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
 #define keyPressedCodeValidation(key, valueKey, valueKeyShift, valueKeyAlt) case key:\
                         if (cptNumberOfValuesConfirmation<limitCharDate)\
                         {\
-                            if ((rightAlt==1 || leftAlt==1) && (leftShift==1 || rightShift==1))\
-                            {\
-                            }\
-                            else if (rightAlt==1 || leftAlt==1)\
-                            {\
-                                if ((valueKeyAlt!=-1) && (valueKeyAlt>47 && valueKeyAlt<58))\
-                                {\
-                                    strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]= valueKeyAlt;\
-                                    cptNumberOfValuesConfirmation+=1;\
-                                }\
-                            }\
-                            else if (leftShift==1 || rightShift==1)\
+                            if (1)\
                             {\
                                 if ((valueKeyShift!=-1) && (valueKeyShift>47 && valueKeyShift<58))\
                                 {\
@@ -2757,25 +2746,6 @@ int charSame(char* string1, char* string2, int sizeString1, int sizeString2)
     return 1;
 }
 
-
-int intAndCharSame(int codeConfirmation, char* string, int sizeString)
-{
-    if (sizeString!=6)
-    {
-        return 0;
-    }
-    int intUser=0;
-    for (int i=5; i>=0; i--)
-    {
-        int pow=1;
-        for (int ii=0; ii>i; ii++)
-        {
-            pow = pow*10;
-        }
-        intUser += (string[5-i]-48)*pow;
-    }
-    return 1;
-}
 
 #define giveCaseNumberPlayer() (((event.button.x-xMinBoard)/lenSquare) + (((event.button.y-yMinBoard)/lenSquare)*8))
 
@@ -4375,7 +4345,7 @@ int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoar
                 }
                 else if (event.button.x >=1768 && event.button.x<=1807 && event.button.y >=611 && event.button.y<=651)
                 {
-                    //Flag
+                    return 2;
                 }
                 else if (event.button.x >=1828 && event.button.y<=45)
                 {
@@ -5436,37 +5406,111 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         if (boolean==1)
                         {
-                            MYSQL *con2 = mysql_init(NULL);
-                            if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                            if (1)
                             {
-                                SDL_Log("Not connected");
-                            }
-                            else
-                            {
-                                SDL_Log("Connected");
-                            }
-                            char request2[] = "SELECT user_id, puzzle_score FROM User Where email='";
-                            strcat(request2, newConnexion1);
-                            strcat(request2, requesttransitionend);
+                                int active;
+                                if (1)
+                                {
+                                    MYSQL *con2 = mysql_init(NULL);
+                                    if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                                    {
+                                        SDL_Log("Not connected");
+                                    }
+                                    else
+                                    {
+                                        SDL_Log("Connected");
+                                    }
+                                    char request2[] = "SELECT active From User Where email='";
+                                    strcat(request2, newConnexion1);
+                                    strcat(request2, requesttransitionend);
+                                    if (mysql_query(con2, request2))
+                                    {
+                                        SDL_Log(mysql_error(con2));
+                                    }
+                                    MYSQL_RES *result2 = mysql_store_result(con2);
+                                    int num_fields2 = mysql_num_fields(result2);
 
-                            if (mysql_query(con2, request2))
-                            {
-                                SDL_Log(mysql_error(con2));
-                            }
-                            MYSQL_RES *result2 = mysql_store_result(con2);
-                            int num_fields2 = mysql_num_fields(result2);
+                                    MYSQL_ROW row2;
+                                    row2 = mysql_fetch_row(result2);
+                                    active = atoi(row2[0]);
+                                }
+                                if (active==0)
+                                {
+                                    MYSQL *con2 = mysql_init(NULL);
+                                    if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                                    {
+                                        SDL_Log("Not connected");
+                                    }
+                                    else
+                                    {
+                                        SDL_Log("Connected");
+                                    }
+                                    char request2[] = "SELECT prenom FROM User Where email='";
+                                    strcat(request2, newConnexion1);
+                                    strcat(request2, requesttransitionend);
 
-                            MYSQL_ROW row2;
-                            row2 = mysql_fetch_row(result2);
-                            userIdConnected = atoi(row2[0]);
-                            puzzle_score = atoi(row2[1]);
-                            mysql_free_result(result2);
-                            mysql_close(con2);
-                            
-                            playSound(ButtonSound)
-                            stayConnected=resterConnecte;
-                            *nextPage=5;
-                            continuer=0;
+                                    if (mysql_query(con2, request2))
+                                    {
+                                        SDL_Log(mysql_error(con2));
+                                    }
+                                    MYSQL_RES *result2 = mysql_store_result(con2);
+                                    int num_fields2 = mysql_num_fields(result2);
+
+                                    MYSQL_ROW row2;
+                                    row2 = mysql_fetch_row(result2);
+                                    char* prenom = row2[0];
+                                    mysql_free_result(result2);
+                                    mysql_close(con2);
+                                    SDL_Log(prenom);
+                                    char *filename = "id.csv";
+                                    FILE *fp = fopen(filename, "w");
+                                    fprintf(fp, "mail;prenom;code\n");
+                                    fprintf(fp, newConnexion1);
+                                    fprintf(fp, ";");
+                                    fprintf(fp, prenom);
+                                    fprintf(fp, ";");
+                                    fclose(fp);
+
+
+                                    *nextPage=4;
+                                    continuer=0;
+                                    continue;
+                                }
+                            }
+                            if (1)
+                            {
+                                MYSQL *con2 = mysql_init(NULL);
+                                if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                                {
+                                    SDL_Log("Not connected");
+                                }
+                                else
+                                {
+                                    SDL_Log("Connected");
+                                }
+                                char request2[] = "SELECT user_id, puzzle_score FROM User Where email='";
+                                strcat(request2, newConnexion1);
+                                strcat(request2, requesttransitionend);
+
+                                if (mysql_query(con2, request2))
+                                {
+                                    SDL_Log(mysql_error(con2));
+                                }
+                                MYSQL_RES *result2 = mysql_store_result(con2);
+                                int num_fields2 = mysql_num_fields(result2);
+
+                                MYSQL_ROW row2;
+                                row2 = mysql_fetch_row(result2);
+                                userIdConnected = atoi(row2[0]);
+                                puzzle_score = atoi(row2[1]);
+                                mysql_free_result(result2);
+                                mysql_close(con2);
+                                
+                                playSound(ButtonSound)
+                                stayConnected=resterConnecte;
+                                *nextPage=5;
+                                continuer=0;
+                            }
                         }
                         else
                         {
@@ -6030,8 +6074,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         
                         char *filename = "id.csv";
                         FILE *fp = fopen(filename, "w");
-                        SDL_Log(newEmail);
-                        SDL_Log(newPrenom);
+                        fprintf(fp, "mail;prenom;code\n");
                         fprintf(fp, newEmail);
                         fprintf(fp, ";");
                         fprintf(fp, newPrenom);
@@ -8926,12 +8969,6 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int leftAlt=0;
     int limitCharDate=6;
 
-
-    
-
-
-
-
     //Generation of the code
     char charCodeConfirmation[6];
     char* ptcharCodeConfirmation=charCodeConfirmation;
@@ -8948,19 +8985,43 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         codeConfirmation+=pow*r;
     }
 
-    charCodeConfirmation[0]=48 + (codeConfirmation/100000);
-    charCodeConfirmation[1]=48 + ((codeConfirmation/10000)%10);
-    charCodeConfirmation[2]=48 + ((codeConfirmation/1000)%10);
-    charCodeConfirmation[3]=48 + ((codeConfirmation/100)%10);
-    charCodeConfirmation[4]=48 + ((codeConfirmation/10)%10);
-    charCodeConfirmation[5]=48 + (codeConfirmation%10);
-    charCodeConfirmation[6]=0;
+    ptcharCodeConfirmation[0]=48 + (codeConfirmation/100000);
+    ptcharCodeConfirmation[1]=48 + ((codeConfirmation/10000)%10);
+    ptcharCodeConfirmation[2]=48 + ((codeConfirmation/1000)%10);
+    ptcharCodeConfirmation[3]=48 + ((codeConfirmation/100)%10);
+    ptcharCodeConfirmation[4]=48 + ((codeConfirmation/10)%10);
+    ptcharCodeConfirmation[5]=48 + (codeConfirmation%10);
+    ptcharCodeConfirmation[6]=0;
 
+    int canWrite=0;
     char *filename = "id.csv";
-    FILE *fp = fopen(filename, "a");
-    SDL_Log(charCodeConfirmation);
-    fprintf(fp, charCodeConfirmation);
+    FILE *fp = fopen(filename, "r");
+    const unsigned MAX_LENGTH = 256;
+    char buffer[MAX_LENGTH];
+
+    fgets(buffer, MAX_LENGTH, fp);
+    fgets(buffer, MAX_LENGTH, fp);
+    char* ptbuffer = buffer;
+    if (ptbuffer[strlen(buffer)-1]==59)
+    {
+        canWrite=1;
+    }
+    else
+    {
+        canWrite=0;
+    }
+    printf("\n");
+    printf("%s",buffer);
     fclose(fp);
+
+    if (canWrite==1)
+    {
+        FILE *fp = fopen(filename, "a");
+        fprintf(fp, charCodeConfirmation);
+        fclose(fp);
+    }
+
+    SDL_Log(charCodeConfirmation);
 
     //Executing python code and sending confirmation mail
     system("python \"mail.py\"");
@@ -9003,7 +9064,7 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 if (event.button.x>832 && event.button.x<1087 && event.button.y>669 && event.button.y<744)
                 {
-                    if (intAndCharSame(codeConfirmation, strPointeurCodeConfirmation, 6)==0)
+                    if (cptNumberOfValuesConfirmation!=6)
                     {
                         SDL_Color color = {230, 20, 20};
                         TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 33);
@@ -9042,11 +9103,73 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderCopy(render, texture, NULL, &sdlRectChamps1);
                         SDL_RenderPresent(render);
                         TTF_CloseFont(font);
+                        MYSQL *con = mysql_init(NULL);
+                        if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                        {
+                            SDL_Log("Not connected");
+                        }
+                        else
+                        {
+                            SDL_Log("Connected");
+                        }
+                        char request[]="Update User SET active=1 Where email='";
+
+                        FILE *fp2 = fopen(filename, "r");
+                        const unsigned MAX_LENGTH = 256;
+                        char buffer[MAX_LENGTH];
+
+                        fgets(buffer, MAX_LENGTH, fp2);
+                        fgets(buffer, MAX_LENGTH, fp2);
+                        char* ptbuffer = buffer;
+                        int test=0;
+                        for (int i=0; i<MAX_LENGTH; i++)
+                        {
+                            if (test==2)
+                            {
+                                test=1;
+                            }
+                            else if (test==1)
+                            {
+                                buffer[i]=32;
+                            }
+                            else if (buffer[i]==59)
+                            {
+                                test=2;
+                                buffer[i]=39;
+                                buffer[i+1]=59;
+                            }
+                        }
+                        buffer[MAX_LENGTH]=0;
+                        fclose(fp2);
+
+                        strcat(request, buffer);
+                        if (mysql_query(con, request))
+                        {
+                            SDL_Log("Error, request connexion");
+                        }
+                        mysql_close(con);
                         SDL_Delay(3000);
 
                         continuer=0;
                         *nextPage=2;
                     }
+                }
+                break;
+            case SDL_KEYUP:
+                switch( event.key.keysym.sym )
+                {
+                    case SDLK_LSHIFT:
+                        leftShift=0;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=0;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=0;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=0;
+                        break;
                 }
                 break;
             case SDL_KEYDOWN:
