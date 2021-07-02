@@ -390,57 +390,72 @@ int minValueList(int* charValues, int lengthChar)
     }
     return min;
 }
+
+
+
+int charHelp(char* ptChar)
+{
+    for (int i=0; i<6; i++)
+    {
+        if (ptChar[i]!=48)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+typedef struct DataPlayerRank DataPlayerRank;
+struct DataPlayerRank
+{
+    int rank;
+    char *FirstName;
+    int score;
+    int numberPuzzlePlayed;
+};
+
 int main(int argc, char* argv[])
 {
-    /*unsigned int chessBoard[64];
-    int rock=0;
-    int whoToPlay=0;
-    int enPassant=0;
-    char fen[]="2r5/6pk/5p1p/5P2/3P1P1N/bP4P1/P2q3P/1K1R4 w - - 0 41";
-    FENToList(fen, chessBoard, &rock, &whoToPlay, &enPassant);
-    printBoard(chessBoard);
-    printf("\n Rock -> %d\n", rock);*/
-    //shrinkChar(fen, 10);
-    char newConnexion1[]="admin@gmail.com";
-    char* pt=newConnexion1;
-    int len = strlen(newConnexion1);
-    char newEnd[len+2];
-    char* ptnewEnd=newEnd;
-    for (int i=0; i>len; i++)
-    {
-        printf("1%c\n", newConnexion1[i]);
-        ptnewEnd[i]=newConnexion1[i];
-    }
-    ptnewEnd[len]=39;
-    ptnewEnd[len+1]=59;
-    ptnewEnd[len+2]=0;
+    
+    char request[]="SELECT prenom, puzzle_score From User order by puzzle_score desc;";
 
-    MYSQL *con2 = mysql_init(NULL);
-    if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+    MYSQL *con = mysql_init(NULL);
+    if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
     {
-        printf("Not connected");
+        return 13;
     }
-    else
-    {
-        printf("Connected");
-    }
-    char request2[] = "SELECT prenom FROM User Where email='";
-    printf("\n%s\n", newEnd);
-    strcat(request2, newEnd);
-    printf("\n%s\n", request2);
 
-    if (mysql_query(con2, request2))
+    if (mysql_query(con, request))
     {
-        printf("error");
+        return 12;
     }
-    /*MYSQL_RES *result2 = mysql_store_result(con2);
-    int num_fields2 = mysql_num_fields(result2);
+    
+    MYSQL_RES *result = mysql_store_result(con);
 
-    MYSQL_ROW row2;
-    row2 = mysql_fetch_row(result2);
-    printf("Prenom-> %s", row2[0]);
-    mysql_free_result(result2);
-    mysql_close(con2);*/
+    if (result == NULL)
+    {
+        return 11;
+    }
+
+    int num_fields = mysql_num_fields(result);
+
+    MYSQL_ROW row;
+
+    int cpt=0;
+    while ((row = mysql_fetch_row(result)))
+    {
+        cpt+=1;
+        printf("%d ", cpt);
+        for(int i = 0; i < num_fields; i++)
+        {
+            
+            printf("%s ", row[i] ? row[i] : "NULL");
+        }
+
+        printf("\n");
+    }
+
+    mysql_free_result(result);
+    mysql_close(con);
 
     return 1;
 }
