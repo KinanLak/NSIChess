@@ -10067,7 +10067,7 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         pointUser.h=18;
                         SDL_RenderFillRect(render, &pointUser);
                         SDL_RenderPresent(render);
-                        saveImage[((event.motion.x-739)/18)+(50*(event.motion.y-113)/18)]=valueSliderRed*65536+valueSliderGreen*256+valueSliderBlue;
+                        //saveImage[((event.motion.x-739)/18)+(50*(event.motion.y-113)/18)]=valueSliderRed*65536+valueSliderGreen*256+valueSliderBlue;
                     }
                 }
                 break;
@@ -10100,7 +10100,7 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     pointUser.h=18;
                     SDL_RenderFillRect(render, &pointUser);
                     SDL_RenderPresent(render);
-                    saveImage[((event.motion.x-739)/18)+(50*(event.motion.y-113)/18)]=valueSliderRed*65536+valueSliderGreen*256+valueSliderBlue;
+                    //saveImage[((event.motion.x-739)/18)+(50*(event.motion.y-113)/18)]=valueSliderRed*65536+valueSliderGreen*256+valueSliderBlue;
                 }
                 else
                 {
