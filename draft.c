@@ -390,57 +390,74 @@ int minValueList(int* charValues, int lengthChar)
     }
     return min;
 }
+
+
+
+int charHelp(char* ptChar)
+{
+    for (int i=0; i<6; i++)
+    {
+        if (ptChar[i]!=48)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+typedef struct DataPlayerRank DataPlayerRank;
+struct DataPlayerRank
+{
+    int rank;
+    char FirstName[30];
+    int score;
+    int numberPuzzlePlayed;
+};
+
 int main(int argc, char* argv[])
 {
-    /*unsigned int chessBoard[64];
-    int rock=0;
-    int whoToPlay=0;
-    int enPassant=0;
-    char fen[]="2r5/6pk/5p1p/5P2/3P1P1N/bP4P1/P2q3P/1K1R4 w - - 0 41";
-    FENToList(fen, chessBoard, &rock, &whoToPlay, &enPassant);
-    printBoard(chessBoard);
-    printf("\n Rock -> %d\n", rock);*/
-    //shrinkChar(fen, 10);
-    char newConnexion1[]="admin@gmail.com";
-    char* pt=newConnexion1;
-    int len = strlen(newConnexion1);
-    char newEnd[len+2];
-    char* ptnewEnd=newEnd;
-    for (int i=0; i>len; i++)
-    {
-        printf("1%c\n", newConnexion1[i]);
-        ptnewEnd[i]=newConnexion1[i];
-    }
-    ptnewEnd[len]=39;
-    ptnewEnd[len+1]=59;
-    ptnewEnd[len+2]=0;
 
-    MYSQL *con2 = mysql_init(NULL);
-    if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
-    {
-        printf("Not connected");
-    }
-    else
-    {
-        printf("Connected");
-    }
-    char request2[] = "SELECT prenom FROM User Where email='";
-    printf("\n%s\n", newEnd);
-    strcat(request2, newEnd);
-    printf("\n%s\n", request2);
+    char request[]="SELECT prenom, puzzle_score, (Select count(*) from Puzzle_done where user_id=User.user_id) From User order by puzzle_score desc;";
 
-    if (mysql_query(con2, request2))
+    MYSQL *con = mysql_init(NULL);
+    if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
     {
-        printf("error");
+        return 13;
     }
-    /*MYSQL_RES *result2 = mysql_store_result(con2);
-    int num_fields2 = mysql_num_fields(result2);
+    if (mysql_query(con, request))
+    {
+        return 12;
+    }
+    MYSQL_RES *result = mysql_store_result(con);
 
-    MYSQL_ROW row2;
-    row2 = mysql_fetch_row(result2);
-    printf("Prenom-> %s", row2[0]);
-    mysql_free_result(result2);
-    mysql_close(con2);*/
+    if (result == NULL)
+    {
+        return 11;
+    }
+
+    int num_fields = mysql_num_fields(result);
+
+    int numberValues = mysql_affected_rows(con);
+
+    DataPlayerRank list[numberValues];
+    MYSQL_ROW row = mysql_fetch_row(result);
+
+    for (int i=0; i<numberValues; i++)
+    {
+        list[i].rank = i+1;
+        list[i].numberPuzzlePlayed = atoi(row[2]);
+        list[i].score = atoi(row[1]);
+        strcpy( list[i].FirstName, row[0]);
+        
+        row = mysql_fetch_row(result);
+    }
+
+    for (int i=0; i<numberValues; i++)
+    {
+        printf("%d, %d, %d, %s\n", list[i].rank, list[i].numberPuzzlePlayed, list[i].score, list[i].FirstName);
+    }
+
+    mysql_free_result(result);
+    mysql_close(con);
 
     return 1;
 }
