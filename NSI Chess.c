@@ -9247,6 +9247,7 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         fclose(fp2);
 
                         strcat(request, buffer);
+                        SDL_Log("%s",request );
                         if (mysql_query(con, request))
                         {
                             SDL_Log("Error, request connexion");

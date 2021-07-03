@@ -1,5 +1,3 @@
-f = open("C:/Users/Kinan/Desktop/text2.txt","w+")
-
 import smtplib
 from email.message import EmailMessage 
 import csv
@@ -16,7 +14,7 @@ email_mdp = 'qX58rn^qwXeA&o1k=s?Hf2!aFdF?RWdA'
 msg = EmailMessage()
 msg['Subject'] = "Confirmation d'inscription"
 msg['From'] = 'NSI Chess'
-msg['To'] = 'kinan.lakh@gmail.com'
+msg['To'] = infos[0]['mail']
 
 msg.set_content("This is a plain text email")
 
