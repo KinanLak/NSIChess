@@ -408,27 +408,25 @@ typedef struct DataPlayerRank DataPlayerRank;
 struct DataPlayerRank
 {
     int rank;
-    char *FirstName;
+    char FirstName[30];
     int score;
     int numberPuzzlePlayed;
 };
 
 int main(int argc, char* argv[])
 {
-    
-    char request[]="SELECT prenom, puzzle_score From User order by puzzle_score desc;";
+
+    char request[]="SELECT prenom, puzzle_score, (Select count(*) from Puzzle_done where user_id=User.user_id) From User order by puzzle_score desc;";
 
     MYSQL *con = mysql_init(NULL);
     if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
     {
         return 13;
     }
-
     if (mysql_query(con, request))
     {
         return 12;
     }
-    
     MYSQL_RES *result = mysql_store_result(con);
 
     if (result == NULL)
@@ -438,20 +436,24 @@ int main(int argc, char* argv[])
 
     int num_fields = mysql_num_fields(result);
 
-    MYSQL_ROW row;
+    int numberValues = mysql_affected_rows(con);
 
-    int cpt=0;
-    while ((row = mysql_fetch_row(result)))
+    DataPlayerRank list[numberValues];
+    MYSQL_ROW row = mysql_fetch_row(result);
+
+    for (int i=0; i<numberValues; i++)
     {
-        cpt+=1;
-        printf("%d ", cpt);
-        for(int i = 0; i < num_fields; i++)
-        {
-            
-            printf("%s ", row[i] ? row[i] : "NULL");
-        }
+        list[i].rank = i+1;
+        list[i].numberPuzzlePlayed = atoi(row[2]);
+        list[i].score = atoi(row[1]);
+        strcpy( list[i].FirstName, row[0]);
+        
+        row = mysql_fetch_row(result);
+    }
 
-        printf("\n");
+    for (int i=0; i<numberValues; i++)
+    {
+        printf("%d, %d, %d, %s\n", list[i].rank, list[i].numberPuzzlePlayed, list[i].score, list[i].FirstName);
     }
 
     mysql_free_result(result);
