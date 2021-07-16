@@ -1333,7 +1333,7 @@ int userIdConnected=1;
 
 
 //Definition of images path
-#define PaintBGImageBMP "images/paintBG.bmp"
+#define PaintBGImageBMP "images/paint/paintBG.bmp"
 #define LeaderboardBGImageBMP "images/classement.bmp"
 #define PuzzleBGImageBMP "images/puzzle/puzzleBG.bmp"
 #define TimerImageBMP "images/timer.bmp"
@@ -3944,8 +3944,8 @@ int minValueList(int* charValues, int lengthChar)
 //saveImage[caseX+(50*caseY)]=valueSliderRed*65536+valueSliderGreen*256+valueSliderBlue;
 #define colorCanvaWithSize(size) if (size==1)\
                         {\
-                            pointUser.x=839+((caseX)*18);\
-                            pointUser.y=116+((caseY)*18);\
+                            pointUser.x=711+((caseX)*18);\
+                            pointUser.y=114+((caseY)*18);\
                             pointUser.w=18;\
                             pointUser.h=18;\
                             SDL_RenderFillRect(render, &pointUser);\
@@ -3955,33 +3955,33 @@ int minValueList(int* charValues, int lengthChar)
                         {\
                             if (caseX==0)\
                             {\
-                                pointUser.x=839+((caseX)*18);\
+                                pointUser.x=711+((caseX)*18);\
                                 pointUser.w=36;\
                             }\
                             else if (caseX==49)\
                             {\
-                                pointUser.x=839+((caseX-1)*18);\
+                                pointUser.x=711+((caseX-1)*18);\
                                 pointUser.w=36;\
                             }\
                             else\
                             {\
-                                pointUser.x=839+((caseX-1)*18);\
+                                pointUser.x=711+((caseX-1)*18);\
                                 pointUser.w=54;\
                             }\
                             \
                             if (caseY==0)\
                             {\
-                                pointUser.y=116+((caseY)*18);\
+                                pointUser.y=114+((caseY)*18);\
                                 pointUser.h=36;\
                             }\
                             else if (caseY==49)\
                             {\
-                                pointUser.y=116+((caseY-1)*18);\
+                                pointUser.y=114+((caseY-1)*18);\
                                 pointUser.h=36;\
                             }\
                             else\
                             {\
-                                pointUser.y=116+((caseY-1)*18);\
+                                pointUser.y=114+((caseY-1)*18);\
                                 pointUser.h=54;\
                             }\
                             SDL_RenderFillRect(render, &pointUser);\
@@ -3990,53 +3990,53 @@ int minValueList(int* charValues, int lengthChar)
                         {\
                             if (caseX==0)\
                             {\
-                                pointUser.x=839+((caseX)*18);\
+                                pointUser.x=711+((caseX)*18);\
                                 pointUser.w=54;\
                             }\
                             else if (caseX==1)\
                             {\
-                                pointUser.x=839+((caseX-1)*18);\
+                                pointUser.x=711+((caseX-1)*18);\
                                 pointUser.w=72;\
                             }\
                             else if (caseX==48)\
                             {\
-                                pointUser.x=839+((caseX-2)*18);\
+                                pointUser.x=711+((caseX-2)*18);\
                                 pointUser.w=72;\
                             }\
                             else if (caseX==49)\
                             {\
-                                pointUser.x=839+((caseX-2)*18);\
+                                pointUser.x=711+((caseX-2)*18);\
                                 pointUser.w=54;\
                             }\
                             else\
                             {\
-                                pointUser.x=839+((caseX-2)*18);\
+                                pointUser.x=711+((caseX-2)*18);\
                                 pointUser.w=90;\
                             }\
                             \
                             if (caseY==0)\
                             {\
-                                pointUser.y=116+((caseY)*18);\
+                                pointUser.y=114+((caseY)*18);\
                                 pointUser.h=54;\
                             }\
                             else if (caseY==1)\
                             {\
-                                pointUser.y=116+((caseY-1)*18);\
+                                pointUser.y=114+((caseY-1)*18);\
                                 pointUser.h=72;\
                             }\
                             else if (caseY==48)\
                             {\
-                                pointUser.y=116+((caseY-2)*18);\
+                                pointUser.y=114+((caseY-2)*18);\
                                 pointUser.h=72;\
                             }\
                             else if (caseY==49)\
                             {\
-                                pointUser.y=116+((caseY-2)*18);\
+                                pointUser.y=114+((caseY-2)*18);\
                                 pointUser.h=54;\
                             }\
                             else\
                             {\
-                                pointUser.y=116+((caseY-2)*18);\
+                                pointUser.y=114+((caseY-2)*18);\
                                 pointUser.h=90;\
                             }\
                             SDL_RenderFillRect(render, &pointUser);\
@@ -4045,80 +4045,80 @@ int minValueList(int* charValues, int lengthChar)
                         {\
                             if (caseX==0)\
                             {\
-                                pointUser.x=839+((caseX)*18);\
+                                pointUser.x=711+((caseX)*18);\
                                 pointUser.w=72;\
                             }\
                             else if (caseX==1)\
                             {\
-                                pointUser.x=839+((caseX-1)*18);\
+                                pointUser.x=711+((caseX-1)*18);\
                                 pointUser.w=90;\
                             }\
                             else if (caseX==2)\
                             {\
-                                pointUser.x=839+((caseX-2)*18);\
+                                pointUser.x=711+((caseX-2)*18);\
                                 pointUser.w=108;\
                             }\
                             else if (caseX==47)\
                             {\
-                                pointUser.x=839+((caseX-3)*18);\
+                                pointUser.x=711+((caseX-3)*18);\
                                 pointUser.w=108;\
                             }\
                             else if (caseX==48)\
                             {\
-                                pointUser.x=839+((caseX-3)*18);\
+                                pointUser.x=711+((caseX-3)*18);\
                                 pointUser.w=90;\
                             }\
                             else if (caseX==49)\
                             {\
-                                pointUser.x=839+((caseX-3)*18);\
+                                pointUser.x=711+((caseX-3)*18);\
                                 pointUser.w=72;\
                             }\
                             else\
                             {\
-                                pointUser.x=839+((caseX-3)*18);\
+                                pointUser.x=711+((caseX-3)*18);\
                                 pointUser.w=126;\
                             }\
                             \
                             if (caseY==0)\
                             {\
-                                pointUser.y=116+((caseY)*18);\
+                                pointUser.y=114+((caseY)*18);\
                                 pointUser.h=72;\
                             }\
                             else if (caseY==1)\
                             {\
-                                pointUser.y=116+((caseY-1)*18);\
+                                pointUser.y=114+((caseY-1)*18);\
                                 pointUser.h=90;\
                             }\
                             else if (caseY==2)\
                             {\
-                                pointUser.y=116+((caseY-2)*18);\
+                                pointUser.y=114+((caseY-2)*18);\
                                 pointUser.h=108;\
                             }\
                             else if (caseY==47)\
                             {\
-                                pointUser.y=116+((caseY-3)*18);\
+                                pointUser.y=114+((caseY-3)*18);\
                                 pointUser.h=108;\
                             }\
                             else if (caseY==48)\
                             {\
-                                pointUser.y=116+((caseY-3)*18);\
+                                pointUser.y=114+((caseY-3)*18);\
                                 pointUser.h=90;\
                             }\
                             else if (caseY==49)\
                             {\
-                                pointUser.y=116+((caseY-3)*18);\
+                                pointUser.y=114+((caseY-3)*18);\
                                 pointUser.h=72;\
                             }\
                             else\
                             {\
-                                pointUser.y=116+((caseY-3)*18);\
+                                pointUser.y=114+((caseY-3)*18);\
                                 pointUser.h=126;\
                             }\
                             SDL_RenderFillRect(render, &pointUser);\
                         }\
                         SDL_RenderPresent(render);
 
-#define updateSlider(numeroSlider, valueChange) if ((numeroSlider<=3 &&((964-valueChange)/2>=0 && (964-valueChange)/2<=255)) || (numeroSlider==5 &&(((valueChange-284)/55)+1>=1 && ((valueChange-284)/55)+1<=4)))\
+#define updateSlider(numeroSlider, valueChange) if ((numeroSlider<=3 &&((964-valueChange)/2>=0 && (964-valueChange)/2<=255)) || (numeroSlider==5 &&(((valueChange-269)/55)+1>=1 && ((valueChange-269)/55)+1<=4)))\
                                         {\
                                             if (numeroSlider==1)\
                                             {\
@@ -4134,23 +4134,22 @@ int minValueList(int* charValues, int lengthChar)
                                             }\
                                             else if (numeroSlider==5)\
                                             {\
-                                                valueSliderSize=((valueChange-284)/55)+1;\
+                                                valueSliderSize=((valueChange-269)/55)+1;\
                                                 char test[3];\
                                                 itoa(valueSliderSize, test, 10);\
-                                                SDL_Log(test);\
                                             }\
                                             SDL_RenderCopy(render, textureBackground, NULL, NULL);\
                                             SDL_SetRenderDrawColor(render, WHITE);\
-                                            rectSlider.x=258;\
-                                            rectSlider.y=959-(valueSliderRed*2);\
+                                            rectSlider.x=243;\
+                                            rectSlider.y=964-(valueSliderRed*2);\
                                             SDL_RenderFillRect(render, &rectSlider);\
-                                            rectSlider.x=353;\
-                                            rectSlider.y=959-(valueSliderGreen*2);\
+                                            rectSlider.x=338;\
+                                            rectSlider.y=964-(valueSliderGreen*2);\
                                             SDL_RenderFillRect(render, &rectSlider);\
-                                            rectSlider.x=448;\
-                                            rectSlider.y=959-(valueSliderBlue*2);\
+                                            rectSlider.x=433;\
+                                            rectSlider.y=964-(valueSliderBlue*2);\
                                             SDL_RenderFillRect(render, &rectSlider);\
-                                            rectSliderSize.x=284+((valueSliderSize-1)*55);\
+                                            rectSliderSize.x=269+((valueSliderSize-1)*55);\
                                             SDL_RenderFillRect(render, &rectSliderSize);\
                                             SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);\
                                             SDL_RenderFillRect(render, &rectColorUser);\
@@ -4162,16 +4161,16 @@ int minValueList(int* charValues, int lengthChar)
                                             valueSliderBlue=blueValue;\
                                             SDL_RenderCopy(render, textureBackground, NULL, NULL);\
                                             SDL_SetRenderDrawColor(render, WHITE);\
-                                            rectSlider.x=258;\
-                                            rectSlider.y=959-(valueSliderRed*2);\
+                                            rectSlider.x=243;\
+                                            rectSlider.y=964-(valueSliderRed*2);\
                                             SDL_RenderFillRect(render, &rectSlider);\
-                                            rectSlider.x=353;\
-                                            rectSlider.y=959-(valueSliderGreen*2);\
+                                            rectSlider.x=338;\
+                                            rectSlider.y=964-(valueSliderGreen*2);\
                                             SDL_RenderFillRect(render, &rectSlider);\
-                                            rectSlider.x=448;\
-                                            rectSlider.y=959-(valueSliderBlue*2);\
+                                            rectSlider.x=433;\
+                                            rectSlider.y=964-(valueSliderBlue*2);\
                                             SDL_RenderFillRect(render, &rectSlider);\
-                                            rectSliderSize.x=284+((valueSliderSize-1)*55);\
+                                            rectSliderSize.x=269+((valueSliderSize-1)*55);\
                                             SDL_RenderFillRect(render, &rectSliderSize);\
                                             SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);\
                                             SDL_RenderFillRect(render, &rectColorUser);\
@@ -5540,6 +5539,8 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     {
         *nextPage=8;
     }
+    SDL_FreeSurface(imageLoadingBackground);
+    SDL_DestroyTexture(textureLoadingBackground);
 }
 
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
@@ -5934,7 +5935,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     fprintf(fp, ";");
                                     fclose(fp);
 
-
                                     *nextPage=4;
                                     continuer=0;
                                     continue;
@@ -6046,6 +6046,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_FreeSurface(imageHoverButtonBackground);
     SDL_FreeSurface(surfaceConnexion1);
     SDL_FreeSurface(surfaceConnexion2);
+    SDL_FreeSurface(imageSelectedResterConnecte);
+    SDL_FreeSurface(imageResterConnecte);
+    SDL_FreeSurface(imageHoverResterConnecte);
 
 
     SDL_DestroyTexture(textureConnexionBackground);
@@ -6053,6 +6056,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_DestroyTexture(textureHoverButtonBackground);
     SDL_DestroyTexture(textureConnexion1);
     SDL_DestroyTexture(textureConnexion2);
+    SDL_DestroyTexture(textureSelectedResterConnecte);
+    SDL_DestroyTexture(textureResterConnecte);
+    SDL_DestroyTexture(textureHoverResterConnecte);
 }
 
 
@@ -7147,10 +7153,20 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_FreeSurface(surfaceOrdinateur);
     SDL_FreeSurface(surfaceSelectionLocal);
     SDL_FreeSurface(surfaceMultijoueur);
+    SDL_FreeSurface(imageModeSelectionBackground);
+    SDL_FreeSurface(imageSelectionLocalBMP);
+    SDL_FreeSurface(imageHoverSelectionLocalBMP);
+    SDL_FreeSurface(imageSelectionMutliplayerBMP);
+    SDL_FreeSurface(imageHoverSelectionMutliplayerBMP);
 
     SDL_DestroyTexture(textureOrdinateur);
     SDL_DestroyTexture(textureSelectionLocal);
     SDL_DestroyTexture(textureMultijoueur);
+    SDL_DestroyTexture(textureModeSelectionBackground);
+    SDL_DestroyTexture(textureSelectionLocalBMP);
+    SDL_DestroyTexture(textureHoverSelectionLocalBMP);
+    SDL_DestroyTexture(textureSelectionMutliplayerBMP);
+    SDL_DestroyTexture(textureHoverSelectionMutliplayerBMP);
 }
 
 int statsPage(SDL_Renderer* render)
@@ -7711,6 +7727,19 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 break;
         }
     }
+    SDL_FreeSurface(imageTempsPartieBackground);
+    SDL_FreeSurface(imageContourBlancBackground);
+    SDL_FreeSurface(imageHoverRetourBackground);
+    SDL_FreeSurface(imageRetourBackground);
+    SDL_FreeSurface(imageHoverLancerBackground);
+    SDL_FreeSurface(imageLancerBackground);
+
+    SDL_DestroyTexture(textureTempsPartieBackground);
+    SDL_DestroyTexture(textureContourBlancBackground);
+    SDL_DestroyTexture(textureHoverRetourBackground);
+    SDL_DestroyTexture(textureRetourBackground);
+    SDL_DestroyTexture(textureHoverLancerBackground);
+    SDL_DestroyTexture(textureLancerBackground);
 }
 
 
@@ -7856,6 +7885,9 @@ void leaderBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 break;
         }
     }
+    SDL_FreeSurface(imageBackground);
+
+    SDL_DestroyTexture(textureBackground);
 }
 
 
@@ -8186,6 +8218,33 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 break;
         }
     }
+    SDL_FreeSurface(imageBackgroundMenu);
+    SDL_FreeSurface(imageHoverPuzzleBackground);
+    SDL_FreeSurface(imagePuzzleBackground);
+    SDL_FreeSurface(imageHoverJouerBackground);
+    SDL_FreeSurface(imageJouerBackground);
+    SDL_FreeSurface(imageHoverAmisBackground);
+    SDL_FreeSurface(imageAmisBackground);
+    SDL_FreeSurface(imageHoverStatsBackground);
+    SDL_FreeSurface(imageStatsBackground);
+    SDL_FreeSurface(imageHoverQuitBackground);
+    SDL_FreeSurface(imageQuitBackground);
+    SDL_FreeSurface(imageMakeFriendListBackground);
+    SDL_FreeSurface(imageFriendListHiderBackground);
+
+    SDL_DestroyTexture(textureBackgroundMenu);
+    SDL_DestroyTexture(textureHoverPuzzleBackground);
+    SDL_DestroyTexture(texturePuzzleBackground);
+    SDL_DestroyTexture(textureHoverJouerBackground);
+    SDL_DestroyTexture(textureJouerBackground);
+    SDL_DestroyTexture(textureHoverAmisBackground);
+    SDL_DestroyTexture(textureAmisBackground);
+    SDL_DestroyTexture(textureHoverStatsBackground);
+    SDL_DestroyTexture(textureStatsBackground);
+    SDL_DestroyTexture(textureHoverQuitBackground);
+    SDL_DestroyTexture(textureQuitBackground);
+    SDL_DestroyTexture(textureMakeFriendListBackground);
+    SDL_DestroyTexture(textureFriendListHiderBackground);
 }
 
 
@@ -9221,6 +9280,17 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage, int color
         else
         {
             SDL_RenderCopy(render, texturePause, NULL, &rectPausePlay);
+            rectTimer.x=75;
+            SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+            surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
+            textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
+            SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+            
+            rectTimer.x=1510;
+            SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+            surfaceTimerBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
+            textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
+            SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
         }
     }
@@ -9610,6 +9680,25 @@ void pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 break;
         }
     }
+    SDL_FreeSurface(surfacePseudo2);
+    SDL_FreeSurface(imageBG);
+    SDL_FreeSurface(imageHoverRetour);
+    SDL_FreeSurface(imageRetour);
+    SDL_FreeSurface(imageHoverValider);
+    SDL_FreeSurface(imageValider);
+    SDL_FreeSurface(imageRandomColor);
+    SDL_FreeSurface(imageBlackWhiteColor);
+    SDL_FreeSurface(imageWhiteBlackColor);
+
+    SDL_DestroyTexture(texturePseudo2);
+    SDL_DestroyTexture(textureBG);
+    SDL_DestroyTexture(textureHoverRetour);
+    SDL_DestroyTexture(textureRetour);
+    SDL_DestroyTexture(textureHoverValider);
+    SDL_DestroyTexture(textureValider);
+    SDL_DestroyTexture(textureRandomColor);
+    SDL_DestroyTexture(textureBlackWhiteColor);
+    SDL_DestroyTexture(textureWhiteBlackColor);
 }
 
 
@@ -9914,6 +10003,13 @@ void attenteCodeConfirmationCompte(SDL_Window* window, SDL_Renderer* render, int
                 break;
         }
     }
+    SDL_FreeSurface(imageMailConfirmationBackground);
+    SDL_FreeSurface(imageValiderButton);
+    SDL_FreeSurface(imageValiderHoverButton);
+
+    SDL_DestroyTexture(textureMailConfirmationBackground);
+    SDL_DestroyTexture(textureValiderButton);
+    SDL_DestroyTexture(textureValiderHoverButton);
 }
 
 void attenteCodeConfirmationLostPassword(SDL_Window* window, SDL_Renderer* render, int* nextPage)
@@ -10170,6 +10266,13 @@ void attenteCodeConfirmationLostPassword(SDL_Window* window, SDL_Renderer* rende
                 break;
         }
     }
+    SDL_FreeSurface(imageMailConfirmationBackground);
+    SDL_FreeSurface(imageValiderButton);
+    SDL_FreeSurface(imageValiderHoverButton);
+
+    SDL_DestroyTexture(textureMailConfirmationBackground);
+    SDL_DestroyTexture(textureValiderButton);
+    SDL_DestroyTexture(textureValiderHoverButton);
 }
 
 void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
@@ -10189,8 +10292,8 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     rectSliderSize.w=20;
     rectSliderSize.h=26;
     SDL_Rect rectColorUser;
-    rectColorUser.x=662;
-    rectColorUser.y=116;
+    rectColorUser.x=558;
+    rectColorUser.y=114;
     rectColorUser.w=46;
     rectColorUser.h=900;
     SDL_Rect pointUser;
@@ -10206,16 +10309,16 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
     SDL_SetRenderDrawColor(render, WHITE);
-    rectSlider.x=258;
-    rectSlider.y=959-(valueSliderRed*2);
+    rectSlider.x=243;
+    rectSlider.y=964-(valueSliderRed*2);
     SDL_RenderFillRect(render, &rectSlider);
-    rectSlider.x=353;
-    rectSlider.y=959-(valueSliderGreen*2);
+    rectSlider.x=338;
+    rectSlider.y=964-(valueSliderGreen*2);
     SDL_RenderFillRect(render, &rectSlider);
-    rectSlider.x=448;
-    rectSlider.y=959-(valueSliderBlue*2);
+    rectSlider.x=433;
+    rectSlider.y=964-(valueSliderBlue*2);
     SDL_RenderFillRect(render, &rectSlider);
-    rectSliderSize.x=284+((valueSliderSize-1)*45);
+    rectSliderSize.x=269+((valueSliderSize-1)*45);
     SDL_RenderFillRect(render, &rectSliderSize);
     SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);
     SDL_RenderFillRect(render, &rectColorUser);
@@ -10239,16 +10342,16 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 {
                     SDL_RenderCopy(render, textureBackground, NULL, NULL);
                     SDL_SetRenderDrawColor(render, WHITE);
-                    rectSlider.x=258;
-                    rectSlider.y=959-(valueSliderRed*2);
+                    rectSlider.x=243;
+                    rectSlider.y=964-(valueSliderRed*2);
                     SDL_RenderFillRect(render, &rectSlider);
-                    rectSlider.x=353;
-                    rectSlider.y=959-(valueSliderGreen*2);
+                    rectSlider.x=338;
+                    rectSlider.y=964-(valueSliderGreen*2);
                     SDL_RenderFillRect(render, &rectSlider);
-                    rectSlider.x=448;
-                    rectSlider.y=959-(valueSliderBlue*2);
+                    rectSlider.x=433;
+                    rectSlider.y=964-(valueSliderBlue*2);
                     SDL_RenderFillRect(render, &rectSlider);
-                    rectSliderSize.x=284+((valueSliderSize-1)*45);
+                    rectSliderSize.x=269+((valueSliderSize-1)*45);
                     SDL_RenderFillRect(render, &rectSliderSize);
                     SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);
                     SDL_RenderFillRect(render, &rectColorUser);
@@ -10276,9 +10379,9 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     //canva
                     int x=event.motion.x;
                     int y=event.motion.y;
-                    if (x>=839 && x<=1738 && y>=116 && y<=1015)
+                    if (x>=711 && x<=1610 && y>=116 && y<=1013)
                     {
-                        int caseX=((x-839)/18);
+                        int caseX=((x-711)/18);
                         int caseY=((y-116)/18);
                         colorCanvaWithSize(valueSliderSize)
                     }
@@ -10289,50 +10392,39 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     updateSlider(5, event.motion.x);
                 }
                 break;
-            case SDL_MOUSEBUTTONDOWN: ;
-                Uint32 testint;
-                SDL_Rect rectTestInt={800,200,1,1};
-
-                SDL_RenderReadPixels(render, &rectTestInt, SDL_PIXELFORMAT_ARGB8888,&value,);
-
-                SDL_Texture* textureRenderPaint = NULL;
-                SDL_SetRenderTarget(render,textureRenderPaint);
-
-                char charTest[100];
-                itoa(testint, charTest, 10);
-                SDL_Log(charTest);
-                if (event.button.x>258 && event.button.x<298 && event.button.y>452 && event.button.y<965)
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>243 && event.button.x<298 && event.button.y>452 && event.button.y<965)
                 {
                     //red
                     focus=1;
                     updateSlider(1, event.button.y);
                 }
-                else if (event.button.x>353 && event.button.x<393 && event.button.y>452 && event.button.y<965)
+                else if (event.button.x>338 && event.button.x<393 && event.button.y>452 && event.button.y<965)
                 {
                     //green
                     focus=2;
                     updateSlider(2, event.button.y);
                 }
-                else if (event.button.x>448 && event.button.x<488 && event.button.y>452 && event.button.y<965)
+                else if (event.button.x>433 && event.button.x<488 && event.button.y>452 && event.button.y<965)
                 {
                     //blue
                     focus=3;
                     updateSlider(3, event.button.y);
                 }
-                else if (event.button.x>=284 && event.button.x<=463 && event.button.y>=125 && event.button.y<=150)
+                else if (event.button.x>=269 && event.button.x<=463 && event.button.y>=125 && event.button.y<=150)
                 {
                     //size
                     focus=5;
                     updateSlider(5, event.button.x);
                 }
-                else if (event.button.x>=839 && event.button.x<=1738 && event.button.y>=116 && event.button.y<=1015)
+                else if (event.button.x>=711 && event.button.x<=1610 && event.button.y>=114 && event.button.y<=1013)
                 {
                     //canva
                     focus=4;
                     int x=event.button.x;
                     int y=event.button.y;
-                    int caseX=((x-839)/18);
-                    int caseY=((y-116)/18);
+                    int caseX=((x-711)/18);
+                    int caseY=((y-114)/18);
                     colorCanvaWithSize(valueSliderSize)
                 }
                 else
@@ -10351,25 +10443,25 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     {
                         SDL_RenderCopy(render, textureBackground, NULL, NULL);
                         SDL_SetRenderDrawColor(render, WHITE);
-                        rectSlider.x=258;
-                        rectSlider.y=959-(valueSliderRed*2);
+                        rectSlider.x=243;
+                        rectSlider.y=964-(valueSliderRed*2);
                         SDL_RenderFillRect(render, &rectSlider);
-                        rectSlider.x=353;
-                        rectSlider.y=959-(valueSliderGreen*2);
+                        rectSlider.x=338;
+                        rectSlider.y=964-(valueSliderGreen*2);
                         SDL_RenderFillRect(render, &rectSlider);
-                        rectSlider.x=448;
-                        rectSlider.y=959-(valueSliderBlue*2);
+                        rectSlider.x=433;
+                        rectSlider.y=964-(valueSliderBlue*2);
                         SDL_RenderFillRect(render, &rectSlider);
-                        rectSliderSize.x=284+((valueSliderSize-1)*45);
+                        rectSliderSize.x=269+((valueSliderSize-1)*45);
                         SDL_RenderFillRect(render, &rectSliderSize);
                         SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);
                         SDL_RenderFillRect(render, &rectColorUser);
                         SDL_RenderPresent(render);
                     }
                 }
-                else if (event.button.x>=260 && event.button.x<=486 && event.button.y>=275 && event.button.y<=387)
+                else if (event.button.x>=245 && event.button.x<=471 && event.button.y>=275 && event.button.y<=387)
                 {
-                    if (event.button.x<=297)
+                    if (event.button.x<=282)
                     {
                         if (event.button.y<=312)
                         {
@@ -10384,7 +10476,7 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             changeColorSlider(140, 255, 251)
                         }
                     }
-                    else if (event.button.x<=334)
+                    else if (event.button.x<=319)
                     {
                         if (event.button.y<=312)
                         {
@@ -10399,7 +10491,7 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             changeColorSlider(0, 168, 253)
                         }
                     }
-                    else if (event.button.x<=372)
+                    else if (event.button.x<=357)
                     {
                         if (event.button.y<=312)
                         {
@@ -10414,7 +10506,7 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             changeColorSlider(63, 72, 204)
                         }
                     }
-                    else if (event.button.x<=411)
+                    else if (event.button.x<=396)
                     {
                         if (event.button.y<=312)
                         {
@@ -10429,7 +10521,7 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             changeColorSlider(184, 61, 186)
                         }
                     }
-                    else if (event.button.x<=448)
+                    else if (event.button.x<=433)
                     {
                         if (event.button.y<=312)
                         {
@@ -10466,8 +10558,9 @@ void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 break;
         }
     }
+    SDL_FreeSurface(imageBackGround);
 
-
+    SDL_DestroyTexture(textureBackground);
 }
 
 int main(int argc, char* argv[])

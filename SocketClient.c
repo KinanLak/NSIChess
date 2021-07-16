@@ -16,7 +16,7 @@ int main()
     sin.sin_port = htons(80);
     connect(sock, (SOCKADDR *)&sin, sizeof(sin));
     recv(sock, buffer, sizeof(buffer), 0);
-    printf("%d", atoi(buffer));
+    printf("%s", buffer);
     closesocket(sock);
     WSACleanup();
     return 0;
