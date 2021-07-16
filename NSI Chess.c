@@ -10581,19 +10581,25 @@ int main(int argc, char* argv[])
         char buffer[MAX_LENGTH];
 
         fgets(buffer, MAX_LENGTH, fileOpen);
-        sound = atoi(buffer);
-        fgets(buffer, MAX_LENGTH, fileOpen);
-        typeChessboard = atoi(buffer);
-        fgets(buffer, MAX_LENGTH, fileOpen);
-        typePieces = atoi(buffer);
-        fgets(buffer, MAX_LENGTH, fileOpen);
-        userIdConnected = atoi(buffer);
-        fgets(buffer, MAX_LENGTH, fileOpen);
-        puzzle_score = atoi(buffer);
+        if (atoi(buffer)==2)
+        {
+            nextPage=2;
+        }
+        else
+        {
+            sound = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            typeChessboard = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            typePieces = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            userIdConnected = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            puzzle_score = atoi(buffer);
+            nextPage=5;
+        }
 
         fclose(fileOpen);
-        nextPage=5;
-        stayConnected=1;
     }
     //Initialisation of the window
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
@@ -10705,7 +10711,13 @@ int main(int argc, char* argv[])
     }
     else
     {
-        remove("save.txt");
+        FILE *fp = fopen(filename, "w");
+        if (fp == NULL)
+        {
+            SDL_Log("Error when writing in the document: 'save.txt'");
+            return -1;
+        }
+        fprintf(fp, "2");
     }
     return 1;
 }
