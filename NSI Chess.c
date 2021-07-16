@@ -10595,7 +10595,6 @@ int main(int argc, char* argv[])
         nextPage=5;
         stayConnected=1;
     }
-    nextPage=13;
     //Initialisation of the window
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     SDL_Window* window = NULL;
