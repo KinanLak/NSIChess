@@ -52,10 +52,10 @@ int reception(char IP[])
 }
 int main()
 {
-    char paquet[] = "grosse merde";
+    char paquet[] = "gros chien";
     envoie(paquet);
     
-    char IP[] = "91.160.9.9";
+    char IP[] = "86.195.96.56";
     reception(IP);
     return 0;
 }

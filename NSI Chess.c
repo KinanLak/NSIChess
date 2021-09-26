@@ -5,8 +5,18 @@
 #include <SDL2/SDL_ttf.h>
 #include <mysql.h>
 #include <math.h>
+#include <winuser.h>
 //#include <SDL2/SDL_image.h>
 //#include <winsock2.h>
+
+typedef struct DataPlayerRank DataPlayerRank;
+struct DataPlayerRank
+{
+    int rank;
+    char FirstName[30];
+    int score;
+    int numberPuzzlePlayed;
+};
 
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
@@ -14,6 +24,7 @@ struct MoveStructure
 {
     int departureCase;
     int arrivalCase;
+    int bonus;
     MoveStructure *nextMove;
 };
 
@@ -26,7 +37,7 @@ struct FileMoveStructure
 
 //Creation of the prototypes
 FileMoveStructure *initialise(void);
-void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase);
+void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase, int bonus);
 void storeAllMovesSQL(FileMoveStructure *file, int gameId);
 
 
@@ -39,7 +50,7 @@ FileMoveStructure *initialise()
 }
 
 
-void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase)
+void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCase, int bonus)
 {
     MoveStructure *new = malloc(sizeof(*new));
     if (file == NULL || new == NULL)
@@ -49,6 +60,7 @@ void addMoveFile(FileMoveStructure *file, int newDepartureCase, int newArrivalCa
 
     new->departureCase = newDepartureCase;
     new->arrivalCase = newArrivalCase;
+    new->bonus = bonus;
     new->nextMove = NULL;
 
     if (file->firstMove != NULL)
@@ -118,7 +130,7 @@ void legalMovesKing(unsigned int* chessBoard, int position, int* rock, FileMoveS
 
 #define addMoveIfPossible(team, chessBoard, file, departure, arrival) if (!(caseIsInCheck(team, chessBoard, kingPosition(team, chessBoard))))\
                                                                         {\
-                                                                            addMoveFile(file, departure, arrival);\
+                                                                            addMoveFile(file, departure, arrival, 0);\
                                                                         }
 
 #define ifSimpleMovePossibleMakeIt(departure, arrival, team, file) unsigned int save = chessBoard[arrival];\
@@ -1292,21 +1304,27 @@ int caseIsInCheck(int team, unsigned int* chessBoard, int position)
 
 //Definitions of variables
 int stayConnected=0;
-int typeChessboard=1;
+
+int add_time=0;
+int leftOverTime=0;
+int local=1;
+
+int typeChessboard=2;
 int sound=1;
 int typePieces=1;
-int puzzle_score=0;
+int puzzle_score=1243;
 int userIdConnected=1;
 #define SCREEN_WIDTH 1920
 #define SCREEN_HEIGHT 1080
-#define xMinBoard 488
-#define xMaxBoard 1432
-#define yMinBoard 69
-#define yMaxBoard 1013
+
 #define lenSquare 118
 #define RED 255, 155, 155, 255
 #define REDLight 255, 200, 200, 255
 #define WHITE 255, 255, 255, 255
+
+#define GREEN 155, 255, 155, 255
+#define GREENLight 200, 255, 200, 255
+
 #define BLACK 0, 0, 0, 255
 #define GREYINPUT 211, 209, 209, 255
 
@@ -1315,6 +1333,10 @@ int userIdConnected=1;
 
 
 //Definition of images path
+#define PaintBGImageBMP "images/paint/paintBG.bmp"
+#define LeaderboardBGImageBMP "images/classement.bmp"
+#define PuzzleBGImageBMP "images/puzzle/puzzleBG.bmp"
+#define TimerImageBMP "images/timer.bmp"
 #define LoadPuzzleBGImageBMP "images/loadPuzzleBG.bmp"
 #define ConnexionBGImageBMP "images/connexion/connexionBG.bmp"
 #define InscriptionBGImageBMP "images/inscription/inscriptionBG.bmp"
@@ -1324,10 +1346,17 @@ int userIdConnected=1;
 #define BlackPromoteBarBMP "images/board/blackPB.bmp"
 #define HoverButtonConnexionBMP "images/connexion/hoverButtonConnexion.bmp"
 #define ButtonConnexionBMP "images/connexion/buttonConnexion.bmp"
+#define ResterConnecteConnexionBMP "images/connexion/connecte.bmp"
+#define HoverResterConnecteConnexionBMP "images/connexion/hoverConnecte.bmp"
+#define SelectedResterConnecteConnexionBMP "images/connexion/selectedConnecte.bmp"
+#define LostPasswordConnexionBMP "images/connexion/lostPassword.bmp"
+#define HoverLostPasswordConnexionBMP "images/connexion/hoverLostPassword.bmp"
+#define SelectedLostPasswordConnexionBMP "images/connexion/selectedLostPassword.bmp"
 #define HoverButtonInscriptionBMP "images/inscription/hoverButtonInscription.bmp"
 #define ButtonInscriptionBMP "images/inscription/buttonInscription.bmp"
 #define ModeSelectionBGImageBMP "images/main_menu/gameModeBG.bmp"
 #define TempsPartieBGImageBMP "images/main_menu/tempsPartieBG.bmp"
+#define StatsBGImageBMP "images/stats/statsBG.bmp"
 #define MenuBGImageBMP "images/main_menu/menuBG.bmp"
 #define WhiteBorderBGImageBMP "images/main_menu/whiteBorder.bmp"
 #define HoverRetourTimeBMP "images/main_menu/hoverRetour.bmp"
@@ -1342,11 +1371,11 @@ int userIdConnected=1;
 #define HoverJouerMainMenuBMP "images/main_menu/hoverJouer.bmp"
 #define AmisMainMenuBMP "images/main_menu/amis.bmp"
 #define HoverAmisMainMenuBMP "images/main_menu/hoverAmis.bmp"
-#define OptionsMainMenuBMP "images/main_menu/options.bmp"
-#define HoverOptionsMainMenuBMP "images/main_menu/hoverOptions.bmp"
+#define QuitMainMenuBMP "images/main_menu/quitter.bmp"
+#define HoverQuitMainMenuBMP "images/main_menu/hoverQuitter.bmp"
 #define HoverAmisMainMenuBMP "images/main_menu/hoverAmis.bmp"
-#define QuitterMainMenuBMP "images/main_menu/quitter.bmp"
-#define HoverQuitterMainMenuBMP "images/main_menu/hoverQuitter.bmp"
+#define StatsMainMenuBMP "images/main_menu/stats.bmp"
+#define HoverStatsMainMenuBMP "images/main_menu/hoverStats.bmp"
 #define ExitConfirmationBMP "images/exitConfirmation.bmp"
 #define OptionsSwitchOnImageBMP "images/options/switchButtonOn.bmp"
 #define OptionsSwitchOffImageBMP "images/options/switchButtonOff.bmp"
@@ -1356,13 +1385,41 @@ int userIdConnected=1;
 #define HoverLeftArrowOptionsImageBMP "images/options/hoverLeftArrow.bmp"
 #define DeconnexionOptionsImageBMP "images/options/deconnexionButton.bmp"
 #define HoverDeconnexionOptionsImageBMP "images/options/hoverDeconnexionButton.bmp"
+#define LeaveGameOptionsImageBMP "images/options/leaveGame.bmp"
+#define HoverLeaveGameOptionsImageBMP "images/options/hoverLeaveGame.bmp"
 #define TypePieces1OptionsImageBMP "images/options/pieces/type1.bmp"
 #define TypePieces2OptionsImageBMP "images/options/pieces/type2.bmp"
 #define TypePieces3OptionsImageBMP "images/options/pieces/type3.bmp"
 #define TypePieces4OptionsImageBMP "images/options/pieces/type4.bmp"
 #define TypePieces5OptionsImageBMP "images/options/pieces/type5.bmp"
-
 #define TypeChessboard1ImageBMP "images/board/types/type1.bmp"
+#define TypePuzzle1ImageBMP "images/puzzle/types/type1.bmp"
+#define MultiplayerSelectionImageBMP "images/main_menu/multiplayer.bmp"
+#define HoverMultiplayerSelectionImageBMP "images/main_menu/hoverMultiplayer.bmp"
+#define LocalSelectionImageBMP "images/main_menu/local.bmp"
+#define HoverLocalSelectionImageBMP "images/main_menu/hoverLocal.bmp"
+#define PseudoChoiceBGimageBMP "images/pseudos/pseudoBG.bmp"
+#define PseudoRetourimageBMP "images/pseudos/retour.bmp"
+#define HoverPseudoRetourimageBMP "images/pseudos/hoverRetour.bmp"
+#define PseudoValiderimageBMP "images/pseudos/valider.bmp"
+#define HoverPseudoValiderimageBMP "images/pseudos/hoverValider.bmp"
+#define PseudoBlackWhiteimageBMP "images/pseudos/blackWhite.bmp"
+#define PseudoWhiteBlackimageBMP "images/pseudos/whiteBlack.bmp"
+#define PseudoRandomimageBMP "images/pseudos/random.bmp"
+#define HintPuzzleimageBMP "images/puzzle/hint.bmp"
+#define HoverHintPuzzleimageBMP "images/puzzle/hoverHint.bmp"
+#define FlagPuzzleimageBMP "images/puzzle/flag.bmp"
+#define HoverFlagPuzzleimageBMP "images/puzzle/hoverFlag.bmp"
+#define DefeatPuzzleBGImageBMP "images/puzzle/loosePuzzle.bmp"
+#define VictoryPuzzleBGImageBMP "images/puzzle/winPuzzle.bmp"
+#define NextPuzzleImageBMP "images/puzzle/nextPuzzle.bmp"
+#define HoverNextPuzzleImageBMP "images/puzzle/hoverNextPuzzle.bmp"
+#define AccueilPuzzleImageBMP "images/puzzle/accueil.bmp"
+#define HoverAccueilPuzzleImageBMP "images/puzzle/hoverAccueil.bmp"
+
+#define PlayButtonLocalImageBMP "images/playButton.bmp"
+#define PauseButtonLocalImageBMP "images/pauseButton.bmp"
+
 
 
 #define TypeChessboard1OptionsImageBMP "images/options/chessboard/type1.bmp"
@@ -1376,11 +1433,11 @@ int userIdConnected=1;
 #define MailConfirmationBGImageBMP "images/inscription/mailConfirmation.bmp"
 #define MailConfirmationButtonImageBMP "images/inscription/validerButton.bmp"
 #define MailConfirmationButtonHoverImageBMP "images/inscription/hoverValiderButton.bmp"
-#define WinBGImageBMP "images/winBG.bmp"
-#define LooseBGImageBMP "images/looseBG.bmp"
-
-#define ButtonContinuerIssueGameBGImageBMP "images/continuer.bmp"
-#define HoverButtonContinuerIssueGameBGImageBMP "images/hoverContinuer.bmp"
+#define EndGameBGImageBMP "images/EndGame/endGameBG.bmp"
+#define ContinuerEndGameImageBMP "images/EndGame/continuer.bmp"
+#define HoverContinuerEndGameImageBMP "images/EndGame/hoverContinuer.bmp"
+#define RejouerEndGameImageBMP "images/EndGame/rejouer.bmp"
+#define HoverRejouerEndGameImageBMP "images/EndGame/hoverRejouer.bmp"
 
 
 #define BlackPawnImageBMP "/black/pawn.bmp"
@@ -1398,6 +1455,8 @@ int userIdConnected=1;
 #define WhiteBishopImageBMP "/white/bishop.bmp"
 
 //Definition of files path
+#define SwitchSound "sounds/switchSound.wav"
+#define WrongAnswerSound "sounds/wrongAnswer.wav"
 #define BoxSound "sounds/boxSound.wav"
 #define ButtonSound "sounds/buttonSound.wav"
 #define MoveSound "sounds/move.wav"
@@ -1477,6 +1536,40 @@ int userIdConnected=1;
         }\
         X = SDL_LoadBMP(pathBoard);\
         Y = SDL_CreateTextureFromSurface(render, X);    
+        
+
+#define ALLImageINITPuzzle(X,Y, render)   char pathPuzzle[]= TypePuzzle1ImageBMP;\
+        char* pointeurPathPuzzle=pathPuzzle;\
+        if (typeChessboard==2)\
+        {\
+            pointeurPathPuzzle[24]=50;\
+        }\
+        else if (typeChessboard==3)\
+        {\
+            pointeurPathPuzzle[24]=51;\
+        }\
+        else if (typeChessboard==4)\
+        {\
+            pointeurPathPuzzle[24]=52;\
+        }\
+        else if (typeChessboard==5)\
+        {\
+            pointeurPathPuzzle[24]=53;\
+        }\
+        else if (typeChessboard==6)\
+        {\
+            pointeurPathPuzzle[24]=54;\
+        }\
+        else if (typeChessboard==7)\
+        {\
+            pointeurPathPuzzle[24]=55;\
+        }\
+        else if (typeChessboard==8)\
+        {\
+            pointeurPathPuzzle[24]=56;\
+        }\
+        X = SDL_LoadBMP(pathPuzzle);\
+        Y = SDL_CreateTextureFromSurface(render, X);    
 
 
 
@@ -1488,7 +1581,6 @@ int userIdConnected=1;
 
 #define CreateRenderInNewWindow(window, render) window = SDL_CreateWindow("Logames", 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_SWSURFACE);\
     render = SDL_CreateRenderer(window, NOTHING, 0);
-
 
 #define departPosition { \
     4,2,3,6,7,3,2,4, \
@@ -1512,6 +1604,7 @@ int userIdConnected=1;
     SDL_Texture* textureWhiteBishop = NULL;\
     SDL_Texture* textureWhiteQueen = NULL; \
     SDL_Texture* textureWhiteKing = NULL;\
+    SDL_Texture* texturePuzzleBG = NULL;\
     SDL_Texture* textureBackground = NULL;\
     SDL_Texture* texturePoint = NULL;\
     SDL_Texture* textureWhitePromoteBar = NULL;\
@@ -1519,6 +1612,7 @@ int userIdConnected=1;
 
 
 #define initAllSurfaces() SDL_Surface* imageBlackPawn = NULL; \
+    SDL_Surface* imagePuzzleBG = NULL; \
     SDL_Surface* imageBlackKnight = NULL; \
     SDL_Surface* imageBlackRook = NULL; \
     SDL_Surface* imageBlackBishop = NULL; \
@@ -1547,6 +1641,7 @@ int userIdConnected=1;
                 }\
             }
 #define initAllBoardImages() ALLImageINITBoard(imageBackground, textureBackground, render)\
+    ALLImageINITPuzzle(imagePuzzleBG, texturePuzzleBG, render)\
     ALLImageINIT(imagePoint, texturePoint, PointImageBMP, render)\
     ALLImageAndTransparencyINITPieces(imageBlackPawn ,textureBlackPawn, BlackPawnImageBMP, render)\
     ALLImageAndTransparencyINITPieces(imageBlackRook ,textureBlackRook, BlackRookImageBMP, render)\
@@ -1565,14 +1660,18 @@ int userIdConnected=1;
 
 #define showPreviousMovesNonInversed()  if (previousMove[0]!=NOTHING)\
                         {\
+                            SDL_Rect rectPreviousMove;\
                             drawFullSquarePreviousMove(previousMove[0], render);\
                             drawFullSquarePreviousMove(previousMove[1], render);\
                         }
 
 #define showPreviousMovesInversed()  if (previousMove[0]!=NOTHING)\
                         {\
-                            drawFullSquarePreviousMove(63-previousMove[0], render);\
-                            drawFullSquarePreviousMove(63-previousMove[1], render);\
+                            SDL_Rect rectPreviousMove;\
+                            int a1=63-previousMove[0];\
+                            int a2=63-previousMove[1];\
+                            drawFullSquarePreviousMove(a1, render);\
+                            drawFullSquarePreviousMove(a2, render);\
                         }
 
 #define showPreviousMoves() if (inverse==1)\
@@ -1582,6 +1681,29 @@ int userIdConnected=1;
     else\
     {\
         showPreviousMovesNonInversed()\
+    }
+
+
+#define showHintNonInversed()  if (hintCase!=NOTHING)\
+                        {\
+                            SDL_Rect rectHint;\
+                            drawFullSquareHint(hintCase, render);\
+                        }
+
+#define showHintInversed()  if (hintCase!=NOTHING)\
+                        {\
+                            SDL_Rect rectHint;\
+                            int b1=63-hintCase;\
+                            drawFullSquareHint(b1, render);\
+                        }
+
+#define showHint() if (inverse==1)\
+    {\
+        showHintInversed()\
+    }\
+    else\
+    {\
+        showHintNonInversed()\
     }
 
 #define displayAllpiecesInRenderNonInversed() for (int i=0; i<64; i++)\
@@ -1679,9 +1801,6 @@ int userIdConnected=1;
                 }
 
 //Prototypes
-int giveCaseNumber(int eventX, int eventY);
-void drawSquare(int squareNumber, SDL_Renderer* render, int inverse);
-void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render);
 
 
 
@@ -1739,6 +1858,31 @@ int isMovePossible(int moveCandidat, FileMoveStructure* file)
     }
     return 0;
 }
+
+int sameChar(char* ptChar1, char* ptChar2)
+{
+    for (int i=0; i<6; i++)
+    {
+        if (ptChar1[i]!=ptChar2[i])
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
+int charHelp(char* ptChar)
+{
+    for (int i=0; i<6; i++)
+    {
+        if (ptChar[i]!=48)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int dayCorrectInThisMonth(int day,int month, int year)
 {
     if ((year%4==0) && ((year%400==0) || (year%100!=0)))
@@ -1775,6 +1919,56 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
     return dayCorrectInThisMonth(day, month, year);
 }
 
+#define showAllPlayer(begin, end) int cpt=0;\
+    for (int i=begin; i<end; i++)\
+    {\
+        if (i!=begin)\
+        {\
+            SDL_SetRenderDrawColor(render, 57, 57, 57, 255);\
+            SDL_RenderDrawLine(render, 572, 380+(cpt*70), 1348, 380+(cpt*70));\
+        }\
+\
+        char charLegendeRank[4];\
+        itoa(list[i].rank, charLegendeRank, 10);\
+        SDL_Surface * surfaceLegendeRank = TTF_RenderText_Solid(font, charLegendeRank, color);\
+        SDL_Texture * textureLegendeRank = SDL_CreateTextureFromSurface(render, surfaceLegendeRank);\
+        int texWLegendeRank, texHLegendeRank;\
+        SDL_QueryTexture(textureLegendeRank, NULL, NULL, &texWLegendeRank, &texHLegendeRank);\
+        SDL_Rect sdlRectLegendeRank = {620, 400+(cpt*70), texWLegendeRank, texHLegendeRank};\
+        SDL_RenderCopy(render, textureLegendeRank, NULL, &sdlRectLegendeRank);\
+\
+        SDL_Log(list[i].FirstName);\
+        SDL_Surface * surfaceLegendePrenom = TTF_RenderText_Solid(font, list[i].FirstName, color);\
+        SDL_Texture * textureLegendePrenom = SDL_CreateTextureFromSurface(render, surfaceLegendePrenom);\
+        int texWLegendePrenom, texHLegendePrenom;\
+        SDL_QueryTexture(textureLegendePrenom, NULL, NULL, &texWLegendePrenom, &texHLegendePrenom);\
+        SDL_Rect sdlRectLegendePrenom = {770, 400+(cpt*70), texWLegendePrenom, texHLegendePrenom};\
+        SDL_RenderCopy(render, textureLegendePrenom, NULL, &sdlRectLegendePrenom);\
+\
+        char charLegendeScore[4];\
+        itoa(list[i].score, charLegendeScore, 10);\
+        SDL_Surface * surfaceLegendeScore = TTF_RenderText_Solid(font, charLegendeScore, color);\
+        SDL_Texture * textureLegendeScore = SDL_CreateTextureFromSurface(render, surfaceLegendeScore);\
+        int texWLegendeScore, texHLegendeScore;\
+        SDL_QueryTexture(textureLegendeScore, NULL, NULL, &texWLegendeScore, &texHLegendeScore);\
+        SDL_Rect sdlRectLegendeScore = {1000, 400+(cpt*70), texWLegendeScore, texHLegendeScore};\
+        SDL_RenderCopy(render, textureLegendeScore, NULL, &sdlRectLegendeScore);\
+\
+        char charLegendeNumberPuzzles[4];\
+        itoa(list[i].numberPuzzlePlayed, charLegendeNumberPuzzles, 10);\
+        SDL_Surface * surfaceLegendeNumberPuzzles = TTF_RenderText_Solid(font, charLegendeNumberPuzzles, color);\
+        SDL_Texture * textureLegendeNumberPuzzles = SDL_CreateTextureFromSurface(render, surfaceLegendeNumberPuzzles);\
+        int texWLegendeNumberPuzzles, texHLegendeNumberPuzzles;\
+        SDL_QueryTexture(textureLegendeNumberPuzzles, NULL, NULL, &texWLegendeNumberPuzzles, &texHLegendeNumberPuzzles);\
+        SDL_Rect sdlRectLegendeNumberPuzzles = {1220, 400+(cpt*70), texWLegendeNumberPuzzles, texHLegendeNumberPuzzles};\
+        SDL_RenderCopy(render, textureLegendeNumberPuzzles, NULL, &sdlRectLegendeNumberPuzzles);\
+        cpt+=1;\
+    }
+
+
+#define showPuzzleInformations() SDL_RenderCopy(render, texturePuzzleId, NULL, &sdlRectPuzzleId);\
+    SDL_RenderCopy(render, texturePuzzleScore, NULL, &sdlRectPuzzleScore);\
+    SDL_RenderCopy(render, textureMyPuzzleScore, NULL, &sdlRectMyPuzzleScore);
 
 #define showTextesConnexion() changeValueConnexion1() \
                 surfaceConnexion1 = TTF_RenderText_Solid(font, strConnexion1, color); \
@@ -1788,6 +1982,25 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                 SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2); \
                 SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2}; \
                 SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
+
+#define showTextesPseudo() changeValuePseudo1() \
+                surfacePseudo1 = TTF_RenderText_Solid(font, strPseudo1, color); \
+                texturePseudo1 = SDL_CreateTextureFromSurface(render, surfacePseudo1); \
+                SDL_QueryTexture(texturePseudo1, NULL, NULL, &texWPseudo1, &texHPseudo1); \
+                if (1)\
+                {\
+                    SDL_Rect sdlRectPseudo1 = {568, 526, texWPseudo1, texHPseudo1}; \
+                    SDL_RenderCopy(render, texturePseudo1, NULL, &sdlRectPseudo1); \
+                }\
+                changeValuePseudo2() \
+                surfacePseudo2 = TTF_RenderText_Solid(font, strPseudo2, color); \
+                texturePseudo2 = SDL_CreateTextureFromSurface(render, surfacePseudo2); \
+                SDL_QueryTexture(texturePseudo2, NULL, NULL, &texWPseudo2, &texHPseudo2); \
+                if (1)\
+                {\
+                    SDL_Rect sdlRectPseudo2 = {1038, 526, texWPseudo2, texHPseudo2}; \
+                    SDL_RenderCopy(render, texturePseudo2, NULL, &sdlRectPseudo2);\
+                }
 
 #define showTextesInscription() changeValueInscription1()\
                 surfaceInscription1 = TTF_RenderText_Solid(font, strInscription1, color);\
@@ -1945,6 +2158,34 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
     rect.h = 42;\
     SDL_RenderDrawRect(render, &rect);
 
+#define focusPseudo1() focus=1;\
+    SDL_SetRenderDrawColor(render, WHITE);\
+    SDL_Rect rect;\
+    rect.x = 564;\
+    rect.y = 521;\
+    rect.w = 326;\
+    rect.h = 40;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = 563;\
+    rect.y = 520;\
+    rect.w = 328;\
+    rect.h = 42;\
+    SDL_RenderDrawRect(render, &rect);
+
+#define focusPseudo2() focus=2;\
+    SDL_SetRenderDrawColor(render, WHITE);\
+    SDL_Rect rect;\
+    rect.x = 1031;\
+    rect.y = 521;\
+    rect.w = 327;\
+    rect.h = 40;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = 1030;\
+    rect.y = 520;\
+    rect.w = 329;\
+    rect.h = 42;\
+    SDL_RenderDrawRect(render, &rect);
+
 #define changeValueConnexion1() SDL_SetRenderDrawColor(render, GREYINPUT);\
     SDL_Rect rectFill1;\
     rectFill1.x = 594;\
@@ -1958,6 +2199,21 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
     rectFill2.x = 592;\
     rectFill2.y = 645;\
     rectFill2.w = 732;\
+    rectFill2.h = 38;\
+    SDL_RenderFillRect(render, &rectFill2);
+
+#define changeValuePseudo1() SDL_SetRenderDrawColor(render, 242, 242, 242, 255);\
+    rectFill1.x = 565;\
+    rectFill1.y = 522;\
+    rectFill1.w = 324;\
+    rectFill1.h = 38;\
+    SDL_RenderFillRect(render, &rectFill1);
+
+
+#define changeValuePseudo2() SDL_SetRenderDrawColor(render, 242, 242, 242, 255);\
+    rectFill2.x = 1032;\
+    rectFill2.y = 522;\
+    rectFill2.w = 325;\
     rectFill2.h = 38;\
     SDL_RenderFillRect(render, &rectFill2);
 
@@ -2088,21 +2344,80 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                         }\
                         break;
 
+
+#define keyPressedPseudo(key, valueKey, valueKeyShift, valueKeyAlt, valueMax) case key:\
+                        if (focus==1)\
+                        {\
+                            if (cptNumberOfValuesPseudo1<valueMax)\
+                            {\
+                                if ((rightAlt==1 || leftAlt==1) && (leftShift==1 || rightShift==1))\
+                                {\
+                                }\
+                                else if (rightAlt==1 || leftAlt==1)\
+                                {\
+                                    if (valueKeyAlt!=-1)\
+                                    {\
+                                        strPointeurPseudo1[cptNumberOfValuesPseudo1]= valueKeyAlt;\
+                                        cptNumberOfValuesPseudo1+=1;\
+                                    }\
+                                }\
+                                else if (leftShift==1 || rightShift==1)\
+                                {\
+                                    if (valueKeyShift!=-1)\
+                                    {\
+                                        strPointeurPseudo1[cptNumberOfValuesPseudo1]= valueKeyShift;\
+                                        cptNumberOfValuesPseudo1+=1;\
+                                    }\
+                                }\
+                                else\
+                                {\
+                                    if (valueKey!=-1)\
+                                    {\
+                                        strPointeurPseudo1[cptNumberOfValuesPseudo1]= valueKey;\
+                                        cptNumberOfValuesPseudo1+=1;\
+                                    }\
+                                }\
+                            }\
+                        }\
+                        else if (focus==2)\
+                        {\
+                            if (cptNumberOfValuesPseudo2<valueMax)\
+                            {\
+                                if ((rightAlt==1 || leftAlt==1) && (leftShift==1 || rightShift==1))\
+                                {\
+                                }\
+                                else if (rightAlt==1 || leftAlt==1)\
+                                {\
+                                    if (valueKeyAlt!=-1)\
+                                    {\
+                                        strPointeurPseudo2[cptNumberOfValuesPseudo2]= valueKeyAlt;\
+                                        cptNumberOfValuesPseudo2+=1;\
+                                    }\
+                                }\
+                                else if (leftShift==1 || rightShift==1)\
+                                {\
+                                    if (valueKeyShift!=-1)\
+                                    {\
+                                        strPointeurPseudo2[cptNumberOfValuesPseudo2]= valueKeyShift;\
+                                        cptNumberOfValuesPseudo2+=1;\
+                                    }\
+                                }\
+                                else\
+                                {\
+                                    if (valueKey!=-1)\
+                                    {\
+                                        strPointeurPseudo2[cptNumberOfValuesPseudo2]= valueKey;\
+                                        cptNumberOfValuesPseudo2+=1;\
+                                    }\
+                                }\
+                            }\
+                        }\
+                        break;
+
 #define keyPressedCodeValidation(key, valueKey, valueKeyShift, valueKeyAlt) case key:\
                         if (cptNumberOfValuesConfirmation<limitCharDate)\
                         {\
-                            if ((rightAlt==1 || leftAlt==1) && (leftShift==1 || rightShift==1))\
-                            {\
-                            }\
-                            else if (rightAlt==1 || leftAlt==1)\
-                            {\
-                                if ((valueKeyAlt!=-1) && (valueKeyAlt>47 && valueKeyAlt<58))\
-                                {\
-                                    strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]= valueKeyAlt;\
-                                    cptNumberOfValuesConfirmation+=1;\
-                                }\
-                            }\
-                            else if (leftShift==1 || rightShift==1)\
+                            if (1)\
                             {\
                                 if ((valueKeyShift!=-1) && (valueKeyShift>47 && valueKeyShift<58))\
                                 {\
@@ -2372,7 +2687,7 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                         }\
                         else if (focus==2)\
                         {\
-                            if (cptNumberOfValuesConnexion1>0)\
+                            if (cptNumberOfValuesConnexion2>0)\
                             {\
                                 cptNumberOfValuesConnexion2-=1;\
                                 strPointeurConnexion2[cptNumberOfValuesConnexion2]=32;\
@@ -2383,6 +2698,7 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                     case SDLK_TAB:\
                         if (focus==0)\
                         {\
+                            playSound(BoxSound)\
                             SDL_RenderClear(render);\
                             SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);\
                             changeValueConnexion1()\
@@ -2393,10 +2709,10 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                             {\
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);\
                             }\
-                            SDL_RenderPresent(render);\
                         }\
                         else if (focus==1)\
                         {\
+                            playSound(BoxSound)\
                             SDL_RenderClear(render);\
                             SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);\
                             changeValueConnexion2()\
@@ -2407,8 +2723,16 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                             {\
                                 SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);\
                             }\
-                            SDL_RenderPresent(render);\
                         }\
+                        if (resterConnecte==0)\
+                        {\
+                            SDL_RenderCopy(render, textureResterConnecte, NULL, &rectResterConnecte);\
+                        }\
+                        else\
+                        {\
+                            SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);\
+                        }\
+                        SDL_RenderPresent(render);\
                         break;\
                     keyPressedConnexion(SDLK_a, 97, 65, -1, limitChar)\
                     keyPressedConnexion(SDLK_b, 98, 66, -1, limitChar)\
@@ -2467,6 +2791,11 @@ int verificationOfTheDayOfBirth(char* strPointeurInscription3)
                         SDL_Rect sdlRectChamps1 = {x, y, texWChamps1, texHChamps1};\
                         SDL_RenderCopy(render, textureChampsVide, NULL, &sdlRectChamps1);
 
+#define initSound() SDL_AudioSpec wavSpec;\
+                    Uint32 wavLength;\
+                    Uint8 *wavBuffer;\
+                    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);\
+                    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
 int emailFormatCorrect(char* string, int stringSize)
 {
@@ -2514,26 +2843,67 @@ int charSame(char* string1, char* string2, int sizeString1, int sizeString2)
 }
 
 
-int intAndCharSame(int codeConfirmation, char* string, int sizeString)
-{
-    if (sizeString!=6)
-    {
-        return 0;
-    }
-    int intUser=0;
-    for (int i=5; i>=0; i--)
-    {
-        int pow=1;
-        for (int ii=0; ii>i; ii++)
-        {
-            pow = pow*10;
-        }
-        intUser += (string[5-i]-48)*pow;
-    }
-    return 1;
-}
+#define giveCaseNumberPlayer() (((event.button.x-xMinBoard)/lenSquare) + (((event.button.y-yMinBoard)/lenSquare)*8))
 
+#define drawFullSquarePreviousMove(squareNumber, render) if (((squareNumber/8)+(squareNumber%8))%2==0)\
+    {\
+        SDL_SetRenderDrawColor(render, REDLight);\
+    }\
+    else\
+    {\
+        SDL_SetRenderDrawColor(render, RED);\
+    }\
+    rectPreviousMove.x = (xMinBoard+(squareNumber%8)*lenSquare);\
+    rectPreviousMove.y = (yMinBoard+(squareNumber/8)*lenSquare);\
+    rectPreviousMove.w = lenSquare;\
+    rectPreviousMove.h = lenSquare;\
+    SDL_RenderFillRect(render, &rectPreviousMove);
 
+#define drawFullSquareHint(squareNumber, render) if (((squareNumber/8)+(squareNumber%8))%2==0)\
+    {\
+        SDL_SetRenderDrawColor(render, GREENLight);\
+    }\
+    else\
+    {\
+        SDL_SetRenderDrawColor(render, GREEN);\
+    }\
+    rectHint.x = (xMinBoard+(squareNumber%8)*lenSquare);\
+    rectHint.y = (yMinBoard+(squareNumber/8)*lenSquare);\
+    rectHint.w = lenSquare;\
+    rectHint.h = lenSquare;\
+    SDL_RenderFillRect(render, &rectHint)
+
+#define drawSquarePlayer(squareNumber, render, inverse) int testA=squareNumber;\
+    if (inverse==1)\
+    {\
+        testA = 63-squareNumber;\
+    }\
+    SDL_Rect rect;\
+    rect.x = (xMinBoard+(testA%8)*lenSquare);\
+    rect.y = (yMinBoard+(testA/8)*lenSquare);\
+    rect.w = lenSquare;\
+    rect.h = lenSquare;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+1);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare+1);\
+    rect.w = lenSquare-2;\
+    rect.h = lenSquare-2;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+2);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare)+2;\
+    rect.w = lenSquare-4;\
+    rect.h = lenSquare-4;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+3);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare+3);\
+    rect.w = lenSquare-6;\
+    rect.h = lenSquare-6;\
+    SDL_RenderDrawRect(render, &rect);\
+    rect.x = (xMinBoard + (testA % 8) * lenSquare+4);\
+    rect.y = (yMinBoard + (testA / 8) * lenSquare+4);\
+    rect.w = lenSquare-8;\
+    rect.h = lenSquare-8;\
+    SDL_RenderDrawRect(render, &rect);
 
 #define showTypePieces() SDL_SetRenderDrawColor(render, 160, 160, 160, 255);\
         SDL_RenderFillRect(render, &rectTypePieces);\
@@ -2595,6 +2965,8 @@ int intAndCharSame(int codeConfirmation, char* string, int sizeString)
 
 int doYouWantToQuitNoTime(SDL_Renderer* render)
 {
+    initSound()
+
     SDL_Surface* imageExitConfirmationBackground = NULL;
     SDL_Texture* textureExitConfirmationBackground = NULL;
     ALLImageAndTransparencyINIT(imageExitConfirmationBackground, textureExitConfirmationBackground, ExitConfirmationBMP, render)
@@ -2607,6 +2979,13 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
         SDL_WaitEvent(&event);
         switch(event.type)
         {
+            case SDL_KEYDOWN:
+                switch( event.key.keysym.sym )
+                {
+                    case SDLK_ESCAPE:
+                        return 0;
+                        break;
+                }
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x>604 && event.button.x<1315 && event.button.y>386 && event.button.y<609)
                 {
@@ -2630,6 +3009,8 @@ int doYouWantToQuitNoTime(SDL_Renderer* render)
 
 int optionNoTime(SDL_Renderer* render)
 {
+    initSound()
+
     SDL_Surface* imageOptionsBG = NULL;
     SDL_Texture* textureOptionsBG = NULL;
     ALLImageAndTransparencyINIT(imageOptionsBG, textureOptionsBG, OptionsBGImageBMP, render)
@@ -2754,6 +3135,15 @@ int optionNoTime(SDL_Renderer* render)
     {
         SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
     }
+
+    if (stayConnected==1)
+    {
+        SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch2);
+    }
+    else
+    {
+        SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch2);
+    }
     SDL_RenderPresent(render);
     SDL_Event event;
     int continuer = 1;
@@ -2832,11 +3222,19 @@ int optionNoTime(SDL_Renderer* render)
                     //not rightArrow2
                 }
                 break;
+            case SDL_KEYDOWN:
+                switch( event.key.keysym.sym )
+                {
+                    case SDLK_ESCAPE:
+                        return 0;
+                        break;
+                }
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x>466 && event.button.x<1455 && event.button.y>331 && event.button.y<886)
                 {
                     if (event.button.x>504 && event.button.x<569 && event.button.y>331 && event.button.y<398)
                     {
+                        playSound(ButtonSound)
                         return 0;
                         //Back button
                     }
@@ -2853,11 +3251,13 @@ int optionNoTime(SDL_Renderer* render)
                             sound=1;
                             SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
                             SDL_RenderPresent(render);
+                            playSound(SwitchSound)
                         }
                         //switch1
                     }
                     else if (event.button.x>892 && event.button.x<1007 && event.button.y>624 && event.button.y<680)
                     {
+                        playSound(SwitchSound)
                         if (stayConnected==1)
                         {
                             stayConnected=0;
@@ -2874,12 +3274,14 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>520 && event.button.x<789 && event.button.y>766 && event.button.y<848)
                     {
+                        playSound(ButtonSound)
                         stayConnected=0;
                         return 1;
                         //déconnexion
                     }
                     else if (event.button.x>865 && event.button.x<893 && event.button.y>791 && event.button.y<822)
                     {
+                        playSound(ButtonSound)
                         if (typePieces==1)
                         {
                             typePieces=5;
@@ -2894,6 +3296,7 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>1046 && event.button.x<1074 && event.button.y>791 && event.button.y<822)
                     {
+                        playSound(ButtonSound)
                         if (typePieces==5)
                         {
                             typePieces=1;
@@ -2908,6 +3311,7 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>1198 && event.button.x<1226 && event.button.y>791 && event.button.y<822)
                     {
+                        playSound(ButtonSound)
                         if (typeChessboard==1)
                         {
                             typeChessboard=8;
@@ -2922,6 +3326,7 @@ int optionNoTime(SDL_Renderer* render)
                     }
                     else if (event.button.x>1287 && event.button.x<1315 && event.button.y>791 && event.button.y<822)
                     {
+                        playSound(ButtonSound)
                         if (typeChessboard==8)
                         {
                             typeChessboard=1;
@@ -2932,6 +3337,354 @@ int optionNoTime(SDL_Renderer* render)
                         }
                         showTypeChessboard()
                         SDL_RenderPresent(render);
+                        //rightArrow2
+                    }
+                }
+                else
+                {
+                    continuer=0;
+                }
+                break;
+        }
+    }
+    return 0;
+}
+
+
+
+int optionGame(SDL_Renderer* render, int timeLeftOver)
+{
+    initSound()
+
+    SDL_Surface* imageOptionsBG = NULL;
+    SDL_Texture* textureOptionsBG = NULL;
+    ALLImageAndTransparencyINIT(imageOptionsBG, textureOptionsBG, OptionsBGImageBMP, render)
+
+    SDL_Surface* imageTypepieces1BG = NULL;
+    SDL_Texture* textureTypepieces1BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces1BG, textureTypepieces1BG, TypePieces1OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces2BG = NULL;
+    SDL_Texture* textureTypepieces2BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces2BG, textureTypepieces2BG, TypePieces2OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces3BG = NULL;
+    SDL_Texture* textureTypepieces3BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces3BG, textureTypepieces3BG, TypePieces3OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces4BG = NULL;
+    SDL_Texture* textureTypepieces4BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces4BG, textureTypepieces4BG, TypePieces4OptionsImageBMP, render)
+    SDL_Surface* imageTypepieces5BG = NULL;
+    SDL_Texture* textureTypepieces5BG = NULL;
+    ALLImageAndTransparencyINIT(imageTypepieces5BG, textureTypepieces5BG, TypePieces5OptionsImageBMP, render)
+    SDL_Rect rectTypePieces;
+    rectTypePieces.x= 915;
+    rectTypePieces.y= 753;
+    rectTypePieces.w= 100;
+    rectTypePieces.h= 100;
+    time_t endTime;
+    time(&endTime);
+    endTime+=timeLeftOver;
+
+    SDL_Surface* imageTypeChessboard1BG = NULL;
+    SDL_Texture* textureTypeChessboard1BG = NULL;
+    ALLImageINIT(imageTypeChessboard1BG, textureTypeChessboard1BG, TypeChessboard1OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard2BG = NULL;
+    SDL_Texture* textureTypeChessboard2BG = NULL;
+    ALLImageINIT(imageTypeChessboard2BG, textureTypeChessboard2BG, TypeChessboard2OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard3BG = NULL;
+    SDL_Texture* textureTypeChessboard3BG = NULL;
+    ALLImageINIT(imageTypeChessboard3BG, textureTypeChessboard3BG, TypeChessboard3OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard4BG = NULL;
+    SDL_Texture* textureTypeChessboard4BG = NULL;
+    ALLImageINIT(imageTypeChessboard4BG, textureTypeChessboard4BG, TypeChessboard4OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard5BG = NULL;
+    SDL_Texture* textureTypeChessboard5BG = NULL;
+    ALLImageINIT(imageTypeChessboard5BG, textureTypeChessboard5BG, TypeChessboard5OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard6BG = NULL;
+    SDL_Texture* textureTypeChessboard6BG = NULL;
+    ALLImageINIT(imageTypeChessboard6BG, textureTypeChessboard6BG, TypeChessboard6OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard7BG = NULL;
+    SDL_Texture* textureTypeChessboard7BG = NULL;
+    ALLImageINIT(imageTypeChessboard7BG, textureTypeChessboard7BG, TypeChessboard7OptionsImageBMP, render)
+    SDL_Surface* imageTypeChessboard8BG = NULL;
+    SDL_Texture* textureTypeChessboard8BG = NULL;
+    ALLImageINIT(imageTypeChessboard8BG, textureTypeChessboard8BG, TypeChessboard8OptionsImageBMP, render)
+    SDL_Rect rectTypeChessboard;
+    rectTypeChessboard.x= 1134;
+    rectTypeChessboard.y= 523;
+    rectTypeChessboard.w= 248;
+    rectTypeChessboard.h= 248;
+
+    SDL_Surface* imageSwitchOnBG = NULL;
+    SDL_Texture* textureSwitchOnBG = NULL;
+    ALLImageAndTransparencyINIT(imageSwitchOnBG, textureSwitchOnBG, OptionsSwitchOnImageBMP, render)
+
+    SDL_Surface* imageSwitchOffBG = NULL;
+    SDL_Texture* textureSwitchOffBG = NULL;
+    ALLImageAndTransparencyINIT(imageSwitchOffBG, textureSwitchOffBG, OptionsSwitchOffImageBMP, render)
+
+    SDL_Rect rectSwitch1;
+    rectSwitch1.x= 893;
+    rectSwitch1.y= 525;
+    rectSwitch1.w= 114;
+    rectSwitch1.h= 55;
+
+    SDL_Rect rectSwitch2;
+    rectSwitch2.x= 893;
+    rectSwitch2.y= 625;
+    rectSwitch2.w= 114;
+    rectSwitch2.h= 55;
+
+    SDL_Surface* imageLeaveGameBG = NULL;
+    SDL_Texture* textureLeaveGameBG = NULL;
+    ALLImageAndTransparencyINIT(imageLeaveGameBG, textureLeaveGameBG, LeaveGameOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverLeaveGameBG = NULL;
+    SDL_Texture* textureHoverLeaveGameBG = NULL;
+    ALLImageAndTransparencyINIT(imageHoverLeaveGameBG, textureHoverLeaveGameBG, HoverLeaveGameOptionsImageBMP, render)
+
+    SDL_Rect rectDeconnexion;
+    rectDeconnexion.x= 521;
+    rectDeconnexion.y= 767;
+    rectDeconnexion.w= 268;
+    rectDeconnexion.h= 81;
+
+    SDL_Surface* imageRightArrow = NULL;
+    SDL_Texture* textureRightArrow = NULL;
+    ALLImageAndTransparencyINIT(imageRightArrow, textureRightArrow, RightArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageLeftArrow = NULL;
+    SDL_Texture* textureLeftArrow = NULL;
+    ALLImageAndTransparencyINIT(imageLeftArrow, textureLeftArrow, LeftArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverRightArrow = NULL;
+    SDL_Texture* textureHoverRightArrow = NULL;
+    ALLImageAndTransparencyINIT(imageHoverRightArrow, textureHoverRightArrow, HoverRightArrowOptionsImageBMP, render)
+
+    SDL_Surface* imageHoverLeftArrow = NULL;
+    SDL_Texture* textureHoverLeftArrow = NULL;
+    ALLImageAndTransparencyINIT(imageHoverLeftArrow, textureHoverLeftArrow, HoverLeftArrowOptionsImageBMP, render)
+
+    SDL_Rect rectArrow;
+    rectArrow.x= 0;
+    rectArrow.y= 792;
+    rectArrow.w= 27;
+    rectArrow.h= 30;
+
+
+    SDL_RenderCopy(render, textureOptionsBG, NULL, NULL);
+    showTypePieces()
+    showTypeChessboard()
+    if (sound==1)
+    {
+        SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
+    }
+    else
+    {
+        SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
+    }
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_PollEvent(&event);
+        if (endTime<=time(NULL))
+        {
+            return 0;
+        }
+        switch(event.type)
+        {
+            case SDL_KEYDOWN:
+                switch( event.key.keysym.sym )
+                {
+                    case SDLK_ESCAPE:
+                        return 0;
+                        break;
+                }
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>520 && event.motion.x<789 && event.motion.y>766 && event.motion.y<848)
+                {
+                    SDL_RenderCopy(render, textureHoverLeaveGameBG, NULL, &rectDeconnexion);
+                    SDL_RenderPresent(render);
+                    //déconnexion
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureLeaveGameBG, NULL, &rectDeconnexion);
+                    SDL_RenderPresent(render);
+                    //not déconnexion
+                }
+                if (event.motion.x>865 && event.motion.x<893 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=866;
+                    SDL_RenderCopy(render, textureHoverLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //leftArrow1
+                }
+                else
+                {
+                    rectArrow.x=866;
+                    SDL_RenderCopy(render, textureLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not leftArrow1
+                }
+                if (event.motion.x>1198 && event.motion.x<1226 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1199;
+                    SDL_RenderCopy(render, textureHoverLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //leftArrow2
+                }
+                else
+                {
+                    rectArrow.x=1199;
+                    SDL_RenderCopy(render, textureLeftArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not leftArrow2
+                }
+                if (event.motion.x>1046 && event.motion.x<1074 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1047;
+                    SDL_RenderCopy(render, textureHoverRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //rightArrow1
+                }
+                else
+                {
+                    rectArrow.x=1047;
+                    SDL_RenderCopy(render, textureRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not rightArrow1
+                }
+                if (event.motion.x>1287 && event.motion.x<1315 && event.motion.y>791 && event.motion.y<822)
+                {
+                    rectArrow.x=1288;
+                    SDL_RenderCopy(render, textureHoverRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //rightArrow2
+                }
+                else
+                {
+                    rectArrow.x=1288;
+                    SDL_RenderCopy(render, textureRightArrow, NULL, &rectArrow);
+                    SDL_RenderPresent(render);
+                    //not rightArrow2
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>466 && event.button.x<1455 && event.button.y>331 && event.button.y<886)
+                {
+                    if (event.button.x>504 && event.button.x<569 && event.button.y>331 && event.button.y<398)
+                    {
+                        playSound(ButtonSound)
+                        SDL_Delay(250);
+                        return 0;
+                        //Back button
+                    }
+                    else if (event.button.x>892 && event.button.x<1007 && event.button.y>524 && event.button.y<580)
+                    {
+                        if (sound==1)
+                        {
+                            sound=0;
+                            SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch1);
+                            SDL_RenderPresent(render);
+                        }
+                        else
+                        {
+                            sound=1;
+                            SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch1);
+                            SDL_RenderPresent(render);
+                            playSound(SwitchSound)
+                        }
+                        SDL_Delay(250);
+                        //switch1
+                    }
+                    else if (event.button.x>892 && event.button.x<1007 && event.button.y>624 && event.button.y<680)
+                    {
+                        playSound(SwitchSound)
+                        if (stayConnected==1)
+                        {
+                            stayConnected=0;
+                            SDL_RenderCopy(render, textureSwitchOffBG, NULL, &rectSwitch2);
+                            SDL_RenderPresent(render);
+                        }
+                        else
+                        {
+                            stayConnected=1;
+                            SDL_RenderCopy(render, textureSwitchOnBG, NULL, &rectSwitch2);
+                            SDL_RenderPresent(render);
+                        }
+                        SDL_Delay(250);
+                        //switch2
+                    }
+                    else if (event.button.x>520 && event.button.x<789 && event.button.y>766 && event.button.y<848)
+                    {
+                        playSound(ButtonSound)
+                        return 1;
+                        //déconnexion
+                    }
+                    else if (event.button.x>865 && event.button.x<893 && event.button.y>791 && event.button.y<822)
+                    {
+                        playSound(ButtonSound)
+                        if (typePieces==1)
+                        {
+                            typePieces=5;
+                        }
+                        else
+                        {
+                            typePieces-=1;
+                        }
+                        showTypePieces()
+                        SDL_RenderPresent(render);
+                        SDL_Delay(250);
+                        //leftArrow1
+                    }
+                    else if (event.button.x>1046 && event.button.x<1074 && event.button.y>791 && event.button.y<822)
+                    {
+                        playSound(ButtonSound)
+                        if (typePieces==5)
+                        {
+                            typePieces=1;
+                        }
+                        else
+                        {
+                            typePieces+=1;
+                        }
+                        showTypePieces()
+                        SDL_RenderPresent(render);
+                        SDL_Delay(250);
+                        //rightArrow1
+                    }
+                    else if (event.button.x>1198 && event.button.x<1226 && event.button.y>791 && event.button.y<822)
+                    {
+                        playSound(ButtonSound)
+                        if (typeChessboard==1)
+                        {
+                            typeChessboard=8;
+                        }
+                        else
+                        {
+                            typeChessboard-=1;
+                        }
+                        showTypeChessboard()
+                        SDL_RenderPresent(render);
+                        SDL_Delay(250);
+                        //leftArrow2
+                    }
+                    else if (event.button.x>1287 && event.button.x<1315 && event.button.y>791 && event.button.y<822)
+                    {
+                        playSound(ButtonSound)
+                        if (typeChessboard==8)
+                        {
+                            typeChessboard=1;
+                        }
+                        else
+                        {
+                            typeChessboard+=1;
+                        }
+                        showTypeChessboard()
+                        SDL_RenderPresent(render);
+                        SDL_Delay(250);
                         //rightArrow2
                     }
                 }
@@ -2965,13 +3718,51 @@ void listMovesToFile(FileMoveStructure* file, char* listMoves)
         cpt+=2;
 
         arrival = ((8-(listMoves[cpt+1]-48))*8) + (listMoves[cpt]-97);
-        cpt+=3;
-
-        addMoveFile(file, departure, arrival);
+        cpt+=2;
+        if (listMoves[cpt]==32)
+        {
+            cpt+=1;
+            addMoveFile(file, departure, arrival, 0);
+        }
+        else
+        {
+            int BonusNB=0;
+            if (listMoves[cpt]==113)
+            {
+                BonusNB=6;
+            }
+            else if (listMoves[cpt]==114)
+            {
+                BonusNB=4;
+            }
+            else if (listMoves[cpt]==110)
+            {
+                BonusNB=3;
+            }
+            else if (listMoves[cpt]==98)
+            {
+                BonusNB=2;
+            }
+            addMoveFile(file, departure, arrival, BonusNB);
+            cpt+=2;
+        }
     }
 }
 
-void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, int* enPassant)
+int nextMoveFile(FileMoveStructure *file)
+{
+    if ((file->firstMove)->nextMove!=NULL)
+    {
+        file->firstMove = (file->firstMove)->nextMove;
+        return 0;
+    }
+    else
+    {
+        return 1;
+    }
+}
+
+void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, int* inverse, int* enPassant)
 {
     int cptStr=0;
     int cptChessBoard=0;
@@ -3060,10 +3851,12 @@ void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, 
     if (fen[cptStr]==119)
     {
         *teamToPlay=1;
+        *inverse=0;
     }
     else
     {
         *teamToPlay=0;
+        *inverse=1;
     }
     cptStr+=2;
     if (fen[cptStr]==45)
@@ -3113,15 +3906,1518 @@ void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, 
     }
 }
 
-//---------------------------------------------------------------------------------
-//------------------------------------All Pages------------------------------------
-//---------------------------------------------------------------------------------
+void emptyChar(char* charName, int length)
+{
+    for (int i=0; i<length; i++)
+    {
+        charName[i]=32;
+    }
+    charName[length]=0;
+}
 
+int maxValueList(int* charValues, int lengthChar)
+{
+    int max=0; //all values of int >0
+    for (int i=0; i<lengthChar; i++)
+    {
+        if (max<charValues[i])
+        {
+            max=charValues[i];
+        }
+    }
+    return max;
+}
+
+int minValueList(int* charValues, int lengthChar)
+{
+    int min=10000; //all values of int <10 000
+    for (int i=0; i<lengthChar; i++)
+    {
+        if (min>charValues[i])
+        {
+            min=charValues[i];
+        }
+    }
+    return min;
+}
+
+//saveImage[caseX+(50*caseY)]=valueSliderRed*65536+valueSliderGreen*256+valueSliderBlue;
+#define colorCanvaWithSize(size) if (size==1)\
+                        {\
+                            pointUser.x=711+((caseX)*18);\
+                            pointUser.y=114+((caseY)*18);\
+                            pointUser.w=18;\
+                            pointUser.h=18;\
+                            SDL_RenderFillRect(render, &pointUser);\
+                            \
+                        }\
+                        else if (size==2)\
+                        {\
+                            if (caseX==0)\
+                            {\
+                                pointUser.x=711+((caseX)*18);\
+                                pointUser.w=36;\
+                            }\
+                            else if (caseX==49)\
+                            {\
+                                pointUser.x=711+((caseX-1)*18);\
+                                pointUser.w=36;\
+                            }\
+                            else\
+                            {\
+                                pointUser.x=711+((caseX-1)*18);\
+                                pointUser.w=54;\
+                            }\
+                            \
+                            if (caseY==0)\
+                            {\
+                                pointUser.y=114+((caseY)*18);\
+                                pointUser.h=36;\
+                            }\
+                            else if (caseY==49)\
+                            {\
+                                pointUser.y=114+((caseY-1)*18);\
+                                pointUser.h=36;\
+                            }\
+                            else\
+                            {\
+                                pointUser.y=114+((caseY-1)*18);\
+                                pointUser.h=54;\
+                            }\
+                            SDL_RenderFillRect(render, &pointUser);\
+                        }\
+                        else if (size==3)\
+                        {\
+                            if (caseX==0)\
+                            {\
+                                pointUser.x=711+((caseX)*18);\
+                                pointUser.w=54;\
+                            }\
+                            else if (caseX==1)\
+                            {\
+                                pointUser.x=711+((caseX-1)*18);\
+                                pointUser.w=72;\
+                            }\
+                            else if (caseX==48)\
+                            {\
+                                pointUser.x=711+((caseX-2)*18);\
+                                pointUser.w=72;\
+                            }\
+                            else if (caseX==49)\
+                            {\
+                                pointUser.x=711+((caseX-2)*18);\
+                                pointUser.w=54;\
+                            }\
+                            else\
+                            {\
+                                pointUser.x=711+((caseX-2)*18);\
+                                pointUser.w=90;\
+                            }\
+                            \
+                            if (caseY==0)\
+                            {\
+                                pointUser.y=114+((caseY)*18);\
+                                pointUser.h=54;\
+                            }\
+                            else if (caseY==1)\
+                            {\
+                                pointUser.y=114+((caseY-1)*18);\
+                                pointUser.h=72;\
+                            }\
+                            else if (caseY==48)\
+                            {\
+                                pointUser.y=114+((caseY-2)*18);\
+                                pointUser.h=72;\
+                            }\
+                            else if (caseY==49)\
+                            {\
+                                pointUser.y=114+((caseY-2)*18);\
+                                pointUser.h=54;\
+                            }\
+                            else\
+                            {\
+                                pointUser.y=114+((caseY-2)*18);\
+                                pointUser.h=90;\
+                            }\
+                            SDL_RenderFillRect(render, &pointUser);\
+                        }\
+                        else if (size==4)\
+                        {\
+                            if (caseX==0)\
+                            {\
+                                pointUser.x=711+((caseX)*18);\
+                                pointUser.w=72;\
+                            }\
+                            else if (caseX==1)\
+                            {\
+                                pointUser.x=711+((caseX-1)*18);\
+                                pointUser.w=90;\
+                            }\
+                            else if (caseX==2)\
+                            {\
+                                pointUser.x=711+((caseX-2)*18);\
+                                pointUser.w=108;\
+                            }\
+                            else if (caseX==47)\
+                            {\
+                                pointUser.x=711+((caseX-3)*18);\
+                                pointUser.w=108;\
+                            }\
+                            else if (caseX==48)\
+                            {\
+                                pointUser.x=711+((caseX-3)*18);\
+                                pointUser.w=90;\
+                            }\
+                            else if (caseX==49)\
+                            {\
+                                pointUser.x=711+((caseX-3)*18);\
+                                pointUser.w=72;\
+                            }\
+                            else\
+                            {\
+                                pointUser.x=711+((caseX-3)*18);\
+                                pointUser.w=126;\
+                            }\
+                            \
+                            if (caseY==0)\
+                            {\
+                                pointUser.y=114+((caseY)*18);\
+                                pointUser.h=72;\
+                            }\
+                            else if (caseY==1)\
+                            {\
+                                pointUser.y=114+((caseY-1)*18);\
+                                pointUser.h=90;\
+                            }\
+                            else if (caseY==2)\
+                            {\
+                                pointUser.y=114+((caseY-2)*18);\
+                                pointUser.h=108;\
+                            }\
+                            else if (caseY==47)\
+                            {\
+                                pointUser.y=114+((caseY-3)*18);\
+                                pointUser.h=108;\
+                            }\
+                            else if (caseY==48)\
+                            {\
+                                pointUser.y=114+((caseY-3)*18);\
+                                pointUser.h=90;\
+                            }\
+                            else if (caseY==49)\
+                            {\
+                                pointUser.y=114+((caseY-3)*18);\
+                                pointUser.h=72;\
+                            }\
+                            else\
+                            {\
+                                pointUser.y=114+((caseY-3)*18);\
+                                pointUser.h=126;\
+                            }\
+                            SDL_RenderFillRect(render, &pointUser);\
+                        }\
+                        SDL_RenderPresent(render);
+
+#define updateSlider(numeroSlider, valueChange) if ((numeroSlider<=3 &&((964-valueChange)/2>=0 && (964-valueChange)/2<=255)) || (numeroSlider==5 &&(((valueChange-269)/55)+1>=1 && ((valueChange-269)/55)+1<=4)))\
+                                        {\
+                                            if (numeroSlider==1)\
+                                            {\
+                                                valueSliderRed=(964-valueChange)/2;\
+                                            }\
+                                            else if (numeroSlider==2)\
+                                            {\
+                                                valueSliderGreen=(964-valueChange)/2;\
+                                            }\
+                                            else if (numeroSlider==3)\
+                                            {\
+                                                valueSliderBlue=(964-valueChange)/2;\
+                                            }\
+                                            else if (numeroSlider==5)\
+                                            {\
+                                                valueSliderSize=((valueChange-269)/55)+1;\
+                                                char test[3];\
+                                                itoa(valueSliderSize, test, 10);\
+                                            }\
+                                            SDL_RenderCopy(render, textureBackground, NULL, NULL);\
+                                            SDL_SetRenderDrawColor(render, WHITE);\
+                                            rectSlider.x=243;\
+                                            rectSlider.y=964-(valueSliderRed*2);\
+                                            SDL_RenderFillRect(render, &rectSlider);\
+                                            rectSlider.x=338;\
+                                            rectSlider.y=964-(valueSliderGreen*2);\
+                                            SDL_RenderFillRect(render, &rectSlider);\
+                                            rectSlider.x=433;\
+                                            rectSlider.y=964-(valueSliderBlue*2);\
+                                            SDL_RenderFillRect(render, &rectSlider);\
+                                            rectSliderSize.x=269+((valueSliderSize-1)*55);\
+                                            SDL_RenderFillRect(render, &rectSliderSize);\
+                                            SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);\
+                                            SDL_RenderFillRect(render, &rectColorUser);\
+                                            SDL_RenderPresent(render);\
+                                        }
+
+#define changeColorSlider(redValue, greenValue, blueValue) valueSliderRed=redValue;\
+                                            valueSliderGreen=greenValue;\
+                                            valueSliderBlue=blueValue;\
+                                            SDL_RenderCopy(render, textureBackground, NULL, NULL);\
+                                            SDL_SetRenderDrawColor(render, WHITE);\
+                                            rectSlider.x=243;\
+                                            rectSlider.y=964-(valueSliderRed*2);\
+                                            SDL_RenderFillRect(render, &rectSlider);\
+                                            rectSlider.x=338;\
+                                            rectSlider.y=964-(valueSliderGreen*2);\
+                                            SDL_RenderFillRect(render, &rectSlider);\
+                                            rectSlider.x=433;\
+                                            rectSlider.y=964-(valueSliderBlue*2);\
+                                            SDL_RenderFillRect(render, &rectSlider);\
+                                            rectSliderSize.x=269+((valueSliderSize-1)*55);\
+                                            SDL_RenderFillRect(render, &rectSliderSize);\
+                                            SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);\
+                                            SDL_RenderFillRect(render, &rectColorUser);\
+                                            SDL_RenderPresent(render);
+
+
+#define makeMovePuzzle(departureCase, arrivalCase, bonusValue) SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);\
+                            SDL_RenderCopy(render, textureStopwatch, NULL, &sdlRectStopwatch);SDL_RenderPresent(render);\
+                            SDL_Delay(1000);\
+                            if ((chessBoard[departureCase]==7 || chessBoard[departureCase]==15) && (departureCase-2==arrivalCase || departureCase+2==arrivalCase))\
+                            {\
+                                if (departureCase-2==arrivalCase)\
+                                {\
+                                    chessBoard[departureCase-1]=chessBoard[departureCase-4];\
+                                    chessBoard[departureCase-4]=0;\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    playSound(RockSound)\
+                                }\
+                                else\
+                                {\
+                                    chessBoard[departureCase+1]=chessBoard[departureCase+3];\
+                                    chessBoard[departureCase+3]=0;\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    playSound(RockSound)\
+                                }\
+                                enPassant=0;\
+                            }\
+                            else if (chessBoard[departureCase]==1 || chessBoard[departureCase]==9)\
+                            {\
+                                if (departureCase+16==arrivalCase || departureCase==arrivalCase+16)\
+                                {\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    enPassant=arrivalCase;\
+                                    playSound(MoveSound)\
+                                }\
+                                else if ((departureCase-9==arrivalCase || departureCase+9==arrivalCase || departureCase-7==arrivalCase || departureCase+7==arrivalCase ) && (chessBoard[arrivalCase]==0))\
+                                {\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    chessBoard[enPassant]=0;\
+                                    playSound(CaptureSound)\
+                                    enPassant=0;\
+                                }\
+                                else if (arrivalCase/8==0)\
+                                {\
+                                    chessBoard[arrivalCase]=8+bonusValue;\
+                                    chessBoard[departureCase]=0;\
+                                    playSound(MoveSound)\
+                                    enPassant=0;\
+                                }\
+                                else if (arrivalCase/8==7)\
+                                {\
+                                    chessBoard[arrivalCase]=bonusValue;\
+                                    chessBoard[departureCase]=0;\
+                                    playSound(MoveSound)\
+                                    enPassant=0;\
+                                }\
+                                else\
+                                {\
+                                    if (chessBoard[arrivalCase]!=0)\
+                                    {\
+                                        playSound(CaptureSound)\
+                                    }\
+                                    else\
+                                    {\
+                                        playSound(MoveSound)\
+                                    }\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    enPassant=0;\
+                                }\
+                            }\
+                            else\
+                            {\
+                                chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                chessBoard[departureCase] = 0;\
+                                playSound(MoveSound)\
+                                enPassant=0;\
+                            }\
+                            if (teamToPlay==1)\
+                            {\
+                                teamToPlay=0;\
+                            }\
+                            else\
+                            {\
+                                teamToPlay=1;\
+                            }\
+                            previousMove[0] = departureCase;\
+                            previousMove[1] = arrivalCase;
+
+
+#define makeMovePuzzleDeparture(departureCase, arrivalCase, bonusValue) if ((chessBoard[departureCase]==7 || chessBoard[departureCase]==15) && (departureCase-2==arrivalCase || departureCase+2==arrivalCase))\
+                            {\
+                                if (departureCase-2==arrivalCase)\
+                                {\
+                                    chessBoard[departureCase-1]=chessBoard[departureCase-4];\
+                                    chessBoard[departureCase-4]=0;\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    playSound(RockSound)\
+                                }\
+                                else\
+                                {\
+                                    chessBoard[departureCase+1]=chessBoard[departureCase+3];\
+                                    chessBoard[departureCase+3]=0;\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    playSound(RockSound)\
+                                }\
+                                enPassant=0;\
+                            }\
+                            else if (chessBoard[departureCase]==1 || chessBoard[departureCase]==9)\
+                            {\
+                                if (departureCase+16==arrivalCase || departureCase==arrivalCase+16)\
+                                {\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    enPassant=arrivalCase;\
+                                    playSound(MoveSound)\
+                                }\
+                                else if ((departureCase-9==arrivalCase || departureCase+9==arrivalCase || departureCase-7==arrivalCase || departureCase+7==arrivalCase ) && (chessBoard[arrivalCase]==0))\
+                                {\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    chessBoard[enPassant]=0;\
+                                    playSound(CaptureSound)\
+                                    enPassant=0;\
+                                }\
+                                else if (arrivalCase/8==0)\
+                                {\
+                                    chessBoard[arrivalCase]=8+bonusValue;\
+                                    chessBoard[departureCase]=0;\
+                                    playSound(MoveSound)\
+                                    enPassant=0;\
+                                }\
+                                else if (arrivalCase/8==7)\
+                                {\
+                                    chessBoard[arrivalCase]=bonusValue;\
+                                    chessBoard[departureCase]=0;\
+                                    playSound(MoveSound)\
+                                    enPassant=0;\
+                                }\
+                                else\
+                                {\
+                                    if (chessBoard[arrivalCase]!=0)\
+                                    {\
+                                        playSound(CaptureSound)\
+                                    }\
+                                    else\
+                                    {\
+                                        playSound(MoveSound)\
+                                    }\
+                                    chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                    chessBoard[departureCase] = 0;\
+                                    enPassant=0;\
+                                }\
+                            }\
+                            else\
+                            {\
+                                chessBoard[arrivalCase] = chessBoard[departureCase];\
+                                chessBoard[departureCase] = 0;\
+                                playSound(MoveSound)\
+                                enPassant=0;\
+                            }\
+                            if (teamToPlay==1)\
+                            {\
+                                teamToPlay=0;\
+                            }\
+                            else\
+                            {\
+                                teamToPlay=1;\
+                            }\
+                            previousMove[0] = departureCase;\
+                            previousMove[1] = arrivalCase;
+
+//-----------------------------------------------------------------------------------
+//------------------------------------All Pages--------------------------------------
+//-----------------------------------------------------------------------------------
+
+int defeatPuzzle(SDL_Window* window, SDL_Renderer* render)
+{
+    SDL_Surface* imageDefeatPuzzleBg = NULL;
+    SDL_Texture* textureDefeatPuzzleBg = NULL;
+    ALLImageINIT(imageDefeatPuzzleBg, textureDefeatPuzzleBg, DefeatPuzzleBGImageBMP, render)
+
+    SDL_Surface* imageAccueil = NULL;
+    SDL_Texture* textureAccueil = NULL;
+    ALLImageAndTransparencyINIT(imageAccueil, textureAccueil, AccueilPuzzleImageBMP, render)
+    SDL_Surface* imageHoverAccueil = NULL;
+    SDL_Texture* textureHoverAccueil = NULL;
+    ALLImageAndTransparencyINIT(imageHoverAccueil, textureHoverAccueil, HoverAccueilPuzzleImageBMP, render)
+    SDL_Rect rectAccueil;
+    rectAccueil.x= 729;
+    rectAccueil.y= 736;
+    rectAccueil.w= 154;
+    rectAccueil.h= 72;
+
+    SDL_Surface* imageNext = NULL;
+    SDL_Texture* textureNext = NULL;
+    ALLImageAndTransparencyINIT(imageNext, textureNext, NextPuzzleImageBMP, render)
+    SDL_Surface* imageHoverNext = NULL;
+    SDL_Texture* textureHoverNext = NULL;
+    ALLImageAndTransparencyINIT(imageHoverNext, textureHoverNext, HoverNextPuzzleImageBMP, render)
+    SDL_Rect rectNext;
+    rectNext.x= 917;
+    rectNext.y= 736;
+    rectNext.w= 275;
+    rectNext.h= 72;
+    
+    SDL_RenderCopy(render, textureDefeatPuzzleBg, NULL, NULL);
+    SDL_RenderCopy(render, textureNext, NULL, &rectNext);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>916 && event.motion.x<1191 && event.motion.y>735 && event.motion.y<808)
+                {
+                    SDL_RenderCopy(render, textureHoverNext, NULL, &rectNext);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureNext, NULL, &rectNext);
+                }
+                if (event.motion.x>728 && event.motion.x<883 && event.motion.y>735 && event.motion.y<808)
+                {
+                    SDL_RenderCopy(render, textureHoverAccueil, NULL, &rectAccueil);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureAccueil, NULL, &rectAccueil);
+                }
+                SDL_RenderPresent(render);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>964 && event.button.x<1240 && event.button.y>735 && event.button.y<808)
+                {
+                    //next puzzle
+                }
+                else if (event.button.x>776 && event.button.x<931 && event.button.y>735 && event.button.y<808)
+                {
+                    //next accueil
+                }
+                else if (event.button.x>679 && event.button.x<743 && event.button.y>739 && event.button.y<803)
+                {
+                    //restart
+                }
+                break;
+        }
+    }
+}
+
+int victoryPuzzle(SDL_Window* window, SDL_Renderer* render, int puzzleId, int scorePuzzle, int myScore, int time)
+{
+    initSound()
+    TTF_Font * fontInformations;
+    SDL_Color color = { 0, 0, 0};
+    SDL_Surface* imageVictoryPuzzleBg = NULL;
+    SDL_Texture* textureVictoryPuzzleBg = NULL;
+    ALLImageINIT(imageVictoryPuzzleBg, textureVictoryPuzzleBg, VictoryPuzzleBGImageBMP, render)
+
+
+    char charPuzzleId[4];
+    itoa(puzzleId, charPuzzleId, 10);
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
+    SDL_Surface * surfacePuzzleId = TTF_RenderText_Solid(fontInformations, charPuzzleId, color);
+    TTF_CloseFont(fontInformations);
+    SDL_Texture * texturePuzzleId = SDL_CreateTextureFromSurface(render, surfacePuzzleId);
+    int texWPuzzleId, texHPuzzleId;
+    SDL_QueryTexture(texturePuzzleId, NULL, NULL, &texWPuzzleId, &texHPuzzleId);
+    SDL_Rect sdlRectPuzzleId = {1058, 437, texWPuzzleId, texHPuzzleId};
+
+    char stringStopwatch[]="00:00";
+    char* ptstringStopwatch=stringStopwatch;
+    stringStopwatch[0]=48+(time/600);
+    stringStopwatch[1]=48+((time/60)%10);
+    stringStopwatch[3]=48+((time%60)/10);
+    stringStopwatch[4]=48+(time%10);
+
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
+    SDL_Surface * surfaceStopwatch = TTF_RenderText_Solid(fontInformations,stringStopwatch, color);
+    TTF_CloseFont(fontInformations);
+    SDL_Texture * textureStopwatch = SDL_CreateTextureFromSurface(render, surfaceStopwatch);
+    int texWStopwatch, texHStopwatch;
+    SDL_QueryTexture(textureStopwatch, NULL, NULL, &texWStopwatch, &texHStopwatch);
+    SDL_Rect sdlRectStopwatch = {920, 641, texWStopwatch, texHStopwatch};
+
+    char charMyPuzzleScore[4];
+    itoa(myScore, charMyPuzzleScore, 10);
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
+    SDL_Surface * surfaceMyPuzzleScore = TTF_RenderText_Solid(fontInformations, charMyPuzzleScore, color);
+    TTF_CloseFont(fontInformations);
+    SDL_Texture * textureMyPuzzleScore = SDL_CreateTextureFromSurface(render, surfaceMyPuzzleScore);
+    int texWMyPuzzleScore, texHMyPuzzleScore;
+    SDL_QueryTexture(textureMyPuzzleScore, NULL, NULL, &texWMyPuzzleScore, &texHMyPuzzleScore);
+    SDL_Rect sdlRectMyPuzzleScore = {1000, 577, texWMyPuzzleScore, texHMyPuzzleScore};
+
+    
+    char charPuzzleScore[4];
+    itoa(scorePuzzle, charPuzzleScore, 10);
+    fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 40);
+    SDL_Surface * surfacePuzzleScore = TTF_RenderText_Solid(fontInformations, charPuzzleScore, color);
+    TTF_CloseFont(fontInformations);
+    SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
+    int texWPuzzleScore, texHPuzzleScore;
+    SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
+    SDL_Rect sdlRectPuzzleScore = {1048, 511, texWPuzzleScore, texHPuzzleScore};
+
+
+    
+    SDL_Surface* imageNext = NULL;
+    SDL_Texture* textureNext = NULL;
+    ALLImageAndTransparencyINIT(imageNext, textureNext, NextPuzzleImageBMP, render)
+    SDL_Surface* imageHoverNext = NULL;
+    SDL_Texture* textureHoverNext = NULL;
+    ALLImageAndTransparencyINIT(imageHoverNext, textureHoverNext, HoverNextPuzzleImageBMP, render)
+    SDL_Rect rectNext;
+    rectNext.x= 917;
+    rectNext.y= 736;
+    rectNext.w= 275;
+    rectNext.h= 72;
+
+    SDL_RenderCopy(render, textureVictoryPuzzleBg, NULL, NULL);
+    SDL_RenderCopy(render, textureStopwatch, NULL, &sdlRectStopwatch);
+    SDL_RenderCopy(render, texturePuzzleId, NULL, &sdlRectPuzzleId);
+    SDL_RenderCopy(render, texturePuzzleScore, NULL, &sdlRectPuzzleScore);
+    SDL_RenderCopy(render, textureMyPuzzleScore, NULL, &sdlRectMyPuzzleScore);
+    SDL_RenderCopy(render, textureNext, NULL, &rectNext);
+    SDL_RenderPresent(render);
+
+    SDL_Surface* imageAccueil = NULL;
+    SDL_Texture* textureAccueil = NULL;
+    ALLImageAndTransparencyINIT(imageAccueil, textureAccueil, AccueilPuzzleImageBMP, render)
+    SDL_Surface* imageHoverAccueil = NULL;
+    SDL_Texture* textureHoverAccueil = NULL;
+    ALLImageAndTransparencyINIT(imageHoverAccueil, textureHoverAccueil, HoverAccueilPuzzleImageBMP, render)
+    SDL_Rect rectAccueil;
+    rectAccueil.x= 729;
+    rectAccueil.y= 736;
+    rectAccueil.w= 154;
+    rectAccueil.h= 72;
+
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>916 && event.motion.x<1191 && event.motion.y>735 && event.motion.y<808)
+                {
+                    SDL_RenderCopy(render, textureHoverNext, NULL, &rectNext);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureNext, NULL, &rectNext);
+                }
+                if (event.motion.x>728 && event.motion.x<883 && event.motion.y>735 && event.motion.y<808)
+                {
+                    SDL_RenderCopy(render, textureHoverAccueil, NULL, &rectAccueil);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureAccueil, NULL, &rectAccueil);
+                }
+                SDL_RenderPresent(render);
+                break;
+            case SDL_QUIT:
+                if (doYouWantToQuitNoTime(render))
+                {
+                    return 0;
+                    //Check number return
+                }
+                else
+                {
+                    return 9;
+                    //Refresh the page
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    playSound(ButtonSound)
+                    if (doYouWantToQuitNoTime(render))
+                    {
+                        return 0;
+                        //Check number return
+                    }
+                    else
+                    {
+                        return 9;
+                        //Refresh the page
+                    }
+                    
+                }
+                else if (event.button.x>916 && event.button.x<1191 && event.button.y>735 && event.button.y<808)
+                {
+                    playSound(ButtonSound)
+                    return 3;
+                    //next puzzle
+                }
+                else if (event.button.x>728 && event.button.x<883 && event.button.y>735 && event.button.y<808)
+                {
+                    playSound(ButtonSound)
+                    return 2;
+                    //next accueil
+                }
+                break;
+        }
+    }
+}
+
+int puzzlePage(SDL_Window* window, SDL_Renderer* render, unsigned int* chessBoard, int rock, int inverse, int teamToPlay, int enPassant, int actual_puzzle_id, int actual_puzzle_score, FileMoveStructure* fileMoves)
+{
+    int xMinBoard = 261;
+    int xMaxBoard = 1204;
+    int yMinBoard = 90;
+    int yMaxBoard = 1033;
+
+    int leadTime;
+    int end=0;
+    int nbHint=0;
+    int fail=0;
+    int chrono=0;
+    int hintCase=NOTHING;
+    int isBegin=0;
+    int change = NOTHING;
+    time_t beginTime;
+    time(&beginTime);
+    
+    initAllSurfaces()
+    initAllTextures()
+
+    //Create all images
+    initAllBoardImages()
+
+    SDL_Rect dstrect;
+    int previousMove[2]={NOTHING, NOTHING};
+
+    SDL_Surface* imageTimer = NULL;
+    SDL_Texture* textureTimer = NULL;
+    ALLImageAndTransparencyINIT(imageTimer, textureTimer, TimerImageBMP, render)
+    SDL_Rect rectTimer;
+    rectTimer.x= 1300;
+    rectTimer.y= 200;
+    rectTimer.w= 338;
+    rectTimer.h= 118;
+
+    SDL_Surface* imageHint = NULL;
+    SDL_Texture* textureHint = NULL;
+    ALLImageAndTransparencyINIT(imageHint, textureHint, HintPuzzleimageBMP, render)
+    SDL_Surface* imageHoverHint = NULL;
+    SDL_Texture* textureHoverHint = NULL;
+    ALLImageAndTransparencyINIT(imageHoverHint, textureHoverHint, HoverHintPuzzleimageBMP, render)
+    SDL_Rect rectHint;
+    rectHint.x= 1722;
+    rectHint.y= 608;
+    rectHint.w= 30;
+    rectHint.h= 46;
+
+    SDL_Surface* imageFlag = NULL;
+    SDL_Texture* textureFlag = NULL;
+    ALLImageAndTransparencyINIT(imageFlag, textureFlag, FlagPuzzleimageBMP, render)
+    SDL_Surface* imageHoverFlag = NULL;
+    SDL_Texture* textureHoverFlag = NULL;
+    ALLImageAndTransparencyINIT(imageHoverFlag, textureHoverFlag, HoverFlagPuzzleimageBMP, render)
+    SDL_Rect rectFlag;
+    rectFlag.x= 1768;
+    rectFlag.y= 611;
+    rectFlag.w= 39;
+    rectFlag.h= 40;
+
+    initSound()
+
+    int noPromotion = NOTHING;
+    //Be careful
+    TTF_Font * font = TTF_OpenFont("fonts/digital-7.ttf", 80);
+    TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 20);
+    SDL_Color color = { 0, 0, 0};
+
+    char stringStopwatch[6]="0:00";
+    SDL_Surface * surfaceStopwatch = TTF_RenderText_Solid(font,stringStopwatch, color);
+    SDL_Texture * textureStopwatch = SDL_CreateTextureFromSurface(render, surfaceStopwatch);
+    int texWStopwatch, texHStopwatch;
+    SDL_QueryTexture(textureStopwatch, NULL, NULL, &texWStopwatch, &texHStopwatch);
+    SDL_Rect sdlRectStopwatch = {1425, 233, texWStopwatch, texHStopwatch};
+
+    
+    //Init all puzzle informations
+    char charPuzzleId[4];
+    itoa(actual_puzzle_id, charPuzzleId, 10);
+    SDL_Surface * surfacePuzzleId = TTF_RenderText_Solid(fontInformations, charPuzzleId, color);
+    SDL_Texture * texturePuzzleId = SDL_CreateTextureFromSurface(render, surfacePuzzleId);
+    int texWPuzzleId=100;
+    int texHPuzzleId=100;
+    SDL_QueryTexture(texturePuzzleId, NULL, NULL, &texWPuzzleId, &texHPuzzleId);
+    SDL_Rect sdlRectPuzzleId = {1620, 480, texWPuzzleId, texHPuzzleId};
+
+    char charMyPuzzleScore[4];
+    itoa(puzzle_score, charMyPuzzleScore, 10);
+    SDL_Surface * surfaceMyPuzzleScore = TTF_RenderText_Solid(fontInformations, charMyPuzzleScore, color);
+    SDL_Texture * textureMyPuzzleScore = SDL_CreateTextureFromSurface(render, surfaceMyPuzzleScore);
+    int texWMyPuzzleScore, texHMyPuzzleScore;
+    SDL_QueryTexture(textureMyPuzzleScore, NULL, NULL, &texWMyPuzzleScore, &texHMyPuzzleScore);
+    SDL_Rect sdlRectMyPuzzleScore = {1575, 557, texWMyPuzzleScore, texHMyPuzzleScore};
+
+    char charPuzzleScore[4];
+    itoa(actual_puzzle_score, charPuzzleScore, 10);
+    SDL_Surface * surfacePuzzleScore = TTF_RenderText_Solid(fontInformations, charPuzzleScore, color);
+    SDL_Texture * texturePuzzleScore = SDL_CreateTextureFromSurface(render, surfacePuzzleScore);
+    int texWPuzzleScore=100;
+    int texHPuzzleScore=100;
+    SDL_QueryTexture(texturePuzzleScore, NULL, NULL, &texWPuzzleScore, &texHPuzzleScore);
+    SDL_Rect sdlRectPuzzleScore = {1600, 519, texWPuzzleScore, texHPuzzleScore};
+
+
+    makeMovePuzzleDeparture((fileMoves->firstMove)->departureCase, (fileMoves->firstMove)->arrivalCase, (fileMoves->firstMove)->bonus)
+    nextMoveFile(fileMoves);
+    SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+    showPuzzleInformations()
+    showPreviousMoves()
+    showHint()
+    displayAllpiecesInRender()
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    FileMoveStructure* file = NULL;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_PollEvent(&event);
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                leadTime=time(NULL);
+                if (doYouWantToQuitNoTime(render))
+                {
+                    return 0;
+                }
+                else
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                    showPuzzleInformations()
+                    showPreviousMoves()
+                    showHint()
+                    displayAllpiecesInRender()
+                    SDL_Delay(200);
+                }
+                beginTime+=time(NULL)-leadTime;
+                break;
+            case SDL_MOUSEMOTION:
+                if (event.button.x >=1722 && event.button.x<=1752 && event.button.y >=608 && event.button.y<=654)
+                {
+                    //Hint
+                    SDL_RenderCopy(render, textureHoverHint, NULL, &rectHint);
+                }
+                else
+                {
+                    //Not Hint
+                    SDL_RenderCopy(render, textureHint, NULL, &rectHint);
+                }
+                if (event.button.x >=1768 && event.button.x<=1807 && event.button.y >=611 && event.button.y<=651)
+                {
+                    //Flag
+                    SDL_RenderCopy(render, textureHoverFlag, NULL, &rectFlag);
+                }
+                else
+                {
+                    //Not Flag
+                    SDL_RenderCopy(render, textureFlag, NULL, &rectFlag);
+                }
+                SDL_RenderPresent(render);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    leadTime=time(NULL);
+                    if (doYouWantToQuitNoTime(render))
+                    {
+                        return 0;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                        showPuzzleInformations()
+                        showPreviousMoves()
+                        showHint()
+                        displayAllpiecesInRender()
+                        SDL_Delay(200);
+                    }
+                    beginTime+=time(NULL)-leadTime;
+                }
+                else if (event.button.x >=1722 && event.button.x<=1752 && event.button.y >=608 && event.button.y<=654)
+                {
+                    //Hint
+                    if (hintCase==NOTHING)
+                    {
+                        nbHint+=1;
+                        hintCase=(fileMoves->firstMove)->departureCase;
+                    }
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                    showPuzzleInformations()
+                    showPreviousMoves()
+                    showHint()
+                    displayAllpiecesInRender()
+                }
+                else if (event.button.x >=1768 && event.button.x<=1807 && event.button.y >=611 && event.button.y<=651)
+                {
+                    return 2;
+                }
+                else if (event.button.x >=1828 && event.button.y<=45)
+                {
+                    leadTime=time(NULL);
+                    if (optionNoTime(render)==1)
+                    {
+                        return 1;
+                    }
+                    else
+                    {
+                        initAllBoardImages()
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                        showPuzzleInformations()
+                        showPreviousMoves()
+                        showHint()
+                        displayAllpiecesInRender()
+                        SDL_Delay(200);
+                    }
+                    beginTime+=time(NULL)-leadTime;
+                }
+                else if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
+                {
+                    int caseNumber=0;
+                    if (inverse)
+                    {
+                        caseNumber=63;
+                        caseNumber -= (giveCaseNumberPlayer());
+                    }
+                    else
+                    {
+                        caseNumber = giveCaseNumberPlayer();
+                    }
+                    if (noPromotion!=NOTHING) // If the pawn is about to be promoted
+                    {
+                        if (teamToPlay)
+                        {
+                            int newValuePiece;
+                            if (caseNumber==noPromotion)
+                            {
+                                newValuePiece=14;
+                            } 
+                            else if (caseNumber==noPromotion+8)
+                            {
+                                newValuePiece=10;
+                            }
+                            else if (caseNumber==noPromotion+16)
+                            {
+                                newValuePiece=12;
+                            }
+                            else if (caseNumber==noPromotion+24)
+                            {
+                                newValuePiece=11;
+                            }
+                            else
+                            {
+                                change=NOTHING;
+                                noPromotion=NOTHING;
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                                SDL_RenderCopy(render, textureStopwatch, NULL, &sdlRectStopwatch);
+                                showPuzzleInformations()
+                                showPreviousMoves()
+                                showHint()
+                                displayAllpiecesInRender()
+                                SDL_RenderPresent(render);
+                                continue;
+                            }
+                            if ((fileMoves->firstMove)->arrivalCase==noPromotion && (fileMoves->firstMove)->departureCase==change && (fileMoves->firstMove)->bonus==(newValuePiece%8))
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=newValuePiece;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
+                                noPromotion=NOTHING;
+                                change=NOTHING;
+                                teamToPlay=0;
+                                enPassant=0;
+                                updateRock(chessBoard, teamToPlay, &rock);
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                                showPuzzleInformations()
+                                showPreviousMoves()
+                                hintCase=NOTHING;
+                                showHint()
+                                displayAllpiecesInRender()
+                                if (nextMoveFile(fileMoves)==1)
+                                {
+                                    end=1;
+                                }
+                            }
+                            else
+                            {
+                                fail+=1;
+                                playSound(WrongAnswerSound)
+                                change=NOTHING;
+                                noPromotion=NOTHING;
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                                SDL_RenderCopy(render, textureStopwatch, NULL, &sdlRectStopwatch);
+                                showPuzzleInformations()
+                                showPreviousMoves()
+                                showHint()
+                                displayAllpiecesInRender()
+                                SDL_RenderPresent(render);
+                                continue;
+                            }
+                        } 
+                        else 
+                        {
+                            int newValuePiece;
+                            if (caseNumber==noPromotion)
+                            {
+                                newValuePiece=6;
+                            } 
+                            else if (caseNumber==noPromotion-8)
+                            {
+                                newValuePiece=2;
+                            }
+                            else if (caseNumber==noPromotion-16)
+                            {
+                                newValuePiece=4;
+                            }
+                            else if (caseNumber==noPromotion-24)
+                            {
+                                newValuePiece=3;
+                            }
+                            else
+                            {
+                                change=NOTHING;
+                                noPromotion=NOTHING;
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                                showPuzzleInformations()
+                                showPreviousMoves()
+                                showHint()
+                                displayAllpiecesInRender()
+                                continue;
+                            }
+                            if ((fileMoves->firstMove)->arrivalCase==noPromotion && (fileMoves->firstMove)->departureCase==change && (fileMoves->firstMove)->bonus==(newValuePiece%8))
+                            {
+                                chessBoard[change]=0;
+                                chessBoard[noPromotion]=newValuePiece;
+                                previousMove[0] = change;
+                                previousMove[1] = noPromotion;
+                                noPromotion=NOTHING;
+                                change=NOTHING;
+                                teamToPlay=1;
+                                enPassant=0;
+                                updateRock(chessBoard, teamToPlay, &rock);
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                                showPuzzleInformations()
+                                showPreviousMoves()
+                                hintCase=NOTHING;
+                                showHint()
+                                displayAllpiecesInRender()
+                                if (nextMoveFile(fileMoves)==1)
+                                {
+                                    end=1;
+                                }
+                            }
+                            else
+                            {
+                                fail+=1;
+                                playSound(WrongAnswerSound)
+                                change=NOTHING;
+                                noPromotion=NOTHING;
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                                showPuzzleInformations()
+                                showPreviousMoves()
+                                showHint()
+                                displayAllpiecesInRender()
+                                continue;
+                            }
+                        }
+
+                    }
+                    else if (change==NOTHING && chessBoard[caseNumber]!=0 && (chessBoard[caseNumber]/8!=teamToPlay))
+                    {
+                    }
+                    else if (change==NOTHING || caseNumber==change)
+                    {
+                        if (caseNumber==change)
+                        {
+                            /*change=NOTHING;
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                            showPuzzleInformations()
+                            if (previousMove[0]!=NOTHING)
+                            {
+                                showPreviousMoves()
+                            }
+                            displayAllpiecesInRender()*/
+                        }
+                        else if (chessBoard[caseNumber]!=0)
+                        {
+                            change = caseNumber;
+                            SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                            showPuzzleInformations()
+                            showPreviousMoves()
+                            showHint()
+                            SDL_SetRenderDrawColor(render, BLACK);
+                            drawSquarePlayer(change, render, inverse)
+                            file = initialise(); 
+                            legalMovePiece(chessBoard, change, enPassant,  &rock, file);
+                            MoveStructure *actualMove=file->firstMove;
+                            displayAllpiecesInRender()
+                            while (actualMove!=NULL)
+                            {
+                                if (inverse==1)
+                                {
+                                    int a=63-(actualMove->arrivalCase);
+                                    DrawImage(dstrect, &dstrect, a, texturePoint)
+                                }
+                                else
+                                {
+                                    DrawImage(dstrect, &dstrect, (actualMove->arrivalCase), texturePoint)
+                                }
+                                actualMove = actualMove->nextMove;
+                            };
+                            
+                        }
+                    }
+                    else
+                    {
+                        if (chessBoard[caseNumber]!=0 && (chessBoard[caseNumber]/8 == chessBoard[change]/8))
+                        {
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                            showPuzzleInformations()
+                            showPreviousMoves()
+                            showHint()
+                            displayAllpiecesInRender()
+                            change = caseNumber;
+                            SDL_SetRenderDrawColor(render, BLACK);
+                            drawSquarePlayer(change, render, inverse)
+                            file = initialise();
+                            legalMovePiece(chessBoard, change, enPassant, &rock, file);
+                            MoveStructure *actualMove= file->firstMove;
+                            while (actualMove!=NULL)
+                            {
+                                if (inverse==1)
+                                {
+                                    int a=63 - (actualMove->arrivalCase);
+                                    DrawImage(dstrect, &dstrect, a, texturePoint)
+                                }
+                                else
+                                {
+                                    DrawImage(dstrect, &dstrect, actualMove->arrivalCase, texturePoint)
+                                }
+                                actualMove = actualMove->nextMove;
+                            };
+                        }
+                        else if (isMovePossible(caseNumber, file))
+                        {
+                            if ((fileMoves->firstMove)->arrivalCase==caseNumber && (fileMoves->firstMove)->departureCase==change && (fileMoves->firstMove)->bonus==0)
+                            {//The move is good
+                            }
+                            else
+                            {
+                                fail+=1;
+                                playSound(WrongAnswerSound)
+                                change=NOTHING;
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                                showPuzzleInformations()
+                                showPreviousMoves()
+                                showHint()
+                                displayAllpiecesInRender()
+                                continue;
+                            }
+                            //Change the pieces of position
+                            if ((chessBoard[change]==7 || chessBoard[change]==15) && (change-2==caseNumber || change+2==caseNumber))
+                            {
+                                if (change-2==caseNumber)
+                                {
+                                    chessBoard[change-1]=chessBoard[change-4];
+                                    chessBoard[change-4]=0;
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                    playSound(RockSound)
+                                }
+                                else
+                                {
+                                    chessBoard[change+1]=chessBoard[change+3];
+                                    chessBoard[change+3]=0;
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                    playSound(RockSound)
+                                }
+                                enPassant=0;
+                            }
+                            else if (chessBoard[change]==1 || chessBoard[change]==9)
+                            {
+                                if (change+16==caseNumber || change==caseNumber+16)
+                                {
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                    enPassant=caseNumber;
+                                    playSound(MoveSound)
+                                }
+                                else if ((change-9==caseNumber || change+9==caseNumber || change-7==caseNumber || change+7==caseNumber ) && (chessBoard[caseNumber]==0))
+                                {
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                    chessBoard[enPassant]=0;
+                                    playSound(CaptureSound)
+                                }
+                                else if (caseNumber/8==0)//White promotion
+                                {
+                                    noPromotion = caseNumber;
+                                    showWhitePromoteBar(dstrect, &dstrect, caseNumber, textureWhitePromoteBar)
+                                    continue;
+                                }
+                                else if (caseNumber/8==7) //Black promotion
+                                {
+                                    noPromotion = caseNumber;
+                                    showBlackPromoteBar(dstrect, &dstrect, caseNumber, textureBlackPromoteBar)
+                                    continue;
+                                }
+                                else
+                                {
+                                    if (chessBoard[caseNumber]!=0)
+                                    {
+                                        playSound(CaptureSound)
+                                    }
+                                    else
+                                    {
+                                        playSound(MoveSound)
+                                    }
+                                    chessBoard[caseNumber] = chessBoard[change];
+                                    chessBoard[change] = 0;
+                                    enPassant=0;
+                                }
+                            }
+                            else
+                            {
+                                chessBoard[caseNumber] = chessBoard[change];
+                                chessBoard[change] = 0;
+                                playSound(MoveSound)
+                                enPassant=0;
+                            }
+                            //Change the moves in the previousMove array
+                            previousMove[0] = change;
+                            previousMove[1] = caseNumber;
+                            
+
+                            //Clear the window
+                            SDL_RenderClear(render);
+
+                            //Show the background
+                            SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+
+                            showPuzzleInformations()
+
+                            //Show the previous move
+                            showPreviousMoves()
+
+                            //Show Hint
+                            hintCase=NOTHING;
+                            showHint()
+
+                            //Show all the pieces
+                            displayAllpiecesInRender()
+
+
+                            //Reset change
+                            change = NOTHING;
+                            if (teamToPlay)
+                            {
+                                teamToPlay=0;
+                            }
+                            else
+                            {
+                                teamToPlay=1;
+                            }
+                            updateRock(chessBoard, teamToPlay, &rock);
+                            if (nextMoveFile(fileMoves)==1)
+                            {
+                                end=1;
+                            }
+                            else
+                            {
+                                makeMovePuzzle((fileMoves->firstMove)->departureCase, (fileMoves->firstMove)->arrivalCase, (fileMoves->firstMove)->bonus)
+                                nextMoveFile(fileMoves);
+                                SDL_RenderClear(render);
+                                //Show the background
+                                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+
+                                showPuzzleInformations()
+
+                                //Show the previous move
+                                showPreviousMoves()
+
+                                //Show Hint
+                                showHint()
+
+                                //Show all the pieces
+                                displayAllpiecesInRender()
+                            }
+
+                        }
+                        else
+                        {
+                            //Clear the window
+                            SDL_RenderClear(render);
+
+                            //Show the background
+                            SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+
+                            showPuzzleInformations()
+
+                            //Show the previous move
+                            showPreviousMoves()
+
+                            //Show Hint
+                            showHint()
+
+                            //Show all the pieces
+                            displayAllpiecesInRender()
+
+
+                            change = NOTHING;
+                        }
+                    }
+
+                }
+                else
+                {
+                    //Reset change
+                    change = NOTHING;
+                }
+                break;
+        }
+        chrono = time(NULL)-beginTime;
+        itoa(chrono/60, stringStopwatch, 10);
+        strcat(stringStopwatch, ":");
+        char stringTens[1];
+        itoa((chrono%60)/10, stringTens, 10);
+        char stringUnity[2];
+        itoa((chrono%60)%10, stringUnity, 10);
+        strcat(stringStopwatch, stringTens);
+        strcat(stringStopwatch, stringUnity);
+
+        
+        SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+        surfaceStopwatch = TTF_RenderText_Solid(font, stringStopwatch, color);
+        textureStopwatch = SDL_CreateTextureFromSurface(render, surfaceStopwatch);
+        SDL_RenderCopy(render, textureStopwatch, NULL, &sdlRectStopwatch);
+        SDL_RenderPresent(render);
+        if (end==1)
+        {
+            int diff=0;
+            if (chrono<5)
+            {
+                diff+=10;
+            }
+            else if (chrono<10)
+            {
+                diff+=8;
+            }
+            else if (chrono<15)
+            {
+                diff+=5;
+            }
+            else if (chrono<20)
+            {
+                diff+=2;
+            }
+            else if (chrono<25)
+            {
+                diff+=0;
+            }
+            else if (chrono<30)
+            {
+                diff-=2;
+            }
+            else
+            {
+                diff-=5;
+            }
+
+            
+            if (fail>4)
+            {
+                diff-=30;
+            }
+            else if (fail>2)
+            {
+                diff-=20;
+            }
+            else if (nbHint>0 && fail==0)
+            {
+                diff-=5;
+            }
+            else if (nbHint==0 && fail>0)
+            {
+                diff-=10;
+            }
+            else if (nbHint==0 && fail==0)
+            {
+                diff+=15;
+            }
+
+            puzzle_score+=diff;
+
+            if (1)
+            {
+                MYSQL *con = mysql_init(NULL);
+                if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                {
+                    SDL_Log("Not connected");
+                }
+                else
+                {
+                    SDL_Log("Connected");
+                }//Update User set puzzle_score=1200 where user_id=12;
+                char request[]="Update User Set puzzle_score=0000 where user_id=000;";
+
+                char* pointeurRequest=request;
+
+                pointeurRequest[29]=48+(puzzle_score/1000);
+                pointeurRequest[30]=48+((puzzle_score/100)%10);
+                pointeurRequest[31]=48+((puzzle_score%100)/10);
+                pointeurRequest[32]=48+(puzzle_score%10);
+
+                pointeurRequest[48]=48+(userIdConnected/100);
+                pointeurRequest[49]=48+((userIdConnected/10)%10);
+                pointeurRequest[50]=48+(userIdConnected%10);
+
+                if (mysql_query(con, request))
+                {
+                    SDL_Log("Error request");
+                    SDL_Log(request);
+                }
+                mysql_close(con);
+            }
+            if (1)
+            {
+                MYSQL *con = mysql_init(NULL);
+                if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                {
+                    SDL_Log("Not connected");
+                }
+                else
+                {
+                    SDL_Log("Connected");
+                }//Update User set puzzle_score=1200 where user_id=12;
+                char request[]="Insert Into Puzzle_done Values(0000000, 000, 0, '0000/00/00', 0000);";
+
+                char* pointeurRequest=request;
+
+                pointeurRequest[31]=48+(actual_puzzle_id/1000000);
+                pointeurRequest[32]=48+((actual_puzzle_id/100000)%10);
+                pointeurRequest[33]=48+((actual_puzzle_id/10000)%10);
+                pointeurRequest[34]=48+((actual_puzzle_id/1000)%10);
+                pointeurRequest[35]=48+((actual_puzzle_id/100)%10);
+                pointeurRequest[36]=48+((actual_puzzle_id/10)%10);
+                pointeurRequest[37]=48+(actual_puzzle_id%10);
+
+                pointeurRequest[40]=48+(userIdConnected/100);
+                pointeurRequest[41]=48+((userIdConnected/10)%10);
+                pointeurRequest[42]=48+(userIdConnected%10);
+
+                
+                if (diff>0)
+                {
+                    pointeurRequest[45]=49;
+                }
+                else
+                {
+                    pointeurRequest[45]=48;
+                }
+
+                time_t t = time(NULL);
+                struct tm tm = *localtime(&t);
+                int year=tm.tm_year+1900;
+                int month= tm.tm_mon + 1;
+                int day = tm.tm_mday;
+                pointeurRequest[49] = 48+(year/1000);
+                pointeurRequest[50] = 48+(year/100)%10;
+                pointeurRequest[51] = 48+(year/10)%10;
+                pointeurRequest[52] = 48+(year%10);
+                pointeurRequest[54] = 48 + (month/10);
+                pointeurRequest[55] = 48 + (month%10);
+                pointeurRequest[57] = 48 + (day/10);
+                pointeurRequest[58] = 48 + (day%10);
+
+                pointeurRequest[62]=48+(puzzle_score/1000);
+                pointeurRequest[63]=48+((puzzle_score/100)%10);
+                pointeurRequest[64]=48+((puzzle_score%100)/10);
+                pointeurRequest[65]=48+(puzzle_score%10);
+
+
+
+                SDL_Log(request);
+                if (mysql_query(con, request))
+                {
+                    SDL_Log("Error request");
+                    SDL_Log(request);
+                }
+                mysql_close(con);
+            }
+
+
+            int res=victoryPuzzle(window, render, actual_puzzle_id, actual_puzzle_score, puzzle_score, chrono);
+            while (res==9)
+            {
+                SDL_RenderCopy(render, texturePuzzleBG, NULL, NULL);
+                showPuzzleInformations()
+                showPreviousMoves()
+                showHint()
+                displayAllpiecesInRender()
+                SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                SDL_RenderCopy(render, textureStopwatch, NULL, &sdlRectStopwatch);
+                res=victoryPuzzle(window, render, actual_puzzle_id, actual_puzzle_score, puzzle_score, chrono);
+            }
+            return res;
+        }
+    }
+    return 1;
+}
 
 void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
     *nextPage=1;
-    SDL_Log("Page launch");
     SDL_Surface* imageLoadingBackground = NULL;
     SDL_Texture* textureLoadingBackground = NULL;
     ALLImageAndTransparencyINIT(imageLoadingBackground, textureLoadingBackground, LoadPuzzleBGImageBMP, render)
@@ -3144,7 +5440,6 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
         strcat(request, charUserId);
         strcat(request, ";");
 
-        SDL_Log(request);
         if (mysql_query(con, request))
         {
             SDL_Log("Error request");
@@ -3183,10 +5478,7 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     pointeurRequest[232]=48+((puzzle_score%100)/10);
     pointeurRequest[233]=48+(puzzle_score%10);
 
-
-    SDL_Log(request);
     mysql_query(con, request);
-    SDL_Log("Test after request");
     MYSQL_RES *result = mysql_store_result(con);
     if (result == NULL)
     {
@@ -3216,6 +5508,8 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     }
     pt_actual_move_list[strlen(row[4])]=0;
 
+    FileMoveStructure* file = initialise();
+    listMovesToFile(file, actual_move_list);
     mysql_free_result(result);
     mysql_close(con);
 
@@ -3223,8 +5517,30 @@ void recherchePuzzlePage(SDL_Window* window, SDL_Renderer* render, int* nextPage
     int rock=0;
     int whoToPlay=0;
     int enPassant=0;
-    //puzzlePage(window, render, nextPage, chessBoard, &rock, &whoToPlay, &enPassant, actual_puzzle_id);
+    int inverse=0;
+    FENToList(actual_puzzle_fen, chessBoard, &rock, &whoToPlay, &inverse, &enPassant);
 
+    int nextPageChoice = puzzlePage(window, render, chessBoard, rock, 0, whoToPlay, enPassant, actual_puzzle_id, average_puzzle_score, file);
+
+    if (nextPageChoice==0)//Quit the app
+    {
+        *nextPage=1;
+    }
+    else if (nextPageChoice==1)//Deconnexion
+    {
+        stayConnected=0;
+        *nextPage=2;
+    }
+    else if (nextPageChoice==2)//Go back in the menu
+    {
+        *nextPage=5;
+    }
+    else if (nextPageChoice==3)//New Puzzle
+    {
+        *nextPage=8;
+    }
+    SDL_FreeSurface(imageLoadingBackground);
+    SDL_DestroyTexture(textureLoadingBackground);
 }
 
 void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
@@ -3236,11 +5552,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
     TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
 
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+    initSound()
 
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
@@ -3261,7 +5573,24 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     rectButton.h= 81;
     rectButton.w= 323;
 
-    //En dessous
+    SDL_Surface* imageSelectedResterConnecte = NULL;
+    SDL_Texture* textureSelectedResterConnecte = NULL;
+    ALLImageAndTransparencyINIT(imageSelectedResterConnecte, textureSelectedResterConnecte, SelectedResterConnecteConnexionBMP, render)
+
+    SDL_Surface* imageResterConnecte = NULL;
+    SDL_Texture* textureResterConnecte = NULL;
+    ALLImageAndTransparencyINIT(imageResterConnecte, textureResterConnecte, ResterConnecteConnexionBMP, render)
+
+    SDL_Surface* imageHoverResterConnecte = NULL;
+    SDL_Texture* textureHoverResterConnecte = NULL;
+    ALLImageAndTransparencyINIT(imageHoverResterConnecte, textureHoverResterConnecte, HoverResterConnecteConnexionBMP, render)
+    SDL_Rect rectResterConnecte;
+    rectResterConnecte.x= 592;
+    rectResterConnecte.y= 692;
+    rectResterConnecte.w= 178;
+    rectResterConnecte.h= 29;
+
+
     SDL_Color color = { 0, 0, 0};
     SDL_Color colorIncorrect = {255, 128, 155};
     openFonts()
@@ -3269,8 +5598,6 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     closeFonts()
     SDL_Texture * textureConnexion1 = SDL_CreateTextureFromSurface(render, surfaceConnexion1);
 
-    //Au dessus erreur SDL_CreateTextureFromSurface() passed NULL surface
-    //En dessous invalid texture
 
     int texWConnexion1 = 729;
     int texHConnexion1 = 38;
@@ -3278,28 +5605,26 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Rect sdlRectConnexion1 = {597, 529, texWConnexion1, texHConnexion1};
     SDL_RenderCopy(render, textureConnexion1, NULL, &sdlRectConnexion1);
 
-    //Au dessus et en dessous
     openFonts()
-    //TTF_CloseFont(font);
-    //TTF_Font * fontPassword = TTF_OpenFont("fonts/arial.ttf", 62);
     SDL_Surface * surfaceConnexion2 = TTF_RenderText_Solid(fontPassword,"   ", color);
     SDL_Texture * textureConnexion2 = SDL_CreateTextureFromSurface(render, surfaceConnexion2);
-    //TTF_CloseFont(fontPassword);
     int texWConnexion2 = 729;
     int texHConnexion2 = 38;
     SDL_QueryTexture(textureConnexion2, NULL, NULL, &texWConnexion2, &texHConnexion2);
     SDL_Rect sdlRectConnexion2 = {594, 643, texWConnexion2, texHConnexion2};
     SDL_RenderCopy(render, textureConnexion2, NULL, &sdlRectConnexion2);
 
-    //Au dessus
 
     //TTF_Font *fontBold = TTF_OpenFont("fonts/arialbd.ttf", 28);
 
-    char strConnexion1[38]="                                      ";
+    char strConnexion1[38];
+    emptyChar(strConnexion1, 38);
     char* strPointeurConnexion1 = strConnexion1;
-    char strConnexion2[38]="                                      ";
+    char strConnexion2[38];
+    emptyChar(strConnexion2, 38);
     char* strPointeurConnexion2 = strConnexion2;
-    char strConnexion2Hidder[38]="                                      ";
+    char strConnexion2Hidder[38];
+    emptyChar(strConnexion2Hidder, 38);
     char* strPointeurConnexion2Hidder = strConnexion2Hidder;
     int cptNumberOfValuesConnexion1 = 0;
     int cptNumberOfValuesConnexion2 = 0;
@@ -3311,6 +5636,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int rightAlt=0;
     int charhidder=42;
     int limitChar=30;
+    int resterConnecte=0;
     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
     SDL_RenderPresent(render);
 
@@ -3327,35 +5653,78 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 if (event.motion.x >799 && event.motion.x <1122 && event.motion.y >739 && event.motion.y <822)
                 {
                     SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
-                    SDL_RenderPresent(render);
                 }
                 else
                 {
                     SDL_RenderCopy(render, textureButtonBackground, NULL, &rectButton);
-                    SDL_RenderPresent(render);
+                }
+                if (event.motion.x>591 && event.motion.x<770 && event.motion.y>691 && event.motion.y<721)
+                {
+                    if (resterConnecte==0)
+                    {
+                        SDL_RenderCopy(render, textureHoverResterConnecte, NULL, &rectResterConnecte);
+                    }
+                }
+                else
+                {
+                    if (resterConnecte==0)
+                    {
+                        SDL_RenderCopy(render, textureResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);
+                    }
                 }
                 if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
                 {
                     SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
                     SDL_RenderDrawLine(render, 853, 889, 1070, 889);
                     SDL_RenderDrawLine(render, 890, 929, 1037, 929);
-                    SDL_RenderPresent(render);
                 }
                 else
                 {
                     SDL_SetRenderDrawColor(render, 29, 137, 228, 255);
                     SDL_RenderDrawLine(render, 853, 889, 1070, 889);
                     SDL_RenderDrawLine(render, 890, 929, 1037, 929);
-                    SDL_RenderPresent(render);
                 }
+                if (event.motion.x>1085 && event.motion.x<1318 && event.motion.y>690 && event.motion.y<715)
+                {
+                    SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+                    SDL_RenderDrawLine(render, 1080, 729, 1280, 729);
+                }
+                else
+                {
+                    SDL_SetRenderDrawColor(render, 59, 57, 57, 255);
+                    SDL_RenderDrawLine(render, 1080, 729, 1280, 729);
+                }
+                SDL_RenderPresent(render);
                 break;
             case SDL_QUIT:
-                *nextPage=1;
-                continuer = 0;
+                if (doYouWantToQuitNoTime(render)==1)
+                {
+                    continuer=0;
+                    *nextPage=1;
+                }
+                else
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                    if (resterConnecte==0)
+                    {
+                        SDL_RenderCopy(render, textureResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    SDL_RenderPresent(render);
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render)==1)
                     {
                         continuer=0;
@@ -3365,8 +5734,22 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     {
                         SDL_RenderClear(render);
                         SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
+                        if (resterConnecte==0)
+                        {
+                            SDL_RenderCopy(render, textureResterConnecte, NULL, &rectResterConnecte);
+                        }
+                        else
+                        {
+                            SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);
+                        }
                         SDL_RenderPresent(render);
                     }
+                }
+                if (event.button.x>1085 && event.button.x<1318 && event.button.y>690 && event.button.y<715)
+                {
+                    playSound(ButtonSound)
+                    //continuer=0;
+                    //*nextPage=12;
                 }
                 if (event.button.x >593 && event.button.y > 529 && event.button.x <1324 && event.button.y < 569)
                 {
@@ -3376,8 +5759,31 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                     focusConnexion1()
                     showTextesConnexion()
+                    if (resterConnecte==0)
+                    {
+                        SDL_RenderCopy(render, textureResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);
+                    }
                     SDL_RenderPresent(render);
                     closeFonts()
+                }
+                else if (event.button.x>591 && event.button.x<770 && event.button.y>691 && event.button.y<721)
+                {
+                    playSound(CheckSound)
+                    if (resterConnecte==1)
+                    {
+                        resterConnecte=0;
+                        SDL_RenderCopy(render, textureHoverResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    else
+                    {
+                        resterConnecte=1;
+                        SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    SDL_RenderPresent(render);
                 }
                 else if (event.button.x >591 && event.button.y > 644 && event.button.x <1325 && event.button.y < 684)
                 {
@@ -3387,11 +5793,20 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                     focusConnexion2()
                     showTextesConnexion()
+                    if (resterConnecte==0)
+                    {
+                        SDL_RenderCopy(render, textureResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);
+                    }
                     SDL_RenderPresent(render);
                     closeFonts()
                 }
                 else if (event.button.x>797 && event.button.y>740 && event.button.x <1120 && event.button.y<821)
                 {
+                    playSound(ButtonSound)
                     if (cptNumberOfValuesConnexion1==0)
                     {
                         openFonts()
@@ -3408,18 +5823,10 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     }
                     else
                     {   
-                        MYSQL *con = mysql_init(NULL);
-                        if (mysql_real_connect(con, "15.188.183.249", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
-                        {
-                            SDL_Log("Error connexion database");
-                        }
-                        else
-                        {
-                            SDL_Log("connected database");
-                        }
+                        int boolean;
                         char request[] = "SELECT Count(*) FROM User Where email='";
-                        char requesttransition1[] = "' AND password='";
-                        char requesttransition3[] = "';";
+                        char requesttransitionmiddle[] = "' AND password='";
+                        char requesttransitionend[] = "';";
 
                         char newConnexion1[cptNumberOfValuesConnexion1];
                         for (int i=0; i<cptNumberOfValuesConnexion1; i++)
@@ -3434,32 +5841,141 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         newConnexion2[cptNumberOfValuesConnexion2]=0;
                         strcat(request, newConnexion1);
-                        strcat(requesttransition1,  newConnexion2);
-                        strcat(requesttransition1,  requesttransition3);
-                        strcat(request, requesttransition1);
+                        strcat(requesttransitionmiddle,  newConnexion2);
+                        strcat(requesttransitionmiddle,  requesttransitionend);
+                        strcat(request, requesttransitionmiddle);
 
-                        if (mysql_query(con, request))
+                        if (1)
                         {
-                            SDL_Log("Error, request connexion");
-                            SDL_Log(request);
-                        }
-                        MYSQL_RES *result = mysql_store_result(con);
-                        int num_fields = mysql_num_fields(result);
+                            MYSQL *con = mysql_init(NULL);
+                            if (mysql_real_connect(con, "15.188.183.249", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                            {
+                                SDL_Log("Error connexion database");
+                            }
+                            else
+                            {
+                                SDL_Log("connected database");
+                            }
+                            if (mysql_query(con, request))
+                            {
+                                SDL_Log("Error, request connexion");
+                            }
+                            MYSQL_RES *result = mysql_store_result(con);
+                            int num_fields = mysql_num_fields(result);
 
-                        MYSQL_ROW row = mysql_fetch_row(result);
-                        int boolean = atoi(row[0]);
-                        mysql_free_result(result);
-                        mysql_close(con);
+                            MYSQL_ROW row = mysql_fetch_row(result);
+                            boolean = atoi(row[0]);
+                            mysql_free_result(result);
+                            mysql_close(con);
+                        }
                         if (boolean==1)
                         {
-                            playSound(ButtonSound)
-                            SDL_Log("1");
-                            *nextPage=5;
-                            continuer=0;
+                            if (1)
+                            {
+                                int active;
+                                if (1)
+                                {
+                                    MYSQL *con2 = mysql_init(NULL);
+                                    if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                                    {
+                                        SDL_Log("Not connected");
+                                    }
+                                    else
+                                    {
+                                        SDL_Log("Connected");
+                                    }
+                                    char request2[] = "SELECT active From User Where email='";
+                                    strcat(request2, newConnexion1);
+                                    strcat(request2, requesttransitionend);
+                                    if (mysql_query(con2, request2))
+                                    {
+                                        SDL_Log(mysql_error(con2));
+                                    }
+                                    MYSQL_RES *result2 = mysql_store_result(con2);
+                                    int num_fields2 = mysql_num_fields(result2);
+
+                                    MYSQL_ROW row2;
+                                    row2 = mysql_fetch_row(result2);
+                                    active = atoi(row2[0]);
+                                }
+                                if (active==0)
+                                {
+                                    MYSQL *con2 = mysql_init(NULL);
+                                    if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                                    {
+                                        SDL_Log("Not connected");
+                                    }
+                                    else
+                                    {
+                                        SDL_Log("Connected");
+                                    }
+                                    char request2[] = "SELECT prenom FROM User Where email='";
+                                    strcat(request2, newConnexion1);
+                                    strcat(request2, requesttransitionend);
+
+                                    if (mysql_query(con2, request2))
+                                    {
+                                        SDL_Log(mysql_error(con2));
+                                    }
+                                    MYSQL_RES *result2 = mysql_store_result(con2);
+                                    int num_fields2 = mysql_num_fields(result2);
+
+                                    MYSQL_ROW row2;
+                                    row2 = mysql_fetch_row(result2);
+                                    char* prenom = row2[0];
+                                    mysql_free_result(result2);
+                                    mysql_close(con2);
+                                    SDL_Log(prenom);
+                                    char *filename = "id.csv";
+                                    FILE *fp = fopen(filename, "w");
+                                    fprintf(fp, "mail;prenom;code\n");
+                                    fprintf(fp, newConnexion1);
+                                    fprintf(fp, ";");
+                                    fprintf(fp, prenom);
+                                    fprintf(fp, ";");
+                                    fclose(fp);
+
+                                    *nextPage=4;
+                                    continuer=0;
+                                    continue;
+                                }
+                            }
+                            if (1)
+                            {
+                                MYSQL *con2 = mysql_init(NULL);
+                                if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                                {
+                                    SDL_Log("Not connected");
+                                }
+                                else
+                                {
+                                    SDL_Log("Connected");
+                                }
+                                char request2[] = "SELECT user_id, puzzle_score FROM User Where email='";
+                                strcat(request2, newConnexion1);
+                                strcat(request2, requesttransitionend);
+
+                                if (mysql_query(con2, request2))
+                                {
+                                    SDL_Log(mysql_error(con2));
+                                }
+                                MYSQL_RES *result2 = mysql_store_result(con2);
+                                int num_fields2 = mysql_num_fields(result2);
+
+                                MYSQL_ROW row2;
+                                row2 = mysql_fetch_row(result2);
+                                userIdConnected = atoi(row2[0]);
+                                puzzle_score = atoi(row2[1]);
+                                mysql_free_result(result2);
+                                mysql_close(con2);
+                                
+                                stayConnected=resterConnecte;
+                                *nextPage=5;
+                                continuer=0;
+                            }
                         }
                         else
                         {
-                            SDL_Log("Error");
                             //Error if false
                             openFonts()
                             SDL_Surface * surfaceChampsIncorrect = TTF_RenderText_Solid(fontBold,"Email ou Mot de passe incorrect", colorIncorrect);
@@ -3476,6 +5992,7 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.motion.x >850 && event.motion.x <1078 && event.motion.y >855 && event.motion.y <928)
                 {
+                    playSound(ButtonSound)
                     continuer=0;
                     *nextPage=3;
                 }
@@ -3486,8 +6003,16 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureConnexionBackground, NULL, NULL);
                     showTextesConnexion()
-                    SDL_RenderPresent(render);
+                    if (resterConnecte==0)
+                    {
+                        SDL_RenderCopy(render, textureResterConnecte, NULL, &rectResterConnecte);
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureSelectedResterConnecte, NULL, &rectResterConnecte);
+                    }
                     closeFonts()
+                    SDL_RenderPresent(render);
                 }
                 break;
             case SDL_KEYDOWN: 
@@ -3521,6 +6046,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_FreeSurface(imageHoverButtonBackground);
     SDL_FreeSurface(surfaceConnexion1);
     SDL_FreeSurface(surfaceConnexion2);
+    SDL_FreeSurface(imageSelectedResterConnecte);
+    SDL_FreeSurface(imageResterConnecte);
+    SDL_FreeSurface(imageHoverResterConnecte);
 
 
     SDL_DestroyTexture(textureConnexionBackground);
@@ -3528,6 +6056,9 @@ void loginPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_DestroyTexture(textureHoverButtonBackground);
     SDL_DestroyTexture(textureConnexion1);
     SDL_DestroyTexture(textureConnexion2);
+    SDL_DestroyTexture(textureSelectedResterConnecte);
+    SDL_DestroyTexture(textureResterConnecte);
+    SDL_DestroyTexture(textureHoverResterConnecte);
 }
 
 
@@ -3540,11 +6071,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_RenderClear(render);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
 
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+    initSound()
 
     SDL_Surface* imageInscriptionBackground = NULL;
     SDL_Texture* textureInscriptionBackground = NULL;
@@ -3631,21 +6158,29 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_RenderCopy(render, textureInscription6, NULL, &sdlRectInscription6);
     closeFonts();
     
-    char strInscription1[38]="                                      ";
+    char strInscription1[38];
+    emptyChar(strInscription1, 38);
     char* strPointeurInscription1 = strInscription1;
-    char strInscription2[38]="                                      ";
+    char strInscription2[38];
+    emptyChar(strInscription2, 38);
     char* strPointeurInscription2 = strInscription2;
-    char strInscription3[38]="                                      ";
+    char strInscription3[38];
+    emptyChar(strInscription3, 38);
     char* strPointeurInscription3 = strInscription3;
-    char strInscription4[38]="                                      ";
+    char strInscription4[38];
+    emptyChar(strInscription4, 38);
     char* strPointeurInscription4 = strInscription4;
-    char strInscription5[38]="                                      ";
+    char strInscription5[38];
+    emptyChar(strInscription5, 38);
     char* strPointeurInscription5 = strInscription5;
-    char strInscription5Hidder[38]="                                      ";
+    char strInscription5Hidder[38];
+    emptyChar(strInscription5Hidder, 38);
     char* strPointeurInscription5Hidder = strInscription5Hidder;
-    char strInscription6[38]="                                      ";
+    char strInscription6[38];
+    emptyChar(strInscription6, 38);
     char* strPointeurInscription6 = strInscription6;
-    char strInscription6Hidder[38]="                                      ";
+    char strInscription6Hidder[38];
+    emptyChar(strInscription6Hidder, 38);
     char* strPointeurInscription6Hidder = strInscription6Hidder;
 
     int cptNumberOfValuesInscription1 = 0;
@@ -3657,7 +6192,6 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
     int focus = 0;
     
-
     int leftShift=0;
     int rightShift=0;
 
@@ -3691,12 +6225,25 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 break;
             case SDL_QUIT:
-                *nextPage=1;
-                continuer = 0;
+                if (doYouWantToQuitNoTime(render)==1)
+                {
+                    continuer=0;
+                    *nextPage=1;
+                }
+                else
+                {
+                    openFonts();
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                    showTextesInscription()
+                    SDL_RenderPresent(render);
+                    closeFonts();
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render)==1)
                     {
                         continuer=0;
@@ -3714,6 +6261,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >598 && event.button.y >225 && event.button.x <640 && event.button.y <269)
                 {
+                    playSound(ButtonSound)
                     continuer=0;
                     *nextPage=2;
                 }
@@ -3785,6 +6333,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x >798 && event.button.x <1121 && event.button.y >881 && event.button.y <963)
                 {
+                    playSound(ButtonSound)
                     if (cptNumberOfValuesInscription1==0)
                     {
                         openFonts();
@@ -3864,10 +6413,57 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     }
                     else
                     {
+                        if (1) //Test if the eamil already exist
+                        {
+                            MYSQL *con = mysql_init(NULL);
+                            if (con == NULL)
+                            {
+                                SDL_Log("mysql_init() failed\n");
+                                exit(1);
+                            }
+
+                            if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                            {
+                                SDL_Log("Non connecte");
+                                exit(1);
+                            }
+                            char newEmail[cptNumberOfValuesInscription4+2];
+                            for (int i=0; i<cptNumberOfValuesInscription4; i++)
+                            {
+                                newEmail[i] = strPointeurInscription4[i];
+                            }
+                            newEmail[cptNumberOfValuesInscription4]=39;
+                            newEmail[cptNumberOfValuesInscription4+1]=59;
+                            newEmail[cptNumberOfValuesInscription4+2]=0;
+
+                            char request[]="SELECT Count(*) FROM User where email='";
+                            strcat(request, newEmail);
+
+                            if (mysql_query(con, request))
+                            {
+                                SDL_Log("Request error");
+                            }
+                            MYSQL_RES *result = mysql_store_result(con);
+                            int num_fields = mysql_num_fields(result);
+                            MYSQL_ROW row = mysql_fetch_row(result);
+                            int nbEmail = atoi(row[0]);
+                            if (nbEmail>0)
+                            {
+                                openFonts();
+                                champsErrorText(707, 536, "Email deja utilisee");
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                                continue;
+                            }
+                            mysql_free_result(result);
+                            mysql_close(con);
+                        }
+
                         MYSQL *con = mysql_init(NULL);
                         time_t t = time(NULL);
                         struct tm tm = *localtime(&t);
-                        char date[]="         ";
+                        char date[9];
+                        emptyChar(date, 9);
                         int year=tm.tm_year+1900;
                         int month= tm.tm_mon + 1;
                         int day = tm.tm_mday;
@@ -3883,6 +6479,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         date[9] = 48 + (day%10);
                         date[10]=0;
 
+
                         printf("now: %d-%d-%d\n", year, month, day);
                         if (con == NULL)
                         {
@@ -3890,7 +6487,7 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             exit(1);
                         }
 
-                        if (mysql_real_connect(con, "15.188.183.249", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
+                        if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0) == NULL)
                         {
                             SDL_Log("Non connecte");
                             exit(1);
@@ -3901,7 +6498,6 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         int num_fields = mysql_num_fields(result);
                         MYSQL_ROW row = mysql_fetch_row(result);
                         int user_id = atoi(row[0])+1;
-                        SDL_Log(row[0]);
                         int len = log10(user_id)+1;
                         char userIdChar[len];
                         itoa(user_id, userIdChar, 10);
@@ -3941,13 +6537,23 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         newEmail[cptNumberOfValuesInscription4]=0;
 
+
+                        
+                        char *filename = "id.csv";
+                        FILE *fp = fopen(filename, "w");
+                        fprintf(fp, "mail;prenom;code\n");
+                        fprintf(fp, newEmail);
+                        fprintf(fp, ";");
+                        fprintf(fp, newPrenom);
+                        fprintf(fp, ";");
+                        fclose(fp);
                         strcat(newPrenom, "','");
                         strcat(newPrenom, newNom);
                         strcat(newPrenom, "','");
                         strcat(newPrenom, newPassword);
                         strcat(newPrenom, "','");
                         strcat(newPrenom, date);
-                        strcat(newPrenom, "', 1000, 1000, 'francais', '");
+                        strcat(newPrenom, "', 700, 700, 'francais', '");
                         strcat(newEmail, "', 0);");
                         strcat(newPrenom, newEmail);
                         strcat(request, newPrenom);
@@ -3955,16 +6561,15 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         MYSQL *con2 = mysql_init(NULL);
                         char* requestpointeur=request;
                         requestpointeur[0]=73;
-                        SDL_Log(request);
-                        if (mysql_real_connect(con2, "15.188.183.249", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
+                        if (mysql_real_connect(con2, "logames.fr", "truc", "Test.123","pokedex", 3306, NULL, 0) == NULL)
                         {
                             SDL_Log("Non connecte2");
                         }
                         if (mysql_query(con2, request))
                         {
-                            SDL_Log(request);
                             exit(1);
                         }
+
                         *nextPage=4;
                         continuer=0;
                         playSound(ButtonSound)
@@ -4054,101 +6659,247 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         }
                         break;
                     case SDLK_TAB:
-                        if (focus==0)
+                        if ((leftShift==1 || rightShift==1))
                         {
-                            openFonts();
-                            SDL_RenderClear(render);
-                            SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
-                            showTextesInscription()
-                            focusInscription1()
-                            int x,y;
-                            SDL_GetGlobalMouseState(&x, &y);
-                            if (x >798 && x <1121 && y >881 && y <963)
+                            if (focus==1)
                             {
-                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focus=0;
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
                             }
-                            SDL_RenderPresent(render);
-                            closeFonts();
+                            else if (focus==2)
+                            {
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription1()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
+                            else if (focus==3)
+                            {
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription2()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
+                            else if (focus==4)
+                            {
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription3()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
+                            else if (focus==5)
+                            {
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription4()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
+                            else if (focus==6)
+                            {
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription5()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
+                            else if (focus==0)
+                            {
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription6()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
                         }
-                        else if (focus==1)
+                        else
                         {
-                            openFonts();
-                            SDL_RenderClear(render);
-                            SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
-                            showTextesInscription()
-                            focusInscription2()
-                            int x,y;
-                            SDL_GetGlobalMouseState(&x, &y);
-                            if (x >798 && x <1121 && y >881 && y <963)
+                            if (focus==0)
                             {
-                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription1()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
                             }
-                            SDL_RenderPresent(render);
-                            closeFonts();
-                        }
-                        else if (focus==2)
-                        {
-                            openFonts();
-                            SDL_RenderClear(render);
-                            SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
-                            showTextesInscription()
-                            focusInscription3()
-                            int x,y;
-                            SDL_GetGlobalMouseState(&x, &y);
-                            if (x >798 && x <1121 && y >881 && y <963)
+                            else if (focus==1)
                             {
-                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription2()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
                             }
-                            SDL_RenderPresent(render);
-                            closeFonts();
-                        }
-                        else if (focus==3)
-                        {
-                            openFonts();
-                            SDL_RenderClear(render);
-                            SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
-                            showTextesInscription()
-                            focusInscription4()
-                            int x,y;
-                            SDL_GetGlobalMouseState(&x, &y);
-                            if (x >798 && x <1121 && y >881 && y <963)
+                            else if (focus==2)
                             {
-                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription3()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
                             }
-                            SDL_RenderPresent(render);
-                            closeFonts();
-                        }
-                        else if (focus==4)
-                        {
-                            openFonts();
-                            SDL_RenderClear(render);
-                            SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
-                            showTextesInscription()
-                            focusInscription5()
-                            int x,y;
-                            SDL_GetGlobalMouseState(&x, &y);
-                            if (x >798 && x <1121 && y >881 && y <963)
+                            else if (focus==3)
                             {
-                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription4()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
                             }
-                            SDL_RenderPresent(render);
-                            closeFonts();
-                        }
-                        else if (focus==5)
-                        {
-                            openFonts();
-                            SDL_RenderClear(render);
-                            SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
-                            showTextesInscription()
-                            focusInscription6()
-                            int x,y;
-                            SDL_GetGlobalMouseState(&x, &y);
-                            if (x >798 && x <1121 && y >881 && y <963)
+                            else if (focus==4)
                             {
-                                SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription5()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
                             }
-                            SDL_RenderPresent(render);
-                            closeFonts();
+                            else if (focus==5)
+                            {
+                                playSound(BoxSound)
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focusInscription6()
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
+                            else if (focus==6)
+                            {
+                                openFonts();
+                                SDL_RenderClear(render);
+                                SDL_RenderCopy(render, textureInscriptionBackground, NULL, NULL);
+                                showTextesInscription()
+                                focus=0;
+                                int x,y;
+                                SDL_GetGlobalMouseState(&x, &y);
+                                if (x >798 && x <1121 && y >881 && y <963)
+                                {
+                                    SDL_RenderCopy(render, textureHoverButtonBackground, NULL, &rectButton);
+                                }
+                                SDL_RenderPresent(render);
+                                closeFonts();
+                            }
                         }
                         break;
                     keyPressedInscription(SDLK_a, 97, 65, -1)
@@ -4238,7 +6989,8 @@ void inscriptionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 
 void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
-    
+    initSound()
+
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
@@ -4250,31 +7002,58 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 34);
     SDL_Color color = {255, 255, 255};
 
+    //MultiplayerSelectionImageBMP
+
+    SDL_Surface* imageSelectionLocalBMP = NULL;
+    SDL_Texture* textureSelectionLocalBMP = NULL;
+    ALLImageAndTransparencyINIT(imageSelectionLocalBMP, textureSelectionLocalBMP, LocalSelectionImageBMP, render)
+
+    SDL_Surface* imageHoverSelectionLocalBMP = NULL;
+    SDL_Texture* textureHoverSelectionLocalBMP = NULL;
+    ALLImageAndTransparencyINIT(imageHoverSelectionLocalBMP, textureHoverSelectionLocalBMP, HoverLocalSelectionImageBMP, render)
+    SDL_Rect rectLocal;
+    rectLocal.x= 521;
+    rectLocal.y= 579;
+    rectLocal.h= 199;
+    rectLocal.w= 241;
+
+    SDL_Surface* imageSelectionMutliplayerBMP = NULL;
+    SDL_Texture* textureSelectionMutliplayerBMP = NULL;
+    ALLImageAndTransparencyINIT(imageSelectionMutliplayerBMP, textureSelectionMutliplayerBMP, MultiplayerSelectionImageBMP, render)
+
+    SDL_Surface* imageHoverSelectionMutliplayerBMP = NULL;
+    SDL_Texture* textureHoverSelectionMutliplayerBMP = NULL;
+    ALLImageAndTransparencyINIT(imageHoverSelectionMutliplayerBMP, textureHoverSelectionMutliplayerBMP, HoverMultiplayerSelectionImageBMP, render)
+    SDL_Rect rectMutliplayer;
+    rectMutliplayer.x= 854;
+    rectMutliplayer.y= 582;
+    rectMutliplayer.h= 192;
+    rectMutliplayer.w= 224;
+
+
     SDL_Surface * surfaceSelectionLocal = TTF_RenderText_Solid(font,"Local", color);
     SDL_Texture * textureSelectionLocal = SDL_CreateTextureFromSurface(render, surfaceSelectionLocal);    
     int texWSelectionLocal = 729;
     int texHSelectionLocal = 38;
     SDL_QueryTexture(textureSelectionLocal, NULL, NULL, &texWSelectionLocal, &texHSelectionLocal);
-    SDL_Rect sdlRectSelectionLocal = {596, 772, texWSelectionLocal, texHSelectionLocal};
+    SDL_Rect sdlRectSelectionLocal = {596, 792, texWSelectionLocal, texHSelectionLocal};
 
     SDL_Surface * surfaceMultijoueur = TTF_RenderText_Solid(font,"Multijoueur", color);
     SDL_Texture * textureMultijoueur = SDL_CreateTextureFromSurface(render, surfaceMultijoueur);    
     int texWMultijoueur = 729;
     int texHMultijoueur = 38;
     SDL_QueryTexture(textureMultijoueur, NULL, NULL, &texWMultijoueur, &texHMultijoueur);
-    SDL_Rect sdlRectMultijoueur = {878, 772, texWMultijoueur, texHMultijoueur};
+    SDL_Rect sdlRectMultijoueur = {878, 792, texWMultijoueur, texHMultijoueur};
 
     SDL_Surface * surfaceOrdinateur = TTF_RenderText_Solid(font,"Ordinateur", color);
     SDL_Texture * textureOrdinateur = SDL_CreateTextureFromSurface(render, surfaceOrdinateur);    
     int texWOrdinateur = 729;
     int texHOrdinateur = 38;
     SDL_QueryTexture(textureOrdinateur, NULL, NULL, &texWOrdinateur, &texHOrdinateur);
-    SDL_Rect sdlRectOrdinateur = {1215, 772, texWOrdinateur, texHOrdinateur};
+    SDL_Rect sdlRectOrdinateur = {1215, 792, texWOrdinateur, texHOrdinateur};
 
     SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
     SDL_RenderPresent(render);
-
-    
 
     SDL_Event event;
     int continuer = 1;
@@ -4284,26 +7063,37 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         switch(event.type)
         {
             case SDL_MOUSEMOTION:
+                SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
                 if (event.motion.x >514 && event.motion.x <766 && event.motion.y >552 && event.motion.y <759)
                 {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
+                    SDL_RenderCopy(render, textureHoverSelectionLocalBMP, NULL, &rectLocal);
                     SDL_RenderCopy(render, textureSelectionLocal, NULL, &sdlRectSelectionLocal);
-                    SDL_RenderPresent(render);
                 }
-                else if (event.motion.x >845 && event.motion.x <1082 && event.motion.y >551 && event.motion.y <763)
+                else
                 {
-                    SDL_RenderClear(render);
-                    SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
+                    SDL_RenderCopy(render, textureSelectionLocalBMP, NULL, &rectLocal);
+                }
+                /*if (event.motion.x >845 && event.motion.x <1082 && event.motion.y >551 && event.motion.y <763)
+                {
+                    SDL_RenderCopy(render, textureHoverSelectionMutliplayerBMP, NULL, &rectMutliplayer);
                     SDL_RenderCopy(render, textureMultijoueur, NULL, &sdlRectMultijoueur);
-                    SDL_RenderPresent(render);
                 }
-                else if (event.motion.x >1187 && event.motion.x <1405 && event.motion.y >545 && event.motion.y <774)
+                else
                 {
-                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureSelectionMutliplayerBMP, NULL, &rectMutliplayer);
+                }*/
+                /*if (event.motion.x >1187 && event.motion.x <1405 && event.motion.y >545 && event.motion.y <774)
+                {
                     SDL_RenderCopy(render, textureModeSelectionBackground, NULL, NULL);
-                    //SDL_RenderCopy(render, textureOrdinateur, NULL, &sdlRectOrdinateur);
-                    SDL_RenderPresent(render);
+                    SDL_RenderCopy(render, textureOrdinateur, NULL, &sdlRectOrdinateur);
+                }*/
+                SDL_RenderPresent(render);
+                break;
+            case SDL_QUIT:
+                if (doYouWantToQuitNoTime(render))
+                {
+                    *nextPage=1;
+                    continuer=0;
                 }
                 else
                 {
@@ -4312,13 +7102,10 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     SDL_RenderPresent(render);
                 }
                 break;
-            case SDL_QUIT:
-                *nextPage=1;
-                continuer = 0;
-                break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render))
                     {
                         *nextPage=1;
@@ -4333,19 +7120,23 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>446 && event.button.y>370 && event.button.x<496 && event.button.y<426 )
                 {
+                    playSound(ButtonSound)
                     *nextPage=5;
                     continuer=0;
                 }
                 else if (event.button.x >514 && event.button.x <766 && event.button.y >552 && event.button.y <759)
                 {
+                    playSound(ButtonSound)
                     *nextPage=7;
+                    local=1;
                     continuer=0;
                     //1
                 }
                 else if (event.button.x >845 && event.button.x <1082 && event.button.y >551 && event.button.y <763)
                 {
-                    *nextPage=7;
-                    continuer=0;
+                    //*nextPage=7;
+                    //local=0;
+                    //continuer=0;
                     //2
                 }
                 else if (event.button.x >1187 && event.button.x <1405 && event.button.y >545 && event.button.y <774)
@@ -4362,16 +7153,244 @@ void modeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_FreeSurface(surfaceOrdinateur);
     SDL_FreeSurface(surfaceSelectionLocal);
     SDL_FreeSurface(surfaceMultijoueur);
+    SDL_FreeSurface(imageModeSelectionBackground);
+    SDL_FreeSurface(imageSelectionLocalBMP);
+    SDL_FreeSurface(imageHoverSelectionLocalBMP);
+    SDL_FreeSurface(imageSelectionMutliplayerBMP);
+    SDL_FreeSurface(imageHoverSelectionMutliplayerBMP);
 
     SDL_DestroyTexture(textureOrdinateur);
     SDL_DestroyTexture(textureSelectionLocal);
     SDL_DestroyTexture(textureMultijoueur);
+    SDL_DestroyTexture(textureModeSelectionBackground);
+    SDL_DestroyTexture(textureSelectionLocalBMP);
+    SDL_DestroyTexture(textureHoverSelectionLocalBMP);
+    SDL_DestroyTexture(textureSelectionMutliplayerBMP);
+    SDL_DestroyTexture(textureHoverSelectionMutliplayerBMP);
 }
 
+int statsPage(SDL_Renderer* render)
+{
+    initSound()
+    SDL_Surface* imageStatsBackground = NULL;
+    SDL_Texture* textureStatsBackground = NULL;
+    ALLImageINIT(imageStatsBackground, textureStatsBackground, StatsBGImageBMP, render)
 
+    int data[]={
+    801, 840, 860, 865, 866, 
+    850, 870, 900, 900, 900, 
+    910, 960, 1020, 1010, 1020, 
+    1050, 1050, 1050, 1050, 1000, 
+    1100, 1200, 1250, 1240, 1230, 
+    1260, 1260, 1260, 1260, 1240, 
+    1260
+    };
+
+    if (1)
+    {
+        MYSQL *con = mysql_init(NULL);
+        mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0);
+        char request[]="SELECT Max(puzzle_score)  FROM Puzzle_done Where date='0000/00/00' AND user_id=000;";
+        time_t t = time(NULL) - (30*(24 * 60 * 60));
+        struct tm tm = *localtime(&t);
+        int year=tm.tm_year+1900;
+        int month= tm.tm_mon + 1;
+        int day = tm.tm_mday;
+        request[55] = 48+(year/1000);
+        request[56] = 48+(year/100)%10;
+        request[57] = 48+(year/10)%10;
+        request[58] = 48+(year%10);
+        request[60] = 48 + (month/10);
+        request[61] = 48 + (month%10);
+        request[63] = 48 + (day/10);
+        request[64] = 48 + (day%10);
+
+        request[79] = 48 + (userIdConnected/100);
+        request[80] = 48 + ((userIdConnected/10)%10);
+        request[81] = 48 + (userIdConnected%10);
+
+        mysql_query(con, request);
+        MYSQL_RES *result = mysql_store_result(con);
+        int num_fields = mysql_num_fields(result);
+        MYSQL_ROW row = mysql_fetch_row(result);
+        int value = atoi(row[0]);
+        mysql_free_result(result);
+        mysql_close(con);
+        if (value==0)
+        {
+            data[0]=700;
+        }
+        else
+        {
+            data[0]=value;
+            printf("%d", value);
+        }
+    }
+    
+    for (int i=29; i>=0; i--)
+    {
+        MYSQL *con = mysql_init(NULL);
+        mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0);
+        char request[]="SELECT Max(puzzle_score)  FROM Puzzle_done Where date='0000/00/00' AND user_id=000;";
+        time_t t = time(NULL) - (i*(24 * 60 * 60));
+        struct tm tm = *localtime(&t);
+        int year=tm.tm_year+1900;
+        int month= tm.tm_mon + 1;
+        int day = tm.tm_mday;
+        request[55] = 48+(year/1000);
+        request[56] = 48+(year/100)%10;
+        request[57] = 48+(year/10)%10;
+        request[58] = 48+(year%10);
+        request[60] = 48 + (month/10);
+        request[61] = 48 + (month%10);
+        request[63] = 48 + (day/10);
+        request[64] = 48 + (day%10);
+
+        request[79] = 48 + (userIdConnected/100);
+        request[80] = 48 + ((userIdConnected/10)%10);
+        request[81] = 48 + (userIdConnected%10);
+
+        mysql_query(con, request);
+        MYSQL_RES *result = mysql_store_result(con);
+        int num_fields = mysql_num_fields(result);
+        MYSQL_ROW row = mysql_fetch_row(result);
+        int value = atoi(row[0]);
+        mysql_free_result(result);
+        mysql_close(con);
+        if (i==0)
+        {
+            printf("\n\n value ->%d\n%s\n", value, request);
+        }
+        if (value==0)
+        {
+            data[30-i]=data[29-i];
+        }
+        else
+        {
+            data[30-i]=value;
+        }
+    }
+    TTF_Font * fontOldPuzzle = TTF_OpenFont("fonts/arialbd.ttf", 25);
+    SDL_Color color = {255, 255, 255};
+    SDL_RenderCopy(render, textureStatsBackground, NULL, NULL);
+    for (int i=0; i<3; i++)
+    {
+        SDL_Surface * surfacePreviousPuzzle = TTF_RenderText_Solid(fontOldPuzzle, "Aucun puzzle joue recemment", color);
+        SDL_Texture * texturePreviousPuzzle = SDL_CreateTextureFromSurface(render, surfacePreviousPuzzle);
+        int texWPreviousPuzzle, texHPreviousPuzzle;
+        SDL_QueryTexture(texturePreviousPuzzle, NULL, NULL, &texWPreviousPuzzle, &texHPreviousPuzzle);
+        SDL_Rect sdlRectPreviousPuzzle = {800, 755+(60*i), texWPreviousPuzzle, texHPreviousPuzzle};
+        SDL_RenderCopy(render, texturePreviousPuzzle, NULL, &sdlRectPreviousPuzzle);
+    }
+    int maxValue = maxValueList(data, 31);
+    int minValue = minValueList(data, 31);
+    float valuePerPixel = (maxValue-minValue)/(float)240;
+    if (valuePerPixel==0)
+    {
+        valuePerPixel=0.25;
+    }
+    else if (valuePerPixel<0.25)
+    {
+        valuePerPixel=0.30;
+    }
+
+
+    int x=555;
+    int y=637;
+    int lastY=y-((data[0]-minValue)/valuePerPixel);
+
+    SDL_SetRenderDrawColor(render, 170, 170, 170, 255);
+    SDL_RenderDrawLine(render, x, 420, 1364, 420);
+    SDL_RenderDrawLine(render, x, 510, 1364, 510);
+    SDL_RenderDrawLine(render, x, 600, 1364, 600);
+
+    SDL_SetRenderDrawColor(render, 255, 255, 255, 255);
+    TTF_Font * fontInformations = TTF_OpenFont("fonts/arialbd.ttf", 15);
+    int legende1=minValue+((637-420)*valuePerPixel);
+    char charLegende1[4];
+    itoa(legende1, charLegende1, 10);
+    SDL_Surface * surfaceLegende1 = TTF_RenderText_Solid(fontInformations, charLegende1, color);
+    SDL_Texture * textureLegende1 = SDL_CreateTextureFromSurface(render, surfaceLegende1);
+    int texWLegende1, texHLegende1;
+    SDL_QueryTexture(textureLegende1, NULL, NULL, &texWLegende1, &texHLegende1);
+    SDL_Rect sdlRectLegende1 = {517, 412, texWLegende1, texHLegende1};
+    SDL_RenderCopy(render, textureLegende1, NULL, &sdlRectLegende1);
+
+    int legende2=minValue+((637-510)*valuePerPixel);
+    char charLegende2[4];
+    itoa(legende2, charLegende2, 10);
+    SDL_Surface * surfaceLegende2 = TTF_RenderText_Solid(fontInformations, charLegende2, color);
+    SDL_Texture * textureLegende2 = SDL_CreateTextureFromSurface(render, surfaceLegende2);
+    int texWLegende2, texHLegende2;
+    SDL_QueryTexture(textureLegende2, NULL, NULL, &texWLegende2, &texHLegende2);
+    SDL_Rect sdlRectLegende2 = {517, 502, texWLegende2, texHLegende2};
+    SDL_RenderCopy(render, textureLegende2, NULL, &sdlRectLegende2);
+
+    int legende3=minValue+((637-600)*valuePerPixel);
+    char charLegende3[4];
+    itoa(legende3, charLegende3, 10);
+    SDL_Surface * surfaceLegende3 = TTF_RenderText_Solid(fontInformations, charLegende3, color);
+    SDL_Texture * textureLegende3 = SDL_CreateTextureFromSurface(render, surfaceLegende3);
+    int texWLegende3, texHLegende3;
+    SDL_QueryTexture(textureLegende3, NULL, NULL, &texWLegende3, &texHLegende3);
+    SDL_Rect sdlRectLegende3 = {517, 592, texWLegende3, texHLegende3};
+    SDL_RenderCopy(render, textureLegende3, NULL, &sdlRectLegende3);
+    TTF_CloseFont(fontOldPuzzle);
+    TTF_CloseFont(fontInformations);
+
+
+
+    for (int i=1; i<31; i++)
+    {
+        int newY=y-((data[i]-minValue)/valuePerPixel); 
+        for (int cpt=0; cpt<27; cpt++)
+        {
+            int temporarY =lastY + (((newY-lastY)/(float)27)*cpt);
+            SDL_SetRenderDrawColor(render, 107, 175, 217, 255);
+            SDL_RenderDrawPoint(render, x+cpt, temporarY);
+            SDL_RenderDrawPoint(render, x+cpt, temporarY-1);
+            SDL_RenderDrawPoint(render, x+cpt, temporarY-2);
+            SDL_SetRenderDrawColor(render, 80, 121, 141, 255);
+            SDL_RenderDrawLine(render, x+cpt, 657, x+cpt, temporarY+1);
+        }
+        lastY=newY;
+        x+=27;
+    }
+
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                return 0;
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>550 && event.button.x<611 && event.button.y>209 && event.button.y<267)
+                {
+                    playSound(ButtonSound)
+                    return 0;
+                }
+                else if (event.button.x>=1875 && event.button.y<=45)
+                {
+                    playSound(ButtonSound)
+                    return 0;
+                }
+                else if (event.button.x>821 && event.button.x<1109 && event.button.y>193 && event.button.y<286)
+                {
+                    //change the type (puzzle or multiplayer)
+                }
+                break;
+        }
+    }
+}
 
 void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
+    initSound()
     
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
@@ -4447,12 +7466,67 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 break;
             case SDL_QUIT:
-                *nextPage=1;
-                continuer = 0;
+                if (doYouWantToQuitNoTime(render)==1)
+                {
+                    *nextPage=1;
+                    continuer=0;
+                }
+                else
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
+                    if (focus==1)
+                    {
+                        createRectTimeChoice(688, 403, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==2)
+                    {
+                        createRectTimeChoice(887, 403, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==3)
+                    {
+                        createRectTimeChoice(1086, 403, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==4)
+                    {
+                        createRectTimeChoice(688, 516, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==5)
+                    {
+                        createRectTimeChoice(887, 516, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==6)
+                    {
+                        createRectTimeChoice(1086, 516, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==7)
+                    {
+                        createRectTimeChoice(688, 628, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==8)
+                    {
+                        createRectTimeChoice(887, 628, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    else if (focus==9)
+                    {
+                        createRectTimeChoice(1086, 628, 146, 71)
+                        SDL_RenderCopy(render, textureContourBlancBackground, NULL, &rectTimeChoice);
+                    }
+                    SDL_RenderPresent(render);
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render)==1)
                     {
                         *nextPage=1;
@@ -4512,7 +7586,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>688 && event.button.x<834 && event.button.y>403 && event.button.y<475 && focus!=1)
                 {
+                    playSound(ButtonSound)
                     focus=1;
+                    leftOverTime=60;
+                    add_time=0;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(688, 403, 146, 71)
@@ -4521,7 +7598,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>887 && event.button.x<1033 && event.button.y>403 && event.button.y<474 && focus!=2)
                 {
+                    playSound(ButtonSound)
                     focus=2;
+                    leftOverTime=60;
+                    add_time=1;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(887, 403, 146, 71)
@@ -4530,7 +7610,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>1086 && event.button.x<1232 && event.button.y>403 && event.button.y<474 && focus!=3)
                 {
+                    playSound(ButtonSound)
                     focus=3;
+                    leftOverTime=120;
+                    add_time=1;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(1086, 403, 146, 71)
@@ -4539,7 +7622,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>688 && event.button.x<834 && event.button.y>516 && event.button.y<587 && focus!=4)
                 {
+                    playSound(ButtonSound)
                     focus=4;
+                    leftOverTime=180;
+                    add_time=0;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(688, 516, 146, 71)
@@ -4548,7 +7634,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>887 && event.button.x<1033 && event.button.y>516 && event.button.y<587 && focus!=5)
                 {
+                    playSound(ButtonSound)
                     focus=5;
+                    leftOverTime=180;
+                    add_time=2;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(887, 516, 146, 71)
@@ -4557,7 +7646,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>1086 && event.button.x<1232 && event.button.y>516 && event.button.y<587 && focus!=6)
                 {
+                    playSound(ButtonSound)
                     focus=6;
+                    leftOverTime=300;
+                    add_time=0;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(1086, 516, 146, 71)
@@ -4566,7 +7658,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>688 && event.button.x<834 && event.button.y>628 && event.button.y<699 && focus!=7)
                 {
+                    playSound(ButtonSound)
                     focus=7;
+                    leftOverTime=600;
+                    add_time=0;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(688, 628, 146, 71)
@@ -4575,7 +7670,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>887 && event.button.x<1033 && event.button.y>628 && event.button.y<699 && focus!=8)
                 {
+                    playSound(ButtonSound)
                     focus=8;
+                    leftOverTime=1800;
+                    add_time=0;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(887, 628, 146, 71)
@@ -4584,7 +7682,10 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>1086 && event.button.x<1232 && event.button.y>628 && event.button.y<699 && focus!=9)
                 {
+                    playSound(ButtonSound)
                     focus=9;
+                    leftOverTime=1800;
+                    add_time=5;
                     SDL_RenderClear(render);
                     SDL_RenderCopy(render, textureTempsPartieBackground, NULL, NULL);
                     createRectTimeChoice(1086, 628, 146, 71)
@@ -4593,16 +7694,27 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>639 && event.button.x<944 && event.button.y>777 && event.button.y<870)
                 {
+                    playSound(ButtonSound)
                     *nextPage=6;
                     continuer=0;
                     //Previous Page
                 }
                 else if (event.button.x>976 && event.button.x<1280 && event.button.y>777 && event.button.y<870)
                 {
+                    playSound(ButtonSound)
                     if (focus!=0)
                     {
-                        *nextPage=10;
-                        continuer=0;
+                        if (local==1)
+                        {
+                            *nextPage=11;
+                            continuer=0;
+                        }
+                        else
+                        {
+                            //To change
+                            *nextPage=1;
+                            continuer=0;
+                        }
                     }
                 }
                 else
@@ -4613,16 +7725,175 @@ void timeSelectionPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     SDL_RenderPresent(render);
                 }
                 break;
-            case SDL_KEYDOWN:
+        }
+    }
+    SDL_FreeSurface(imageTempsPartieBackground);
+    SDL_FreeSurface(imageContourBlancBackground);
+    SDL_FreeSurface(imageHoverRetourBackground);
+    SDL_FreeSurface(imageRetourBackground);
+    SDL_FreeSurface(imageHoverLancerBackground);
+    SDL_FreeSurface(imageLancerBackground);
+
+    SDL_DestroyTexture(textureTempsPartieBackground);
+    SDL_DestroyTexture(textureContourBlancBackground);
+    SDL_DestroyTexture(textureHoverRetourBackground);
+    SDL_DestroyTexture(textureRetourBackground);
+    SDL_DestroyTexture(textureHoverLancerBackground);
+    SDL_DestroyTexture(textureLancerBackground);
+}
+
+
+void leaderBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
+{
+    initSound()
+    SDL_RenderClear(render);
+
+    SDL_Surface* imageBackground = NULL;
+    SDL_Texture* textureBackground = NULL;
+    ALLImageAndTransparencyINIT(imageBackground, textureBackground, LeaderboardBGImageBMP, render)
+    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+
+    char request[]="SELECT prenom, puzzle_score, (Select count(*) from Puzzle_done where user_id=User.user_id) From User order by puzzle_score desc;";
+
+    MYSQL *con = mysql_init(NULL);
+    mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0);
+    mysql_query(con, request);
+    MYSQL_RES *result = mysql_store_result(con);
+    int num_fields = mysql_num_fields(result);
+    int numberValues = mysql_affected_rows(con);
+    int begin=0;
+
+    DataPlayerRank list[numberValues];
+    MYSQL_ROW row = mysql_fetch_row(result);
+
+    for (int i=0; i<numberValues; i++)
+    {
+        list[i].rank = i+1;
+        list[i].numberPuzzlePlayed = atoi(row[2]);
+        list[i].score = atoi(row[1]);
+        strcpy( list[i].FirstName, row[0]);
+        row = mysql_fetch_row(result);
+    }
+    mysql_free_result(result);
+    mysql_close(con);
+
+    TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 25);
+    SDL_Color color = {163, 163, 163};
+    if (numberValues>8)
+    {
+        showAllPlayer(begin, begin+8);
+    }
+    else
+    {
+        showAllPlayer(0, numberValues);
+    }
+    TTF_CloseFont(font);
+    SDL_RenderPresent(render);
+
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEWHEEL:
+                SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                if (numberValues>8)
+                {
+                    if(event.wheel.y > 0) // scroll up
+                    {
+                        if (begin>0)
+                        {
+                            begin-=1;
+                        }
+                    }
+                    else if(event.wheel.y < 0) // scroll down
+                    {
+                        if (begin+8<numberValues)
+                        {
+                            begin+=1;
+                        }
+                    }
+                }
+                font = TTF_OpenFont("fonts/arialbd.ttf", 25);
+                if (numberValues>8)
+                {
+                    showAllPlayer(begin, begin+8);
+                }
+                else
+                {
+                    showAllPlayer(0, numberValues);
+                }
+                TTF_CloseFont(font);
+                SDL_RenderPresent(render);
+                break;
+            case SDL_QUIT:
+                if (doYouWantToQuitNoTime(render)==1)
+                {
+                    *nextPage=1;
+                    continuer=0;
+                    continue;
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                    font = TTF_OpenFont("fonts/arialbd.ttf", 25);
+                    if (numberValues>8)
+                    {
+                        showAllPlayer(begin, begin+8);
+                    }
+                    else
+                    {
+                        showAllPlayer(0, numberValues);
+                    }
+                    TTF_CloseFont(font);
+                    SDL_RenderPresent(render);
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                        continue;
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                        font = TTF_OpenFont("fonts/arialbd.ttf", 25);
+                        if (numberValues>8)
+                        {
+                            showAllPlayer(begin, begin+8);
+                        }
+                        else
+                        {
+                            showAllPlayer(0, numberValues);
+                        }
+                        TTF_CloseFont(font);
+                        SDL_RenderPresent(render);
+                    }
+                }
+                else if (event.button.x>550 && event.button.x<607 && event.button.y>208 && event.button.y<262)
+                {
+                    *nextPage=5;
+                    continuer=0;
+
+                }
                 break;
         }
     }
+    SDL_FreeSurface(imageBackground);
+
+    SDL_DestroyTexture(textureBackground);
 }
 
 
 void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
-    
+    initSound()
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
@@ -4635,12 +7906,6 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_RenderPresent(render);
 
     int slideAmis=0;
-
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
 
     //Puzzle
     SDL_Surface* imageHoverPuzzleBackground = NULL;
@@ -4684,33 +7949,33 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Texture* textureAmisBackground = NULL;
     ALLImageAndTransparencyINIT(imageAmisBackground, textureAmisBackground, AmisMainMenuBMP, render)
 
-    //Options
-    SDL_Surface* imageHoverOptionsBackground = NULL;
-    SDL_Texture* textureHoverOptionsBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverOptionsBackground, textureHoverOptionsBackground, HoverOptionsMainMenuBMP, render)
-    SDL_Rect rectButtonOptions;
-    rectButtonOptions.x= 452;
-    rectButtonOptions.y= 660;
-    rectButtonOptions.w= 304;
-    rectButtonOptions.h= 92;
+    //Stats
+    SDL_Surface* imageHoverStatsBackground = NULL;
+    SDL_Texture* textureHoverStatsBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverStatsBackground, textureHoverStatsBackground, HoverStatsMainMenuBMP, render)
+    SDL_Rect rectButtonStats;
+    rectButtonStats.x= 452;
+    rectButtonStats.y= 660;
+    rectButtonStats.w= 304;
+    rectButtonStats.h= 92;
     
-    SDL_Surface* imageOptionsBackground = NULL;
-    SDL_Texture* textureOptionsBackground = NULL;
-    ALLImageAndTransparencyINIT(imageOptionsBackground, textureOptionsBackground, OptionsMainMenuBMP, render)
+    SDL_Surface* imageStatsBackground = NULL;
+    SDL_Texture* textureStatsBackground = NULL;
+    ALLImageAndTransparencyINIT(imageStatsBackground, textureStatsBackground, StatsMainMenuBMP, render)
 
-    //Quitter
-    SDL_Surface* imageHoverQuitterBackground = NULL;
-    SDL_Texture* textureHoverQuitterBackground = NULL;
-    ALLImageAndTransparencyINIT(imageHoverQuitterBackground, textureHoverQuitterBackground, HoverQuitterMainMenuBMP, render)
-    SDL_Rect rectButtonQuitter;
-    rectButtonQuitter.x= 452;
-    rectButtonQuitter.y= 774;
-    rectButtonQuitter.w= 304;
-    rectButtonQuitter.h= 92;
+    //Quit
+    SDL_Surface* imageHoverQuitBackground = NULL;
+    SDL_Texture* textureHoverQuitBackground = NULL;
+    ALLImageAndTransparencyINIT(imageHoverQuitBackground, textureHoverQuitBackground, HoverQuitMainMenuBMP, render)
+    SDL_Rect rectButtonQuit;
+    rectButtonQuit.x= 452;
+    rectButtonQuit.y= 776;
+    rectButtonQuit.w= 304;
+    rectButtonQuit.h= 92;
     
-    SDL_Surface* imageQuitterBackground = NULL;
-    SDL_Texture* textureQuitterBackground = NULL;
-    ALLImageAndTransparencyINIT(imageQuitterBackground, textureQuitterBackground, QuitterMainMenuBMP, render)
+    SDL_Surface* imageQuitBackground = NULL;
+    SDL_Texture* textureQuitBackground = NULL;
+    ALLImageAndTransparencyINIT(imageQuitBackground, textureQuitBackground, QuitMainMenuBMP, render)
 
     //FriendList
     SDL_Surface* imageMakeFriendListBackground = NULL;
@@ -4727,9 +7992,9 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     ALLImageAndTransparencyINIT(imageFriendListHiderBackground, textureFriendListHiderBackground, FriendListHiderMainMenuBMP, render)
     SDL_Rect rectButtonFriendListHider;
     rectButtonFriendListHider.x= 0;
-    rectButtonFriendListHider.y= 0;
+    rectButtonFriendListHider.y= 45;
     rectButtonFriendListHider.w= 402;
-    rectButtonFriendListHider.h= 1080;
+    rectButtonFriendListHider.h= 1035;
     
     SDL_Event event;
     int continuer = 1;
@@ -4738,6 +8003,16 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         SDL_WaitEvent(&event);
         switch(event.type)
         {
+            case SDL_MOUSEWHEEL:
+                if(event.wheel.y > 0) // scroll up
+                {
+                    playSound(BoxSound)
+                }
+                else if(event.wheel.y < 0) // scroll down
+                {
+                    playSound(CheckSound)
+                }
+                break;
             case SDL_MOUSEMOTION:
                 if(event.motion.x>1043 && event.motion.x<1595 && event.motion.y>340 && event.motion.y<955)
                 {
@@ -4771,28 +8046,38 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 if(event.motion.x>451 && event.motion.x<756 && event.motion.y>659 && event.motion.y<752)
                 {
-                    SDL_RenderCopy(render, textureHoverOptionsBackground, NULL, &rectButtonOptions);
+                    SDL_RenderCopy(render, textureHoverStatsBackground, NULL, &rectButtonStats);
                     SDL_RenderPresent(render);
                 }
                 else
                 {
-                    SDL_RenderCopy(render, textureOptionsBackground, NULL, &rectButtonOptions);
+                    SDL_RenderCopy(render, textureStatsBackground, NULL, &rectButtonStats);
                     SDL_RenderPresent(render);
                 }
                 if(event.motion.x>451 && event.motion.x<756 && event.motion.y>773 && event.motion.y<866)
                 {
-                    SDL_RenderCopy(render, textureHoverQuitterBackground, NULL, &rectButtonQuitter);
+                    SDL_RenderCopy(render, textureHoverQuitBackground, NULL, &rectButtonQuit);
                     SDL_RenderPresent(render);
                 }
                 else
                 {
-                    SDL_RenderCopy(render, textureQuitterBackground, NULL, &rectButtonQuitter);
+                    SDL_RenderCopy(render, textureQuitBackground, NULL, &rectButtonQuit);
                     SDL_RenderPresent(render);
                 }
                 break;
             case SDL_QUIT:
-                *nextPage=1;
-                continuer = 0;
+                if (doYouWantToQuitNoTime(render)==1)
+                {
+                    *nextPage=1;
+                    continuer=0;
+                    continue;
+                }
+                else
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
+                    SDL_RenderPresent(render);
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (slideAmis==1)
@@ -4802,23 +8087,43 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         
                     }
                     else
-
                     {
-                        slideAmis=0;
-                        for (int i=16; i>-1; i--)
+                        if (!(event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637))
                         {
-                            rectButtonFriendListHider.x= -25*i;
-                            SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
-                            SDL_RenderPresent(render);
-                            SDL_Delay(5);
+                            slideAmis=0;
+                            for (int i=16; i>-1; i--)
+                            {
+                                rectButtonFriendListHider.x= -25*i;
+                                SDL_RenderCopy(render, textureFriendListHiderBackground, NULL, &rectButtonFriendListHider);
+                                SDL_RenderPresent(render);
+                                SDL_Delay(5);
+                            }
                         }
                     }
                 }
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render)==1)
                     {
                         *nextPage=1;
+                        continuer=0;
+                        continue;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
+                }
+                else if (event.button.x >=1824 && event.button.y <=45)
+                {
+                    playSound(ButtonSound)
+                    if (optionNoTime(render)==1)
+                    {
+                        *nextPage=2;
+                        stayConnected=0;
                         continuer=0;
                     }
                     else
@@ -4830,16 +8135,21 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 else if (event.button.x>1043 && event.button.x<1595 && event.button.y>340 && event.button.y<955)
                 {
+                    playSound(ButtonSound)
+                    *nextPage=8;
+                    continuer=0;
                     //Puzzle
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>429 && event.button.y<522)
                 {
+                    playSound(ButtonSound)
                     *nextPage=6;
                     continuer=0;
                     //Jouer
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>544 && event.button.y<637)
                 {
+                    playSound(ButtonSound)
                     if (slideAmis==0)
                     {
                         slideAmis=1;
@@ -4862,26 +8172,21 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             SDL_Delay(5);
                         }
                     }
+                    SDL_Delay(100);
                     //Amis
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>659 && event.button.y<752)
                 {
-                    if (optionNoTime(render)==1)
-                    {
-                        //l'utilisateur veut se déconnecter
-                        *nextPage=2;
-                        continuer=0;
-                    }
-                    else
-                    {
-                        SDL_RenderClear(render);
-                        SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
-                        SDL_RenderPresent(render);
-                    }
-                    //Options
+                    playSound(ButtonSound)
+                    statsPage(render);
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
+                    SDL_RenderPresent(render);
+                    //Stats
                 }
                 else if (event.button.x>451 && event.button.x<756 && event.button.y>773 && event.button.y<866)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render)==1)
                     {
                         *nextPage=1;
@@ -4893,7 +8198,7 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderCopy(render, textureBackgroundMenu, NULL, NULL);
                         SDL_RenderPresent(render);
                     }
-                    //Quitter
+                    //Quit
                 }
                 break;
             case SDL_KEYDOWN:
@@ -4913,38 +8218,227 @@ void mainMenuPage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 break;
         }
     }
+    SDL_FreeSurface(imageBackgroundMenu);
+    SDL_FreeSurface(imageHoverPuzzleBackground);
+    SDL_FreeSurface(imagePuzzleBackground);
+    SDL_FreeSurface(imageHoverJouerBackground);
+    SDL_FreeSurface(imageJouerBackground);
+    SDL_FreeSurface(imageHoverAmisBackground);
+    SDL_FreeSurface(imageAmisBackground);
+    SDL_FreeSurface(imageHoverStatsBackground);
+    SDL_FreeSurface(imageStatsBackground);
+    SDL_FreeSurface(imageHoverQuitBackground);
+    SDL_FreeSurface(imageQuitBackground);
+    SDL_FreeSurface(imageMakeFriendListBackground);
+    SDL_FreeSurface(imageFriendListHiderBackground);
+
+    SDL_DestroyTexture(textureBackgroundMenu);
+    SDL_DestroyTexture(textureHoverPuzzleBackground);
+    SDL_DestroyTexture(texturePuzzleBackground);
+    SDL_DestroyTexture(textureHoverJouerBackground);
+    SDL_DestroyTexture(textureJouerBackground);
+    SDL_DestroyTexture(textureHoverAmisBackground);
+    SDL_DestroyTexture(textureAmisBackground);
+    SDL_DestroyTexture(textureHoverStatsBackground);
+    SDL_DestroyTexture(textureStatsBackground);
+    SDL_DestroyTexture(textureHoverQuitBackground);
+    SDL_DestroyTexture(textureQuitBackground);
+    SDL_DestroyTexture(textureMakeFriendListBackground);
+    SDL_DestroyTexture(textureFriendListHiderBackground);
 }
 
 
 
-int issueOfTheGame(SDL_Renderer* render, int* nextPage, int win, int type)
+int issueOfTheGameLocal(SDL_Renderer* render, int* nextPage, int type, char* pseudoWhite, char* pseudoBlack, int leftOverTimeWhite, int leftOverTimeBlack, int nbMoveWhite, int nbMoveBlack, int whiteWin, unsigned int* chessBoard)
 {
+
+    initSound()
+
+    TTF_Font * font = TTF_OpenFont("fonts/digital-7.ttf", 50);
+    SDL_Color color = {0, 0, 0};
     SDL_Surface* imageBackground = NULL;
     SDL_Texture* textureBackground = NULL;
-    if (win==1)
+    ALLImageINIT(imageBackground, textureBackground, EndGameBGImageBMP, render)
+    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+    char textVictory[]="Victoire de ";
+    if (whiteWin==1)
     {
-        ALLImageAndTransparencyINIT(imageBackground, textureBackground, WinBGImageBMP, render)
+        strcat(textVictory, pseudoWhite);
     }
     else
     {
-        ALLImageAndTransparencyINIT(imageBackground, textureBackground, LooseBGImageBMP, render)
+        strcat(textVictory, pseudoBlack);
     }
+
+    int nbPiecesBlack=0;
+    int nbPiecesWhite=0;
+
+    for (int i=0; i<64; i++)
+    {
+        if (chessBoard[i]!=0)
+        {
+            if (chessBoard[i]/8==1)
+            {
+                nbPiecesWhite+=1;
+            }
+            else
+            {
+                nbPiecesBlack+=1;
+            }
+        }
+    }
+
+    SDL_Surface * surfaceTextVictory = TTF_RenderText_Solid(font, textVictory, color);
+    SDL_Texture * textureTextVictory = SDL_CreateTextureFromSurface(render, surfaceTextVictory);
+    int texWTextVictory, texHTextVictory;
+    SDL_QueryTexture(textureTextVictory, NULL, NULL, &texWTextVictory, &texHTextVictory);
+    SDL_Rect sdlRectTextVictory = {650, 220, texWTextVictory, texHTextVictory};
+    SDL_RenderCopy(render, textureTextVictory, NULL, &sdlRectTextVictory);
+
+    char stringTimeToShowWhite[6]="0:00";
+    char stringTimeToShowBlack[6]="0:00";
+    if (1)
+    {
+        itoa(leftOverTimeWhite/60, stringTimeToShowWhite, 10);
+        strcat(stringTimeToShowWhite, ":");
+        char stringTens[1];
+        itoa((leftOverTimeWhite%60)/10, stringTens, 10);
+        char stringUnity[2];
+        itoa((leftOverTimeWhite%60)%10, stringUnity, 10);
+        strcat(stringTimeToShowWhite, stringTens);
+        strcat(stringTimeToShowWhite, stringUnity);
+    }
+    if (1)
+    {
+        itoa(leftOverTimeBlack/60, stringTimeToShowBlack, 10);
+        strcat(stringTimeToShowBlack, ":");
+        char stringTens[1];
+        itoa((leftOverTimeBlack%60)/10, stringTens, 10);
+        char stringUnity[2];
+        itoa((leftOverTimeBlack%60)%10, stringUnity, 10);
+        strcat(stringTimeToShowBlack, stringTens);
+        strcat(stringTimeToShowBlack, stringUnity);
+    }
+
+    char textTypeVictory[16];
+    emptyChar(textTypeVictory, 16);
+    if (type==1)
+    {//Par echec et mat
+        textTypeVictory[0]=112;
+        textTypeVictory[1]=97;
+        textTypeVictory[2]=114;
+        textTypeVictory[3]=32;
+        textTypeVictory[4]=101;
+        textTypeVictory[5]=99;
+        textTypeVictory[6]=104;
+        textTypeVictory[7]=101;
+        textTypeVictory[8]=99;
+        textTypeVictory[9]=32;
+        textTypeVictory[10]=101;
+        textTypeVictory[11]=116;
+        textTypeVictory[12]=32;
+        textTypeVictory[13]=109;
+        textTypeVictory[14]=97;
+        textTypeVictory[15]=116;
+    }
+    else if (type==2)
+    {//Au temps
+        textTypeVictory[0]=97;
+        textTypeVictory[1]=117;
+        textTypeVictory[2]=32;
+        textTypeVictory[3]=116;
+        textTypeVictory[4]=97;
+        textTypeVictory[5]=109;
+        textTypeVictory[6]=112;
+        textTypeVictory[7]=115;
+    }
+
+    SDL_Surface * surfaceTextTypeVictory = TTF_RenderText_Solid(font, textTypeVictory, color);
+    SDL_Texture * textureTextTypeVictory = SDL_CreateTextureFromSurface(render, surfaceTextTypeVictory);
+    int texWTextTypeVictory, texHTextTypeVictory;
+    SDL_QueryTexture(textureTextTypeVictory, NULL, NULL, &texWTextTypeVictory, &texHTextTypeVictory);
+    SDL_Rect sdlRectTextTypeVictory = {650, 280, texWTextTypeVictory, texHTextTypeVictory};
+    SDL_RenderCopy(render, textureTextTypeVictory, NULL, &sdlRectTextTypeVictory);
+
+    SDL_Surface * surfaceLeftOverTimeBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
+    SDL_Texture * textureLeftOverTimeBlack = SDL_CreateTextureFromSurface(render, surfaceLeftOverTimeBlack);
+    int texWLeftOverTimeBlack, texHLeftOverTimeBlack;
+    SDL_QueryTexture(textureLeftOverTimeBlack, NULL, NULL, &texWLeftOverTimeBlack, &texHLeftOverTimeBlack);
+    SDL_Rect sdlRectLeftOverTimeBlack = {1280, 485, texWLeftOverTimeBlack, texHLeftOverTimeBlack};
+    SDL_RenderCopy(render, textureLeftOverTimeBlack, NULL, &sdlRectLeftOverTimeBlack);
+
+    SDL_Surface * surfaceLeftOverTimeWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
+    SDL_Texture * textureLeftOverTimeWhite = SDL_CreateTextureFromSurface(render, surfaceLeftOverTimeWhite);
+    int texWLeftOverTimeWhite, texHLeftOverTimeWhite;
+    SDL_QueryTexture(textureLeftOverTimeWhite, NULL, NULL, &texWLeftOverTimeWhite, &texHLeftOverTimeWhite);
+    SDL_Rect sdlRectLeftOverTimeWhite = {968, 485, texWLeftOverTimeWhite, texHLeftOverTimeWhite};
+    SDL_RenderCopy(render, textureLeftOverTimeWhite, NULL, &sdlRectLeftOverTimeWhite);
     
+    char charnbMoveBlack[3];
+    itoa(nbMoveBlack, charnbMoveBlack, 10);
+    SDL_Surface * surfaceNumberMoveBlack = TTF_RenderText_Solid(font, charnbMoveBlack, color);
+    SDL_Texture * textureNumberMoveBlack = SDL_CreateTextureFromSurface(render, surfaceNumberMoveBlack);
+    int texWNumberMoveBlack, texHNumberMoveBlack;
+    SDL_QueryTexture(textureNumberMoveBlack, NULL, NULL, &texWNumberMoveBlack, &texHNumberMoveBlack);
+    SDL_Rect sdlRectNumberMoveBlack = {1280, 694, texWNumberMoveBlack, texHNumberMoveBlack};
+    SDL_RenderCopy(render, textureNumberMoveBlack, NULL, &sdlRectNumberMoveBlack);
+
+    char charnbMoveWhite[3];
+    itoa(nbMoveWhite, charnbMoveWhite, 10);
+    SDL_Surface * surfaceNumberMoveWhite = TTF_RenderText_Solid(font, charnbMoveWhite, color);
+    SDL_Texture * textureNumberMoveWhite = SDL_CreateTextureFromSurface(render, surfaceNumberMoveWhite);
+    int texWNumberMoveWhite, texHNumberMoveWhite;
+    SDL_QueryTexture(textureNumberMoveWhite, NULL, NULL, &texWNumberMoveWhite, &texHNumberMoveWhite);
+    SDL_Rect sdlRectNumberMoveWhite = {968, 694, texWNumberMoveWhite, texHNumberMoveWhite};
+    SDL_RenderCopy(render, textureNumberMoveWhite, NULL, &sdlRectNumberMoveWhite);
+    
+
+    char charnbPiecesBlack[3];
+    itoa(nbPiecesBlack, charnbPiecesBlack, 10);
+    SDL_Surface * surfaceNumberPiecesBlack = TTF_RenderText_Solid(font, charnbPiecesBlack, color);
+    SDL_Texture * textureNumberPiecesBlack = SDL_CreateTextureFromSurface(render, surfaceNumberPiecesBlack);
+    int texWNumberPiecesBlack, texHNumberPiecesBlack;
+    SDL_QueryTexture(textureNumberPiecesBlack, NULL, NULL, &texWNumberPiecesBlack, &texHNumberPiecesBlack);
+    SDL_Rect sdlRectNumberPiecesBlack = {1280, 576, texWNumberPiecesBlack, texHNumberPiecesBlack};
+    SDL_RenderCopy(render, textureNumberPiecesBlack, NULL, &sdlRectNumberPiecesBlack);
+
+    char charnbPiecesWhite[3];
+    itoa(nbPiecesWhite, charnbPiecesWhite, 10);
+    SDL_Surface * surfaceNumberPiecesWhite = TTF_RenderText_Solid(font, charnbPiecesWhite, color);
+    SDL_Texture * textureNumberPiecesWhite = SDL_CreateTextureFromSurface(render, surfaceNumberPiecesWhite);
+    int texWNumberPiecesWhite, texHNumberPiecesWhite;
+    SDL_QueryTexture(textureNumberPiecesWhite, NULL, NULL, &texWNumberPiecesWhite, &texHNumberPiecesWhite);
+    SDL_Rect sdlRectNumberPiecesWhite = {968, 576, texWNumberPiecesWhite, texHNumberPiecesWhite};
+    SDL_RenderCopy(render, textureNumberPiecesWhite, NULL, &sdlRectNumberPiecesWhite);
+
     SDL_Surface* imageHoverContinuerButton = NULL;
     SDL_Texture* textureHoverContinuerButton = NULL;
-    ALLImageAndTransparencyINIT(imageHoverContinuerButton, textureHoverContinuerButton, HoverButtonContinuerIssueGameBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageHoverContinuerButton, textureHoverContinuerButton, HoverContinuerEndGameImageBMP, render)
     SDL_Rect rectButtonContinuer;
-    rectButtonContinuer.x= 833;
-    rectButtonContinuer.y= 875;
+    rectButtonContinuer.x= 677;
+    rectButtonContinuer.y= 822;
     rectButtonContinuer.w= 254;
     rectButtonContinuer.h= 72;
     
     SDL_Surface* imageContinuerButton = NULL;
     SDL_Texture* textureContinuerButton = NULL;
-    ALLImageAndTransparencyINIT(imageContinuerButton, textureContinuerButton, ButtonContinuerIssueGameBGImageBMP, render)
+    ALLImageAndTransparencyINIT(imageContinuerButton, textureContinuerButton, ContinuerEndGameImageBMP, render)
+
+    
+    SDL_Surface* imageHoverRejouerButton = NULL;
+    SDL_Texture* textureHoverRejouerButton = NULL;
+    ALLImageAndTransparencyINIT(imageHoverRejouerButton, textureHoverRejouerButton, HoverRejouerEndGameImageBMP, render)
+    SDL_Rect rectButtonRejouer;
+    rectButtonRejouer.x= 989;
+    rectButtonRejouer.y= 822;
+    rectButtonRejouer.w= 254;
+    rectButtonRejouer.h= 72;
+    
+    SDL_Surface* imageRejouerButton = NULL;
+    SDL_Texture* textureRejouerButton = NULL;
+    ALLImageAndTransparencyINIT(imageRejouerButton, textureRejouerButton, RejouerEndGameImageBMP, render)
 
 
-    SDL_RenderCopy(render, textureBackground, NULL, NULL);
     SDL_RenderPresent(render);
     SDL_Event event;
     int continuer = 1;
@@ -4954,20 +8448,32 @@ int issueOfTheGame(SDL_Renderer* render, int* nextPage, int win, int type)
         switch(event.type)
         {
             case SDL_MOUSEMOTION:
-                if (event.motion.x>832 && event.motion.x<1087 && event.motion.y>874 && event.motion.y<947)
+                if (event.motion.x>676 && event.motion.x<931 && event.motion.y>821 && event.motion.y<894)
                 {
                     SDL_RenderCopy(render, textureHoverContinuerButton, NULL, &rectButtonContinuer);
-                    SDL_RenderPresent(render);
+                    //continuer
                 }
                 else
                 {
                     SDL_RenderCopy(render, textureContinuerButton, NULL, &rectButtonContinuer);
-                    SDL_RenderPresent(render);
+                    //not continuer
                 }
+                if (event.motion.x>988 && event.motion.x<1243 && event.motion.y>821 && event.motion.y<894)
+                {
+                    SDL_RenderCopy(render, textureHoverRejouerButton, NULL, &rectButtonRejouer);
+                    //rejouer
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureRejouerButton, NULL, &rectButtonRejouer);
+                    //not rejouer
+                }
+                SDL_RenderPresent(render);
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render))
                     {
                         *nextPage=1;
@@ -4975,29 +8481,61 @@ int issueOfTheGame(SDL_Renderer* render, int* nextPage, int win, int type)
                     }
                     else
                     {
-                        *nextPage=5;
-                        continuer=0;
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                        SDL_RenderPresent(render);
                     }
                     
                 }
-                else if (event.button.x>832 && event.button.x<1087 && event.button.y>874 && event.button.y<947)
+                else if (event.button.x>676 && event.button.x<931 && event.button.y>821 && event.button.y<894)
                 {
+                    playSound(ButtonSound)
                     *nextPage=5;
+                    continuer=0;
+                }
+                else if (event.button.x>988 && event.button.x<1243 && event.button.y>821 && event.button.y<894)
+                {
+                    playSound(ButtonSound)
+                    *nextPage=7;
                     continuer=0;
                 }
                 break;
             case SDL_QUIT:
-                *nextPage=1;
-                continuer=0;
+                if (doYouWantToQuitNoTime(render))
+                {
+                    *nextPage=1;
+                    continuer=0;
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                    SDL_RenderPresent(render);
+                }
                 break;
         }
     }
 }
 
+#define renderGoodColorChoice() if (colorChoice==0)\
+                                {\
+                                    SDL_RenderCopy(render, textureWhiteBlackColor, NULL, &rectColorChoice);\
+                                }\
+                                else if (colorChoice==1)\
+                                {\
+                                    SDL_RenderCopy(render, textureBlackWhiteColor, NULL, &rectColorChoice);\
+                                }\
+                                else\
+                                {\
+                                    SDL_RenderCopy(render, textureRandomColor, NULL, &rectColorChoice);\
+                                }
 
-int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
+
+
+int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage, int colorChoice, char* charPseudo1, char* charPseudo2)
 {
-
+    int xMinBoard = 488;
+    int xMaxBoard = 1432;
+    int yMinBoard = 70;
+    int yMaxBoard = 1014;
     //CreateRenderInNewWindow(window, render)
     SDL_RenderClear(render);
     initAllSurfaces()
@@ -5010,12 +8548,57 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     SDL_Rect dstrect;
     int previousMove[2]={NOTHING, NOTHING};
 
-    //Initialisation of the audio
-    SDL_AudioSpec wavSpec;
-    Uint32 wavLength;
-    Uint8 *wavBuffer;
-    SDL_LoadWAV(MoveSound, &wavSpec, &wavBuffer, &wavLength);
-    SDL_AudioDeviceID deviceId = SDL_OpenAudioDevice(NULL, 0, &wavSpec, NULL, 0);
+
+    SDL_Surface* imagePause = NULL;
+    SDL_Texture* texturePause = NULL;
+    ALLImageAndTransparencyINIT(imagePause, texturePause, PauseButtonLocalImageBMP, render)
+    SDL_Surface* imagePlay = NULL;
+    SDL_Texture* texturePlay = NULL;
+    ALLImageAndTransparencyINIT(imagePlay, texturePlay, PlayButtonLocalImageBMP, render)
+    SDL_Rect rectPausePlay;
+    rectPausePlay.x=1600;
+    rectPausePlay.y=880;
+    rectPausePlay.w=100;
+    rectPausePlay.h=100;
+
+    
+    SDL_Surface* imageTimer = NULL;
+    SDL_Texture* textureTimer = NULL;
+    ALLImageAndTransparencyINIT(imageTimer, textureTimer, TimerImageBMP, render)
+    SDL_Rect rectTimer;
+    rectTimer.x= 100;
+    rectTimer.y= 200;
+    rectTimer.w= 338;
+    rectTimer.h= 118;
+
+    //Initialisation of the name of the 2 players
+    TTF_Font * font = TTF_OpenFont("fonts/digital-7.ttf", 50);
+    TTF_Font * fontName = TTF_OpenFont("fonts/digital-7.ttf", 25);
+    SDL_Color colorNameWhite = {0, 0, 0};
+    SDL_Color colorNameBlack = {255, 255, 255};
+    SDL_Surface * surfaceNameWhite;
+    SDL_Surface * surfaceNameBlack;
+    if (colorChoice==0)
+    {
+        surfaceNameWhite = TTF_RenderText_Solid(fontName, charPseudo1, colorNameWhite);
+        surfaceNameBlack = TTF_RenderText_Solid(fontName, charPseudo2, colorNameBlack);
+    }
+    else
+    {
+        surfaceNameWhite = TTF_RenderText_Solid(fontName, charPseudo2, colorNameWhite);
+        surfaceNameBlack = TTF_RenderText_Solid(fontName, charPseudo1, colorNameBlack);
+    }
+    SDL_Texture * textureNameWhite = SDL_CreateTextureFromSurface(render, surfaceNameWhite);
+    SDL_Texture * textureNameBlack = SDL_CreateTextureFromSurface(render, surfaceNameBlack);
+    
+    int texWNameWhite, texHNameWhite;
+    SDL_QueryTexture(textureNameWhite, NULL, NULL, &texWNameWhite, &texHNameWhite);
+    SDL_Rect sdlRectNameWhite = {97, 520, texWNameWhite, texHNameWhite};
+    int texWNameBlack, texHNameBlack;
+    SDL_QueryTexture(textureNameBlack, NULL, NULL, &texWNameBlack, &texHNameBlack);
+    SDL_Rect sdlRectNameBlack = {1552, 520, texWNameBlack, texHNameBlack};
+
+    initSound()
     
     unsigned int chessBoard[64] = departPosition;
 
@@ -5023,23 +8606,27 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int enPassant = 0;
     int rock=15;
     int teamToPlay = 1;
+    int moveWhite=0;
+    int moveBlack=0;
     int noPromotion = NOTHING;
 
     //Initialisation of the timer
+    int leadTime;
     int timerIsOn=1;
     int inverse=0;
-    int add_time=2;
+    int leftOverTimeBlack=leftOverTime;
+    int leftOverTimeWhite=leftOverTime;
 
-    TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 50);
+    //Be careful
     SDL_Color color = { 0, 0, 0};
     time_t endTime;
     time(&endTime);
-    endTime += 100;
-    
-    int leftOverTimeWhite = 100;
-    int leftOverTimeBlack = 100;
-    char stringTimeToShowWhite[6]="1:40";
-    char stringTimeToShowBlack[6]="1:40";
+    endTime += leftOverTime;
+    char stringTimeToShowWhite[6]="0:00";
+    char stringTimeToShowBlack[6]="0:00";
+
+
+
     SDL_Surface * surfaceTimerWhite = TTF_RenderText_Solid(font,stringTimeToShowWhite, color);
     SDL_Texture * textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
     SDL_Surface * surfaceTimerBlack = TTF_RenderText_Solid(font,stringTimeToShowBlack, color);
@@ -5047,13 +8634,52 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int texWWhite = 200;
     int texHWhite = 100;
     SDL_QueryTexture(textureTimerWhite, NULL, NULL, &texWWhite, &texHWhite);
-    SDL_Rect sdlRectTimerWhite = {300, 300, texWWhite, texHWhite};
+    SDL_Rect sdlRectTimerWhite = {225, 233, texWWhite, texHWhite};
     int texWBlack = 200;
     int texHBlack = 100;
     SDL_QueryTexture(textureTimerBlack, NULL, NULL, &texWBlack, &texHBlack);
-    SDL_Rect sdlRectTimerBlack = {200, 200, texWBlack, texHBlack};
+    SDL_Rect sdlRectTimerBlack = {1660, 233, texWBlack, texHBlack};
     SDL_RenderCopy(render, textureBackground, NULL, NULL);
+
+    SDL_RenderCopy(render, textureNameWhite, NULL, &sdlRectNameWhite);
+    SDL_RenderCopy(render, textureNameBlack, NULL, &sdlRectNameBlack);
     displayAllpiecesInRender()
+    
+    if (1)
+    {
+        itoa(leftOverTimeWhite/60, stringTimeToShowWhite, 10);
+        strcat(stringTimeToShowWhite, ":");
+        char stringTens[1];
+        itoa((leftOverTimeWhite%60)/10, stringTens, 10);
+        char stringUnity[2];
+        itoa((leftOverTimeWhite%60)%10, stringUnity, 10);
+        strcat(stringTimeToShowWhite, stringTens);
+        strcat(stringTimeToShowWhite, stringUnity);
+    }
+    if (1)
+    {
+        itoa(leftOverTimeBlack/60, stringTimeToShowBlack, 10);
+        strcat(stringTimeToShowBlack, ":");
+        char stringTens[1];
+        itoa((leftOverTimeBlack%60)/10, stringTens, 10);
+        char stringUnity[2];
+        itoa((leftOverTimeBlack%60)%10, stringUnity, 10);
+        strcat(stringTimeToShowBlack, stringTens);
+        strcat(stringTimeToShowBlack, stringUnity);
+    }
+    
+    rectTimer.x=75;
+    SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+    surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
+    textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
+    SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+    
+    rectTimer.x=1510;
+    SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+    surfaceTimerBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
+    textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
+    SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+
     SDL_RenderPresent(render);
 
     SDL_Event event;
@@ -5065,16 +8691,40 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         switch(event.type)
         {
             case SDL_QUIT:
-                *nextPage=1;
-                continuer = 0;
+                if (doYouWantToQuitNoTime(render))
+                {
+                    *nextPage=1;
+                    continuer=0;
+                    continue;
+                }
+                else
+                {
+                    SDL_RenderClear(render);
+                    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                    showPreviousMoves()
+                    displayAllpiecesInRender()
+                    rectTimer.x=75;
+                    SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                    rectTimer.x=1510;
+                    SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                    SDL_RenderCopy(render, textureNameWhite, NULL, &sdlRectNameWhite);
+                    SDL_RenderCopy(render, textureNameBlack, NULL, &sdlRectNameBlack);
+                    SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+                    SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+                    SDL_RenderPresent(render);
+                    SDL_Delay(100);
+                }
                 break;
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
+                    endTime-=time(NULL);
                     if (doYouWantToQuitNoTime(render))
                     {
                         *nextPage=1;
                         continuer=0;
+                        timerIsOn=0;
                         continue;
                     }
                     else
@@ -5083,25 +8733,75 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_RenderCopy(render, textureBackground, NULL, NULL);
                         showPreviousMoves()
                         displayAllpiecesInRender()
+                        rectTimer.x=75;
+                        SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                        rectTimer.x=1510;
+                        SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                        SDL_RenderCopy(render, textureNameWhite, NULL, &sdlRectNameWhite);
+                        SDL_RenderCopy(render, textureNameBlack, NULL, &sdlRectNameBlack);
+                        SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+                        SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
                         SDL_RenderPresent(render);
                         SDL_Delay(100);
                     }
+                    endTime+=time(NULL);
                     
                 }
-                else if (event.button.x >= xxx && event.button.y<=45)
+                else if (event.button.x >=1828 && event.button.y<=45)
                 {
-                    
+                    playSound(ButtonSound)
+                    endTime-=time(NULL);
+                    if (optionNoTime(render))
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                        timerIsOn=0;
+                        continue;
+                    }
+                    else
+                    {
+                        initAllBoardImages()
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                        showPreviousMoves()
+                        displayAllpiecesInRender()
+                        rectTimer.x=75;
+                        SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                        rectTimer.x=1510;
+                        SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                        SDL_RenderCopy(render, textureNameWhite, NULL, &sdlRectNameWhite);
+                        SDL_RenderCopy(render, textureNameBlack, NULL, &sdlRectNameBlack);
+                        SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+                        SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+                        SDL_RenderPresent(render);
+                        SDL_Delay(100);
+                    }
+                    endTime+=time(NULL);
+                }
+                else if (event.button.x>1599 && event.button.x<1701 && event.button.y>879 && event.button.y<981)
+                {
+                    if (timerIsOn==1)
+                    {
+                        timerIsOn=0;
+                        leadTime=time(NULL);
+                    }
+                    else
+                    {
+                        endTime+=(time(NULL)-leadTime);
+                        timerIsOn=1;
+                    }
+                    SDL_Delay(300);
                 }
                 else if (event.button.x >= xMinBoard && event.button.x <= xMaxBoard && event.button.y <=yMaxBoard && event.button.y >= yMinBoard)
                 {
                     int caseNumber = 0;
                     if (inverse)
                     {
-                        caseNumber = 63-giveCaseNumber(event.button.x, event.button.y);
+                        caseNumber = 63-giveCaseNumberPlayer();
                     }
                     else
                     {
-                        caseNumber = giveCaseNumber(event.button.x, event.button.y);
+                        caseNumber = giveCaseNumberPlayer();
                     }
 
                     if (noPromotion!=NOTHING) // If the pawn is about to be promoted
@@ -5136,18 +8836,42 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureBackground, NULL, NULL);
                                 showPreviousMoves()
                                 displayAllpiecesInRender()
+                                rectTimer.x=75;
+                                SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                                rectTimer.x=1510;
+                                SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                                SDL_RenderCopy(render, textureNameWhite, NULL, &sdlRectNameWhite);
+                                SDL_RenderCopy(render, textureNameBlack, NULL, &sdlRectNameBlack);
+                                SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+                                SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+                                SDL_RenderCopy(render, texturePlay, NULL, &rectPausePlay);
                                 SDL_RenderPresent(render);
                                 continue;
                             }
                             previousMove[0] = change;
                             previousMove[1] = noPromotion;
+                            //On the timer
+                            if (timerIsOn==0)
+                            {
+                                endTime+=(time(NULL)-leadTime);
+                                timerIsOn=1;
+                            }
                             noPromotion=NOTHING;
                             change=NOTHING;
                             teamToPlay=0;
                             if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
-                                issueOfTheGame(render, nextPage, inverse, 0);
+                                if (colorChoice==0)
+                                {
+                                    issueOfTheGameLocal(render, nextPage, 1, charPseudo1, charPseudo2, leftOverTimeWhite, leftOverTimeBlack, moveWhite, moveBlack, teamToPlay, chessBoard);
+                                }
+                                else
+                                {
+                                    issueOfTheGameLocal(render, nextPage, 1, charPseudo2, charPseudo1, leftOverTimeWhite, leftOverTimeBlack, moveWhite, moveBlack, teamToPlay, chessBoard);
+                                }
                                 continuer=0;
+                                timerIsOn=0;
+                                continue;
                             }
                             enPassant=0;
                             updateRock(chessBoard, teamToPlay, &rock);
@@ -5155,7 +8879,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             SDL_RenderCopy(render, textureBackground, NULL, NULL);
                             showPreviousMoves()
                             displayAllpiecesInRender()
-                            SDL_RenderPresent(render);
                         } 
                         else 
                         {
@@ -5187,18 +8910,42 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 SDL_RenderCopy(render, textureBackground, NULL, NULL);
                                 showPreviousMoves()
                                 displayAllpiecesInRender()
+                                rectTimer.x=75;
+                                SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                                rectTimer.x=1510;
+                                SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                                SDL_RenderCopy(render, textureNameWhite, NULL, &sdlRectNameWhite);
+                                SDL_RenderCopy(render, textureNameBlack, NULL, &sdlRectNameBlack);
+                                SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+                                SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+                                SDL_RenderCopy(render, texturePlay, NULL, &rectPausePlay);
                                 SDL_RenderPresent(render);
                                 continue;
                             }
                             previousMove[0] = change;
                             previousMove[1] = noPromotion;
+                            //On the timer
+                            if (timerIsOn==0)
+                            {
+                                endTime+=(time(NULL)-leadTime);
+                                timerIsOn=1;
+                            }
                             noPromotion=NOTHING;
                             change=NOTHING;
                             teamToPlay=1;
                             if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
-                                issueOfTheGame(render, nextPage, inverse, 0);
+                                if (colorChoice==0)
+                                {
+                                    issueOfTheGameLocal(render, nextPage, 1, charPseudo1, charPseudo2, leftOverTimeWhite, leftOverTimeBlack, moveWhite, moveBlack, teamToPlay, chessBoard);
+                                }
+                                else
+                                {
+                                    issueOfTheGameLocal(render, nextPage, 1, charPseudo2, charPseudo1, leftOverTimeWhite, leftOverTimeBlack, moveWhite, moveBlack, teamToPlay, chessBoard);
+                                }
                                 continuer=0;
+                                timerIsOn=0;
+                                continue;
                             }
                             enPassant=0;
                             updateRock(chessBoard, teamToPlay, &rock);
@@ -5206,7 +8953,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             SDL_RenderCopy(render, textureBackground, NULL, NULL);
                             showPreviousMoves()
                             displayAllpiecesInRender()
-                            SDL_RenderPresent(render);
                         }
 
                     }
@@ -5236,7 +8982,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             showPreviousMoves()
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquare(change, render, inverse);
+                            drawSquarePlayer(change, render, inverse)
                             file = initialise(); 
                             legalMovePiece(chessBoard, change, enPassant,  &rock, file);
                             MoveStructure *actualMove= file->firstMove;
@@ -5254,7 +9000,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 }
                                 actualMove = actualMove->nextMove;
                             };
-                            SDL_RenderPresent(render);
                             
                         }
                     }
@@ -5268,7 +9013,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             displayAllpiecesInRender()
                             change = caseNumber;
                             SDL_SetRenderDrawColor(render, BLACK);
-                            drawSquare(change, render, inverse);
+                            drawSquarePlayer(change, render, inverse)
                             file = initialise();
                             legalMovePiece(chessBoard, change, enPassant, &rock, file);
                             MoveStructure *actualMove= file->firstMove;
@@ -5286,7 +9031,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                 }
                                 actualMove = actualMove->nextMove;
                             };
-                            SDL_RenderPresent(render);
                         }
                         else if (isMovePossible(caseNumber, file))
                         {
@@ -5333,6 +9077,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     noPromotion = caseNumber;
                                     showWhitePromoteBar(dstrect, &dstrect, caseNumber, textureWhitePromoteBar)
                                     SDL_RenderPresent(render);
+                                    SDL_Delay(300);
                                     continue;
                                 }
                                 else if (caseNumber/8==7) //Black promotion
@@ -5340,6 +9085,7 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                                     noPromotion = caseNumber;
                                     showBlackPromoteBar(dstrect, &dstrect, caseNumber, textureBlackPromoteBar)
                                     SDL_RenderPresent(render);
+                                    SDL_Delay(300);
                                     continue;
                                 }
                                 else
@@ -5368,7 +9114,13 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             previousMove[0] = change;
                             previousMove[1] = caseNumber;
                             
-
+                            //On the timer
+                            if (timerIsOn==0)
+                            {
+                                endTime+=(time(NULL)-leadTime);
+                                timerIsOn=1;
+                            }
+                            
                             //Clear the window
                             SDL_RenderClear(render);
 
@@ -5381,24 +9133,33 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             //Show all the pieces
                             displayAllpiecesInRender()
 
-                            SDL_RenderPresent(render);
-
                             //Reset change
                             change = NOTHING;
-                            if (teamToPlay)
+                            if (teamToPlay==1)
                             {
                                 teamToPlay=0;
+                                moveWhite+=1;
                                 endTime=time(NULL)+leftOverTimeBlack+add_time;
                             }
                             else
                             {
                                 teamToPlay=1;
+                                moveBlack+=1;
                                 endTime=time(NULL)+leftOverTimeWhite+add_time;
                             }
                             if (isCheckMate(chessBoard, teamToPlay, &rock, enPassant)==1)
                             {
                                 continuer=0;
-                                issueOfTheGame(render, nextPage, inverse, 0);
+                                if (colorChoice==0)
+                                {
+                                    issueOfTheGameLocal(render, nextPage, 1, charPseudo1, charPseudo2, leftOverTimeWhite, leftOverTimeBlack, moveWhite, moveBlack, teamToPlay, chessBoard);
+                                }
+                                else
+                                {
+                                    issueOfTheGameLocal(render, nextPage, 1, charPseudo2, charPseudo1, leftOverTimeWhite, leftOverTimeBlack, moveWhite, moveBlack, teamToPlay, chessBoard);
+                                }
+                                timerIsOn=0;
+                                continue;
                             }
                             updateRock(chessBoard, teamToPlay, &rock);
 
@@ -5417,8 +9178,6 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                             //Show all the pieces
                             displayAllpiecesInRender()
 
-                            SDL_RenderPresent(render);
-
                             change = NOTHING;
                         }
                     }
@@ -5433,12 +9192,29 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         }
         if (timerIsOn)
         {
+            SDL_RenderCopy(render, texturePlay, NULL, &rectPausePlay);
             if (teamToPlay)
             {
                 leftOverTimeWhite = endTime-time(NULL);
                 if (leftOverTimeWhite<=0)
                 {
-                    continuer = 0;
+                    rectTimer.x=75;
+                    SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                    surfaceTimerWhite = TTF_RenderText_Solid(font, "0:00", color);
+                    textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
+                    SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+                    SDL_RenderPresent(render);
+                    if (colorChoice==0)
+                    {
+                        issueOfTheGameLocal(render, nextPage, 2, charPseudo1, charPseudo2, 0, leftOverTimeBlack, moveWhite, moveBlack, 0, chessBoard);
+                    }
+                    else
+                    {
+                        issueOfTheGameLocal(render, nextPage, 2, charPseudo2, charPseudo1, 0, leftOverTimeBlack, moveWhite, moveBlack, 0, chessBoard);
+                    }
+                    timerIsOn=0;
+                    continuer=0;
+                    continue;
                 }
                 else
                 {
@@ -5457,7 +9233,23 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 leftOverTimeBlack = endTime-time(NULL);
                 if (leftOverTimeBlack<=0)
                 {
-                    continuer = 0;
+                    rectTimer.x=1510;
+                    SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+                    surfaceTimerBlack = TTF_RenderText_Solid(font, "0:00", color);
+                    textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
+                    SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+                    SDL_RenderPresent(render);
+                    if (colorChoice==0)
+                    {
+                        issueOfTheGameLocal(render, nextPage, 2, charPseudo1, charPseudo2, leftOverTimeWhite, 0, moveWhite, moveBlack, 1, chessBoard);
+                    }
+                    else
+                    {
+                        issueOfTheGameLocal(render, nextPage, 2, charPseudo2, charPseudo1, leftOverTimeWhite, 0, moveWhite, moveBlack, 1, chessBoard);
+                    }
+                    timerIsOn=0;
+                    continuer=0;
+                    continue;
                 }
                 else
                 {
@@ -5471,18 +9263,35 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     strcat(stringTimeToShowBlack, stringUnity);
                 }
             }
-            SDL_Rect rect;
-            drawSquareTimer(300, 100)
+            rectTimer.x=75;
+            SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
             surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
             textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
             SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
             
-            drawSquareTimer(200, 100)
+            rectTimer.x=1510;
+            SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
             surfaceTimerBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
             textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
             SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
             SDL_RenderPresent(render);
             //SDL_Delay(5);
+        }
+        else
+        {
+            SDL_RenderCopy(render, texturePause, NULL, &rectPausePlay);
+            rectTimer.x=75;
+            SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+            surfaceTimerWhite = TTF_RenderText_Solid(font, stringTimeToShowWhite, color);
+            textureTimerWhite = SDL_CreateTextureFromSurface(render, surfaceTimerWhite);
+            SDL_RenderCopy(render, textureTimerWhite, NULL, &sdlRectTimerWhite);
+            
+            rectTimer.x=1510;
+            SDL_RenderCopy(render, textureTimer, NULL, &rectTimer);
+            surfaceTimerBlack = TTF_RenderText_Solid(font, stringTimeToShowBlack, color);
+            textureTimerBlack = SDL_CreateTextureFromSurface(render, surfaceTimerBlack);
+            SDL_RenderCopy(render, textureTimerBlack, NULL, &sdlRectTimerBlack);
+            SDL_RenderPresent(render);
         }
     }
 
@@ -5491,8 +9300,413 @@ int mainBoard(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 }
 
 
-void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
+void pseudoChoice(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
+    initSound()
+
+    int focus=0;
+    int colorChoice=2;
+    int leftShift=0;
+    int rightShift=0;
+    int leftAlt=0;
+    int rightAlt=0;
+    int limitChar=14;
+    int cptNumberOfValuesPseudo1=0;
+    int cptNumberOfValuesPseudo2=0;
+    char strPseudo1[38];
+    emptyChar(strPseudo1, 38);
+    char* strPointeurPseudo1=strPseudo1;
+    char strPseudo2[38];
+    emptyChar(strPseudo2, 38);
+    char* strPointeurPseudo2=strPseudo2;
+
+    TTF_Font * font=NULL;
+    TTF_Font *fontBold =NULL;
+    TTF_Font * fontPassword =NULL;
+    SDL_Rect rectFill1;
+    SDL_Rect rectFill2;
+    
+    SDL_Color color = { 0, 0, 0};
+    SDL_Color colorIncorrect = {255, 128, 155};
+    openFonts()
+    SDL_Surface * surfacePseudo1 = TTF_RenderText_Solid(font,"   ", color);
+    SDL_Texture * texturePseudo1 = SDL_CreateTextureFromSurface(render, surfacePseudo1);
+
+    int texWPseudo1 = 729;
+    int texHPseudo1 = 38;
+
+    SDL_Surface * surfacePseudo2 = TTF_RenderText_Solid(fontPassword,"   ", color);
+    closeFonts()
+    SDL_Texture * texturePseudo2 = SDL_CreateTextureFromSurface(render, surfacePseudo2);
+    int texWPseudo2 = 729;
+    int texHPseudo2 = 38;
+
+    SDL_Surface* imageBG = NULL;
+    SDL_Texture* textureBG = NULL;
+    ALLImageAndTransparencyINIT(imageBG, textureBG, PseudoChoiceBGimageBMP, render)
+
+    SDL_Surface* imageHoverRetour = NULL;
+    SDL_Texture* textureHoverRetour = NULL;
+    ALLImageAndTransparencyINIT(imageHoverRetour, textureHoverRetour, HoverPseudoRetourimageBMP, render)
+    SDL_Rect rectRetour;
+    rectRetour.x= 673;
+    rectRetour.y= 622;
+    rectRetour.w= 254;
+    rectRetour.h= 74;
+    
+    SDL_Surface* imageRetour = NULL;
+    SDL_Texture* textureRetour = NULL;
+    ALLImageAndTransparencyINIT(imageRetour, textureRetour, PseudoRetourimageBMP, render)
+
+    SDL_Surface* imageHoverValider = NULL;
+    SDL_Texture* textureHoverValider = NULL;
+    ALLImageAndTransparencyINIT(imageHoverValider, textureHoverValider, HoverPseudoValiderimageBMP, render)
+    SDL_Rect rectValider;
+    rectValider.x= 995;
+    rectValider.y= 622;
+    rectValider.w= 254;
+    rectValider.h= 74;
+
+    SDL_Surface* imageValider = NULL;
+    SDL_Texture* textureValider = NULL;
+    ALLImageAndTransparencyINIT(imageValider, textureValider, PseudoValiderimageBMP, render)
+
+    SDL_Surface* imageRandomColor = NULL;
+    SDL_Texture* textureRandomColor = NULL;
+    ALLImageAndTransparencyINIT(imageRandomColor, textureRandomColor, PseudoRandomimageBMP, render)
+
+    SDL_Surface* imageBlackWhiteColor = NULL;
+    SDL_Texture* textureBlackWhiteColor = NULL;
+    ALLImageAndTransparencyINIT(imageBlackWhiteColor, textureBlackWhiteColor, PseudoBlackWhiteimageBMP, render)
+
+    SDL_Surface* imageWhiteBlackColor = NULL;
+    SDL_Texture* textureWhiteBlackColor = NULL;
+    ALLImageAndTransparencyINIT(imageWhiteBlackColor, textureWhiteBlackColor, PseudoWhiteBlackimageBMP, render)
+    SDL_Rect rectColorChoice;
+    rectColorChoice.x= 923;
+    rectColorChoice.y= 520;
+    rectColorChoice.w= 76;
+    rectColorChoice.h= 43;
+
+    SDL_RenderCopy(render, textureBG, NULL, NULL);
+    renderGoodColorChoice()
+    SDL_RenderPresent(render);
+
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_QUIT:
+                if (doYouWantToQuitNoTime(render))
+                {
+                    *nextPage=1;
+                    continuer=0;
+                    continue;
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureBG, NULL, NULL);
+                    if (focus==1)
+                    {
+                        focusPseudo1()
+                    }
+                    else if (focus==2)
+                    {
+                        focusPseudo2()
+                    }
+                    SDL_RenderPresent(render);
+                }
+                break;
+            case SDL_MOUSEMOTION:
+                if (event.button.x > 672 && event.button.x < 927 && event.button.y > 621 && event.button.y < 696)
+                {
+                    SDL_RenderCopy(render, textureHoverRetour, NULL, &rectRetour);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureRetour, NULL, &rectRetour);
+                }
+                if (event.button.x > 994 && event.button.x < 1249 && event.button.y > 621 && event.button.y < 696)
+                {
+                    SDL_RenderCopy(render, textureHoverValider, NULL, &rectValider);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureValider, NULL, &rectValider);
+                }
+                SDL_RenderPresent(render);
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    playSound(ButtonSound)
+                    if (doYouWantToQuitNoTime(render))
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                        continue;
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureBG, NULL, NULL);
+                        if (focus==1)
+                        {
+                            focusPseudo1()
+                        }
+                        else if (focus==2)
+                        {
+                            focusPseudo2()
+                        }
+                        SDL_RenderPresent(render);
+                    }
+                }
+                else if (event.button.x>564 && event.button.y>521 && event.button.x<890 && event.button.y<561)
+                {
+                    playSound(BoxSound)
+                    SDL_RenderCopy(render, textureBG, NULL, NULL);
+                    if (focus!=1)
+                    {
+                        focusPseudo1()
+                    }
+                    else
+                    {
+                        focus=0;
+                    }
+                }
+                else if (event.button.x>1031 && event.button.y>521 && event.button.x<1358 && event.button.y<561)
+                {
+                    playSound(BoxSound)
+                    SDL_RenderCopy(render, textureBG, NULL, NULL);
+                    if (focus!=2)
+                    {
+                        focusPseudo2()
+                    }
+                    else
+                    {
+                        focus=0;
+                    }
+                }
+                else if (event.button.x > 672 && event.button.x < 927 && event.button.y > 621 && event.button.y < 696)
+                {
+                    playSound(ButtonSound)
+                    *nextPage=7;
+                    continuer=0;
+                }
+                else if (event.button.x > 994 && event.button.x < 1249 && event.button.y > 621 && event.button.y < 696)
+                {
+                    playSound(ButtonSound)
+                    if (colorChoice==2)
+                    {
+                        srand(time(NULL));
+                        colorChoice = rand()%2;  
+                    }
+
+                    char newPseudo1[cptNumberOfValuesPseudo1];
+                    for (int i=0; i<cptNumberOfValuesPseudo1; i++)
+                    {
+                        newPseudo1[i]=strPointeurPseudo1[i];
+                    }
+                    newPseudo1[cptNumberOfValuesPseudo1]=0;
+
+                    char newPseudo2[cptNumberOfValuesPseudo2];
+                    for (int i=0; i<cptNumberOfValuesPseudo2; i++)
+                    {
+                        newPseudo2[i]=strPointeurPseudo2[i];
+                    }
+                    newPseudo2[cptNumberOfValuesPseudo2]=0;
+
+                    mainBoard(window, render, nextPage, colorChoice, newPseudo1, newPseudo2);
+                    continuer=0;
+                    continue;
+                    //Valider button
+                }
+                else if (event.button.x > 922 && event.button.x < 999 && event.button.y > 519 && event.button.y < 563)
+                {
+                    playSound(ButtonSound)
+                    if (colorChoice==2)
+                    {
+                        colorChoice=0;
+                    }
+                    else
+                    {
+                        colorChoice+=1;
+                    }
+                }
+                else
+                {
+                    focus=0;
+                    SDL_RenderCopy(render, textureBG, NULL, NULL);
+                }
+                openFonts()
+                showTextesPseudo()
+                closeFonts()
+                renderGoodColorChoice()
+                SDL_RenderPresent(render);
+                break;
+            case SDL_KEYDOWN: 
+                switch( event.key.keysym.sym ){
+                    case SDLK_LSHIFT:
+                        leftShift=1;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=1;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=1;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=1;
+                        break;
+                    case SDLK_BACKSPACE:
+                        if (focus==1)
+                        {
+                            if (cptNumberOfValuesPseudo1>0)
+                            {
+                                cptNumberOfValuesPseudo1-=1;
+                                strPointeurPseudo1[cptNumberOfValuesPseudo1]=32;
+                            }
+                        }
+                        else if (focus==2)
+                        {
+                            if (cptNumberOfValuesPseudo2>0)
+                            {
+                                cptNumberOfValuesPseudo2-=1;
+                                strPointeurPseudo2[cptNumberOfValuesPseudo2]=32;
+                            }
+                        }
+                        break;
+                    case SDLK_TAB:
+                        if (focus==0)
+                        {
+                            playSound(BoxSound)
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureBG, NULL, NULL);
+                            renderGoodColorChoice()
+                            changeValuePseudo1()
+                            focusPseudo1()
+                            int x,y;
+                            SDL_GetGlobalMouseState(&x, &y);
+                            if (x>994 && x<1249 && y>621 && y<696)
+                            {
+                                SDL_RenderCopy(render, textureHoverValider, NULL, &rectValider);
+                            }
+                            else if (x>672 && x<927 && y>621 && y<696)
+                            {
+                                SDL_RenderCopy(render, textureHoverRetour, NULL, &rectRetour);
+                            }
+                            SDL_RenderPresent(render);
+                        }
+                        else if (focus==1)
+                        {
+                            playSound(BoxSound)
+                            SDL_RenderClear(render);
+                            SDL_RenderCopy(render, textureBG, NULL, NULL);
+                            renderGoodColorChoice()
+                            changeValuePseudo2()
+                            focusPseudo2()
+                            int x,y;
+                            SDL_GetGlobalMouseState(&x, &y);
+                            if (x>994 && x<1249 && y>621 && y<696)
+                            {
+                                SDL_RenderCopy(render, textureHoverValider, NULL, &rectValider);
+                            }
+                            else if (x>672 && x<927 && y>621 && y<696)
+                            {
+                                SDL_RenderCopy(render, textureHoverRetour, NULL, &rectRetour);
+                            }
+                            SDL_RenderPresent(render);
+                        }
+                        break;
+                    keyPressedPseudo(SDLK_a, 97, 65, -1, limitChar)
+                    keyPressedPseudo(SDLK_b, 98, 66, -1, limitChar)
+                    keyPressedPseudo(SDLK_c, 99, 67, -1, limitChar)
+                    keyPressedPseudo(SDLK_d, 100, 68, -1, limitChar)
+                    keyPressedPseudo(SDLK_e, 101, 69, -1, limitChar)
+                    keyPressedPseudo(SDLK_f, 102, 70, -1, limitChar)
+                    keyPressedPseudo(SDLK_g, 103, 71, -1, limitChar)
+                    keyPressedPseudo(SDLK_h, 104, 72, -1, limitChar)
+                    keyPressedPseudo(SDLK_i, 105, 73, -1, limitChar)
+                    keyPressedPseudo(SDLK_j, 106, 74, -1, limitChar)
+                    keyPressedPseudo(SDLK_k, 107, 75, -1, limitChar)
+                    keyPressedPseudo(SDLK_l, 108, 76, -1, limitChar)
+                    keyPressedPseudo(SDLK_m, 109, 77, -1, limitChar)
+                    keyPressedPseudo(SDLK_n, 110, 78, -1, limitChar)
+                    keyPressedPseudo(SDLK_o, 111, 79, -1, limitChar)
+                    keyPressedPseudo(SDLK_p, 112, 80, -1, limitChar)
+                    keyPressedPseudo(SDLK_q, 113, 81, -1, limitChar)
+                    keyPressedPseudo(SDLK_r, 114, 82, -1, limitChar)
+                    keyPressedPseudo(SDLK_s, 115, 83, -1, limitChar)
+                    keyPressedPseudo(SDLK_t, 116, 84, -1, limitChar)
+                    keyPressedPseudo(SDLK_u, 117, 85, -1, limitChar)
+                    keyPressedPseudo(SDLK_v, 118, 86, -1, limitChar)
+                    keyPressedPseudo(SDLK_w, 119, 87, -1, limitChar)
+                    keyPressedPseudo(SDLK_x, 120, 88, -1, limitChar)
+                    keyPressedPseudo(SDLK_y, 121, 89, -1, limitChar)
+                    keyPressedPseudo(SDLK_z, 122, 90, -1, limitChar)
+                    keyPressedPseudo(SDLK_1, 38, 49, -1, limitChar)
+                    keyPressedPseudo(SDLK_2, 233, 50, -1, limitChar)
+                    keyPressedPseudo(SDLK_3, -1, 51, 35, limitChar)
+                    keyPressedPseudo(SDLK_4, -1, 52, -1, limitChar)
+                    keyPressedPseudo(SDLK_5, -1, 53, -1, limitChar)
+                    keyPressedPseudo(SDLK_6, 45, 54, -1, limitChar)
+                    keyPressedPseudo(SDLK_7, 232, 55, -1, limitChar)
+                    keyPressedPseudo(SDLK_8, 95, 56, -1, limitChar)
+                    keyPressedPseudo(SDLK_9, 231, 57, -1, limitChar)
+                    keyPressedPseudo(SDLK_0, 224, 48, 64, limitChar)
+                }
+                openFonts()
+                showTextesPseudo()
+                closeFonts()
+                SDL_RenderPresent(render);
+                break;
+            case SDL_KEYUP:
+                switch( event.key.keysym.sym ){
+                    case SDLK_LSHIFT:
+                        leftShift=0;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=0;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=0;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=0;
+                        break;
+                }
+                break;
+        }
+    }
+    SDL_FreeSurface(surfacePseudo2);
+    SDL_FreeSurface(imageBG);
+    SDL_FreeSurface(imageHoverRetour);
+    SDL_FreeSurface(imageRetour);
+    SDL_FreeSurface(imageHoverValider);
+    SDL_FreeSurface(imageValider);
+    SDL_FreeSurface(imageRandomColor);
+    SDL_FreeSurface(imageBlackWhiteColor);
+    SDL_FreeSurface(imageWhiteBlackColor);
+
+    SDL_DestroyTexture(texturePseudo2);
+    SDL_DestroyTexture(textureBG);
+    SDL_DestroyTexture(textureHoverRetour);
+    SDL_DestroyTexture(textureRetour);
+    SDL_DestroyTexture(textureHoverValider);
+    SDL_DestroyTexture(textureValider);
+    SDL_DestroyTexture(textureRandomColor);
+    SDL_DestroyTexture(textureBlackWhiteColor);
+    SDL_DestroyTexture(textureWhiteBlackColor);
+}
+
+
+
+void attenteCodeConfirmationCompte(SDL_Window* window, SDL_Renderer* render, int* nextPage)
+{
+    initSound()
+
     SDL_Surface* imageMailConfirmationBackground = NULL;
     SDL_Texture* textureMailConfirmationBackground = NULL;
     ALLImageINIT(imageMailConfirmationBackground, textureMailConfirmationBackground, MailConfirmationBGImageBMP, render)
@@ -5510,7 +9724,8 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     rectValiderButton.w = 254;
     rectValiderButton.h = 74; 
 
-    char strCodeConfirmation[38]="                                      ";
+    char strCodeConfirmation[38];
+    emptyChar(strCodeConfirmation, 38);
     char* strPointeurCodeConfirmation = strCodeConfirmation;
     int cptNumberOfValuesConfirmation=0;
 
@@ -5521,6 +9736,8 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
     int limitCharDate=6;
 
     //Generation of the code
+    char charCodeConfirmation[12];
+    char* ptcharCodeConfirmation=charCodeConfirmation;
     int codeConfirmation=0;
     srand(time(NULL));
     for (int x=0; x<6; x++)
@@ -5533,6 +9750,46 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
         }
         codeConfirmation+=pow*r;
     }
+
+    ptcharCodeConfirmation[0]=48 + (codeConfirmation/100000);
+    ptcharCodeConfirmation[1]=48 + ((codeConfirmation/10000)%10);
+    ptcharCodeConfirmation[2]=48 + ((codeConfirmation/1000)%10);
+    ptcharCodeConfirmation[3]=48 + ((codeConfirmation/100)%10);
+    ptcharCodeConfirmation[4]=48 + ((codeConfirmation/10)%10);
+    ptcharCodeConfirmation[5]=48 + (codeConfirmation%10);
+    ptcharCodeConfirmation[6]=0;
+
+    int canWrite=0;
+    char *filename = "id.csv";
+    FILE *fp = fopen(filename, "r");
+    const unsigned MAX_LENGTH = 256;
+    char buffer[MAX_LENGTH];
+
+    fgets(buffer, MAX_LENGTH, fp);
+    fgets(buffer, MAX_LENGTH, fp);
+    char* ptbuffer = buffer;
+    if (ptbuffer[strlen(buffer)-1]==59)
+    {
+        canWrite=1;
+    }
+    else
+    {
+        canWrite=0;
+    }
+    printf("\n");
+    printf("%s",buffer);
+    fclose(fp);
+
+    if (canWrite==1)
+    {
+        FILE *fp = fopen(filename, "a");
+        fprintf(fp, charCodeConfirmation);
+        fclose(fp);
+    }
+
+    SDL_Log(charCodeConfirmation);
+    //Executing python code and sending confirmation mail
+    WinExec("python \"mail.py\"", SW_HIDE);
 
     SDL_RenderCopy(render, textureMailConfirmationBackground, NULL, NULL);
     SDL_RenderPresent(render);
@@ -5558,6 +9815,7 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
             case SDL_MOUSEBUTTONDOWN:
                 if (event.button.x >=1875 && event.button.y <=45)
                 {
+                    playSound(ButtonSound)
                     if (doYouWantToQuitNoTime(render)==1)
                     {
                         continuer=0;
@@ -5572,7 +9830,317 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 }
                 if (event.button.x>832 && event.button.x<1087 && event.button.y>669 && event.button.y<744)
                 {
-                    if (intAndCharSame(codeConfirmation, strPointeurCodeConfirmation, cptNumberOfValuesConfirmation)==0)
+                    playSound(ButtonSound)
+                    if ((sameChar(charCodeConfirmation, strCodeConfirmation)==0) && (charHelp(strCodeConfirmation)==0))
+                    {
+                        SDL_Color color = {230, 20, 20};
+                        TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 33);
+
+                        SDL_Surface * surface = TTF_RenderText_Solid(font, "Code Incorrect", color);
+                        SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
+                        int texWChamps1 = 729;
+                        int texHChamps1 = 38;
+                        SDL_QueryTexture(texture, NULL, NULL, &texWChamps1, &texHChamps1);
+                        SDL_Rect sdlRectChamps1 = { 855, 630, texWChamps1, texHChamps1};
+                        SDL_RenderCopy(render, texture, NULL, &sdlRectChamps1);
+                        SDL_RenderPresent(render);
+                        TTF_CloseFont(font);
+                        SDL_Delay(3000);
+
+                        SDL_SetRenderDrawColor(render, 239, 239, 239, 239);
+                        SDL_Rect rectCode;
+                        rectCode.x = 770;
+                        rectCode.y = 630;
+                        rectCode.w = 350;
+                        rectCode.h = 30;
+                        SDL_RenderFillRect(render, &rectCode);
+                        SDL_RenderPresent(render);
+                    }
+                    else
+                    {
+                        SDL_Color color = {20, 230, 20};
+                        TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 33);
+
+                        SDL_Surface * surface = TTF_RenderText_Solid(font, "Code correct !", color);
+                        SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
+                        int texWChamps1 = 729;
+                        int texHChamps1 = 38;
+                        SDL_QueryTexture(texture, NULL, NULL, &texWChamps1, &texHChamps1);
+                        SDL_Rect sdlRectChamps1 = { 855, 630, texWChamps1, texHChamps1};
+                        SDL_RenderCopy(render, texture, NULL, &sdlRectChamps1);
+                        SDL_RenderPresent(render);
+                        TTF_CloseFont(font);
+                        MYSQL *con = mysql_init(NULL);
+                        if (mysql_real_connect(con, "logames.fr", "truc", "Test.123", "pokedex", 3306, NULL, 0)==NULL)
+                        {
+                            SDL_Log("Not connected");
+                        }
+                        else
+                        {
+                            SDL_Log("Connected");
+                        }
+                        char request[]="Update User SET active=1 Where email='";
+
+                        FILE *fp2 = fopen(filename, "r");
+                        const unsigned MAX_LENGTH = 256;
+                        char buffer[MAX_LENGTH];
+
+                        fgets(buffer, MAX_LENGTH, fp2);
+                        fgets(buffer, MAX_LENGTH, fp2);
+                        char* ptbuffer = buffer;
+                        int test=0;
+                        for (int i=0; i<MAX_LENGTH; i++)
+                        {
+                            if (test==2)
+                            {
+                                test=1;
+                            }
+                            else if (test==1)
+                            {
+                                buffer[i]=32;
+                            }
+                            else if (buffer[i]==59)
+                            {
+                                test=2;
+                                buffer[i]=39;
+                                buffer[i+1]=59;
+                            }
+                        }
+                        buffer[MAX_LENGTH]=0;
+                        fclose(fp2);
+
+                        strcat(request, buffer);
+                        SDL_Log("%s",request );
+                        if (mysql_query(con, request))
+                        {
+                            SDL_Log("Error, request connexion");
+                        }
+                        mysql_close(con);
+                        SDL_Delay(3000);
+
+                        continuer=0;
+                        *nextPage=2;
+                    }
+                }
+                break;
+            case SDL_KEYUP:
+                switch( event.key.keysym.sym )
+                {
+                    case SDLK_LSHIFT:
+                        leftShift=0;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=0;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=0;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=0;
+                        break;
+                }
+                break;
+            case SDL_KEYDOWN:
+                switch( event.key.keysym.sym ){
+                    case SDLK_LSHIFT:
+                        leftShift=1;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=1;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=1;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=1;
+                        break;
+                    case SDLK_BACKSPACE:
+                        if (cptNumberOfValuesConfirmation>0)
+                        {
+                            cptNumberOfValuesConfirmation-=1;
+                            strPointeurCodeConfirmation[cptNumberOfValuesConfirmation]=32;
+                        }
+                        break;
+                    keyPressedCodeValidation(SDLK_1, 38, 49, -1)
+                    keyPressedCodeValidation(SDLK_2, 233, 50, -1)
+                    keyPressedCodeValidation(SDLK_3, -1, 51, 35)
+                    keyPressedCodeValidation(SDLK_4, -1, 52, -1)
+                    keyPressedCodeValidation(SDLK_5, -1, 53, -1)
+                    keyPressedCodeValidation(SDLK_6, 45, 54, -1)
+                    keyPressedCodeValidation(SDLK_7, 232, 55, -1)
+                    keyPressedCodeValidation(SDLK_8, 95, 56, -1)
+                    keyPressedCodeValidation(SDLK_9, 231, 57, -1)
+                    keyPressedCodeValidation(SDLK_0, 224, 48, 64)
+                }
+                SDL_Color color = {0, 0, 0};
+                TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 40);
+                SDL_SetRenderDrawColor(render, WHITE);
+                SDL_Rect rectCode;
+                rectCode.x = 695;
+                rectCode.y = 557;
+                rectCode.w = 36;
+                rectCode.h = 53;
+                for (int i=0; i<6; i++)
+                {
+                    rectCode.x+=71;
+                    SDL_RenderFillRect(render, &rectCode);
+
+                    char test[38];
+                    emptyChar(test, 38);
+                    char* testpointeur=test;
+                    testpointeur[0]=strPointeurCodeConfirmation[i];
+
+                    SDL_Surface * surface = TTF_RenderText_Solid(font, test, color);
+                    SDL_Texture * texture = SDL_CreateTextureFromSurface(render, surface);
+                    int texWChamps1 = 729;
+                    int texHChamps1 = 38;
+                    SDL_QueryTexture(texture, NULL, NULL, &texWChamps1, &texHChamps1);
+                    SDL_Rect sdlRectChamps1 = { 770+(71*i), 557, texWChamps1, texHChamps1};
+                    SDL_RenderCopy(render, texture, NULL, &sdlRectChamps1);
+                }
+                TTF_CloseFont(font);
+                SDL_RenderPresent(render);
+                break;
+        }
+    }
+    SDL_FreeSurface(imageMailConfirmationBackground);
+    SDL_FreeSurface(imageValiderButton);
+    SDL_FreeSurface(imageValiderHoverButton);
+
+    SDL_DestroyTexture(textureMailConfirmationBackground);
+    SDL_DestroyTexture(textureValiderButton);
+    SDL_DestroyTexture(textureValiderHoverButton);
+}
+
+void attenteCodeConfirmationLostPassword(SDL_Window* window, SDL_Renderer* render, int* nextPage)
+{
+    initSound()
+
+    SDL_Surface* imageMailConfirmationBackground = NULL;
+    SDL_Texture* textureMailConfirmationBackground = NULL;
+    ALLImageINIT(imageMailConfirmationBackground, textureMailConfirmationBackground, MailConfirmationBGImageBMP, render)
+
+    SDL_Surface* imageValiderButton = NULL;
+    SDL_Texture* textureValiderButton = NULL;
+    ALLImageAndTransparencyINIT(imageValiderButton, textureValiderButton, MailConfirmationButtonImageBMP, render)
+
+    SDL_Surface* imageValiderHoverButton = NULL;
+    SDL_Texture* textureValiderHoverButton = NULL;
+    ALLImageAndTransparencyINIT(imageValiderHoverButton, textureValiderHoverButton, MailConfirmationButtonHoverImageBMP, render)
+    SDL_Rect rectValiderButton;
+    rectValiderButton.x = 833;
+    rectValiderButton.y = 670;
+    rectValiderButton.w = 254;
+    rectValiderButton.h = 74; 
+
+    char strCodeConfirmation[38];
+    emptyChar(strCodeConfirmation, 38);
+    char* strPointeurCodeConfirmation = strCodeConfirmation;
+    int cptNumberOfValuesConfirmation=0;
+
+    int leftShift=0;
+    int rightShift=0;
+    int rightAlt=0;
+    int leftAlt=0;
+    int limitCharDate=6;
+
+    //Generation of the code
+    char charCodeConfirmation[12];
+    char* ptcharCodeConfirmation=charCodeConfirmation;
+    int codeConfirmation=0;
+    srand(time(NULL));
+    for (int x=0; x<6; x++)
+    {
+        int r = (rand()%100)%10;
+        int pow=1;
+        for (int y=0; y<x; y++)
+        {
+            pow=pow*10;
+        }
+        codeConfirmation+=pow*r;
+    }
+
+    ptcharCodeConfirmation[0]=48 + (codeConfirmation/100000);
+    ptcharCodeConfirmation[1]=48 + ((codeConfirmation/10000)%10);
+    ptcharCodeConfirmation[2]=48 + ((codeConfirmation/1000)%10);
+    ptcharCodeConfirmation[3]=48 + ((codeConfirmation/100)%10);
+    ptcharCodeConfirmation[4]=48 + ((codeConfirmation/10)%10);
+    ptcharCodeConfirmation[5]=48 + (codeConfirmation%10);
+    ptcharCodeConfirmation[6]=0;
+
+    int canWrite=0;
+    char *filename = "id.csv";
+    FILE *fp = fopen(filename, "r");
+    const unsigned MAX_LENGTH = 256;
+    char buffer[MAX_LENGTH];
+
+    fgets(buffer, MAX_LENGTH, fp);
+    fgets(buffer, MAX_LENGTH, fp);
+    char* ptbuffer = buffer;
+    if (ptbuffer[strlen(buffer)-1]==59)
+    {
+        canWrite=1;
+    }
+    else
+    {
+        canWrite=0;
+    }
+    printf("\n");
+    printf("%s",buffer);
+    fclose(fp);
+
+    if (canWrite==1)
+    {
+        FILE *fp = fopen(filename, "a");
+        fprintf(fp, charCodeConfirmation);
+        fclose(fp);
+    }
+
+    SDL_Log(charCodeConfirmation);
+    //Executing python code and sending confirmation mail
+    WinExec("python \"mail.py\"", SW_HIDE);
+
+    SDL_RenderCopy(render, textureMailConfirmationBackground, NULL, NULL);
+    SDL_RenderPresent(render);
+    SDL_Event event;
+    int continuer = 1;
+    while (continuer)
+    {
+        SDL_WaitEvent(&event);
+        switch(event.type)
+        {
+            case SDL_MOUSEMOTION:
+                if (event.motion.x>832 && event.motion.x<1087 && event.motion.y>669 && event.motion.y<744)
+                {
+                    SDL_RenderCopy(render, textureValiderHoverButton, NULL, &rectValiderButton);
+                    SDL_RenderPresent(render);
+                }
+                else
+                {
+                    SDL_RenderCopy(render, textureValiderButton, NULL, &rectValiderButton);
+                    SDL_RenderPresent(render);
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    playSound(ButtonSound)
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        continuer=0;
+                        *nextPage=1;
+                    }
+                    else
+                    {
+                        SDL_RenderClear(render);
+                        SDL_RenderCopy(render, textureMailConfirmationBackground, NULL, NULL);
+                        SDL_RenderPresent(render);
+                    }
+                }
+                if (event.button.x>832 && event.button.x<1087 && event.button.y>669 && event.button.y<744)
+                {
+                    playSound(ButtonSound)
+                    if ((sameChar(charCodeConfirmation, strCodeConfirmation)==0) && (charHelp(strCodeConfirmation)==0))
                     {
                         SDL_Color color = {230, 20, 20};
                         TTF_Font * font = TTF_OpenFont("fonts/arialbd.ttf", 33);
@@ -5614,8 +10182,25 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                         SDL_Delay(3000);
 
                         continuer=0;
-                        *nextPage=2;
+                        *nextPage=13;
                     }
+                }
+                break;
+            case SDL_KEYUP:
+                switch( event.key.keysym.sym )
+                {
+                    case SDLK_LSHIFT:
+                        leftShift=0;
+                        break;
+                    case SDLK_RSHIFT:
+                        rightShift=0;
+                        break;
+                    case SDLK_RALT:
+                        rightAlt=0;
+                        break;
+                    case SDLK_LALT:
+                        leftAlt=0;
+                        break;
                 }
                 break;
             case SDL_KEYDOWN:
@@ -5650,7 +10235,6 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     keyPressedCodeValidation(SDLK_9, 231, 57, -1)
                     keyPressedCodeValidation(SDLK_0, 224, 48, 64)
                 }
-                //updateTextesCodeConfirmation()
                 SDL_Color color = {0, 0, 0};
                 TTF_Font * font = TTF_OpenFont("fonts/arial.ttf", 40);
                 SDL_SetRenderDrawColor(render, WHITE);
@@ -5664,7 +10248,8 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                     rectCode.x+=71;
                     SDL_RenderFillRect(render, &rectCode);
 
-                    char test[38]="                                      ";
+                    char test[38];
+                    emptyChar(test, 38);
                     char* testpointeur=test;
                     testpointeur[0]=strPointeurCodeConfirmation[i];
 
@@ -5681,42 +10266,301 @@ void attenteCodePage(SDL_Window* window, SDL_Renderer* render, int* nextPage)
                 break;
         }
     }
+    SDL_FreeSurface(imageMailConfirmationBackground);
+    SDL_FreeSurface(imageValiderButton);
+    SDL_FreeSurface(imageValiderHoverButton);
+
+    SDL_DestroyTexture(textureMailConfirmationBackground);
+    SDL_DestroyTexture(textureValiderButton);
+    SDL_DestroyTexture(textureValiderHoverButton);
 }
 
-
-int pagePuzzle(SDL_Window* window, SDL_Renderer* render, int* nextPage, unsigned int* chessBoard, int* rock, int* teamToPlay, int* enPassant)
+void creationImagePaint(SDL_Window* window, SDL_Renderer* render, int* nextPage)
 {
-    SDL_Surface* imageExitConfirmationBackground = NULL;
-    SDL_Texture* textureExitConfirmationBackground = NULL;
-    ALLImageAndTransparencyINIT(imageExitConfirmationBackground, textureExitConfirmationBackground, ExitConfirmationBMP, render)
-    SDL_RenderCopy(render, textureExitConfirmationBackground, NULL, NULL);
+    int valueSliderRed=0;
+    int valueSliderGreen=0;
+    int valueSliderBlue=0;
+    int valueSliderSize=1;
+
+    int focus=0;
+
+    SDL_Rect rectSlider;
+    rectSlider.w=42;
+    rectSlider.h=10;
+    SDL_Rect rectSliderSize;
+    rectSliderSize.y=125;
+    rectSliderSize.w=20;
+    rectSliderSize.h=26;
+    SDL_Rect rectColorUser;
+    rectColorUser.x=558;
+    rectColorUser.y=114;
+    rectColorUser.w=46;
+    rectColorUser.h=900;
+    SDL_Rect pointUser;
+    pointUser.w=18;
+    pointUser.h=18;
+
+    int saveImage[2600]={0};
+    initSound()
+
+    SDL_Surface* imageBackGround = NULL;
+    SDL_Texture* textureBackground = NULL;
+    ALLImageINIT(imageBackGround, textureBackground, PaintBGImageBMP, render)
+
+    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+    SDL_SetRenderDrawColor(render, WHITE);
+    rectSlider.x=243;
+    rectSlider.y=964-(valueSliderRed*2);
+    SDL_RenderFillRect(render, &rectSlider);
+    rectSlider.x=338;
+    rectSlider.y=964-(valueSliderGreen*2);
+    SDL_RenderFillRect(render, &rectSlider);
+    rectSlider.x=433;
+    rectSlider.y=964-(valueSliderBlue*2);
+    SDL_RenderFillRect(render, &rectSlider);
+    rectSliderSize.x=269+((valueSliderSize-1)*45);
+    SDL_RenderFillRect(render, &rectSliderSize);
+    SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);
+    SDL_RenderFillRect(render, &rectColorUser);
     SDL_RenderPresent(render);
+
     SDL_Event event;
-    int continuer = 1;
+    int continuer=1;
     while (continuer)
     {
         SDL_WaitEvent(&event);
         switch(event.type)
         {
-            case SDL_MOUSEBUTTONDOWN:
-                if (event.button.x>604 && event.button.x<1315 && event.button.y>386 && event.button.y<609)
+            case SDL_QUIT:
+                if (doYouWantToQuitNoTime(render)==1)
                 {
-                    if (event.button.x>756 && event.button.x<901 && event.button.y>514 && event.button.y<566)
-                    {
-                        return 0;
-                    }
-                    else if (event.button.x>1019 && event.button.x<1164 && event.button.y>514 && event.button.y<566)
-                    {
-                        return 1;
-                    }
+                    *nextPage=1;
+                    continuer=0;
+                    continue;
                 }
                 else
                 {
-                    return 0;
+                    SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                    SDL_SetRenderDrawColor(render, WHITE);
+                    rectSlider.x=243;
+                    rectSlider.y=964-(valueSliderRed*2);
+                    SDL_RenderFillRect(render, &rectSlider);
+                    rectSlider.x=338;
+                    rectSlider.y=964-(valueSliderGreen*2);
+                    SDL_RenderFillRect(render, &rectSlider);
+                    rectSlider.x=433;
+                    rectSlider.y=964-(valueSliderBlue*2);
+                    SDL_RenderFillRect(render, &rectSlider);
+                    rectSliderSize.x=269+((valueSliderSize-1)*45);
+                    SDL_RenderFillRect(render, &rectSliderSize);
+                    SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);
+                    SDL_RenderFillRect(render, &rectColorUser);
+                    SDL_RenderPresent(render);
                 }
+                break;
+            case SDL_MOUSEMOTION:
+                if (focus==1)
+                {
+                    //red
+                    updateSlider(1, event.motion.y);
+                }
+                else if (focus==2)
+                {
+                    //green
+                    updateSlider(2, event.motion.y);
+                }
+                else if (focus==3)
+                {
+                    //blue
+                    updateSlider(3, event.motion.y);
+                }
+                else if (focus==4)
+                {
+                    //canva
+                    int x=event.motion.x;
+                    int y=event.motion.y;
+                    if (x>=711 && x<=1610 && y>=116 && y<=1013)
+                    {
+                        int caseX=((x-711)/18);
+                        int caseY=((y-116)/18);
+                        colorCanvaWithSize(valueSliderSize)
+                    }
+                }
+                else if (focus==5)
+                {
+                    //size
+                    updateSlider(5, event.motion.x);
+                }
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                if (event.button.x>243 && event.button.x<298 && event.button.y>452 && event.button.y<965)
+                {
+                    //red
+                    focus=1;
+                    updateSlider(1, event.button.y);
+                }
+                else if (event.button.x>338 && event.button.x<393 && event.button.y>452 && event.button.y<965)
+                {
+                    //green
+                    focus=2;
+                    updateSlider(2, event.button.y);
+                }
+                else if (event.button.x>433 && event.button.x<488 && event.button.y>452 && event.button.y<965)
+                {
+                    //blue
+                    focus=3;
+                    updateSlider(3, event.button.y);
+                }
+                else if (event.button.x>=269 && event.button.x<=463 && event.button.y>=125 && event.button.y<=150)
+                {
+                    //size
+                    focus=5;
+                    updateSlider(5, event.button.x);
+                }
+                else if (event.button.x>=711 && event.button.x<=1610 && event.button.y>=114 && event.button.y<=1013)
+                {
+                    //canva
+                    focus=4;
+                    int x=event.button.x;
+                    int y=event.button.y;
+                    int caseX=((x-711)/18);
+                    int caseY=((y-114)/18);
+                    colorCanvaWithSize(valueSliderSize)
+                }
+                else
+                {
+                    focus=0;
+                }
+                if (event.button.x >=1875 && event.button.y <=45)
+                {
+                    if (doYouWantToQuitNoTime(render)==1)
+                    {
+                        *nextPage=1;
+                        continuer=0;
+                        continue;
+                    }
+                    else
+                    {
+                        SDL_RenderCopy(render, textureBackground, NULL, NULL);
+                        SDL_SetRenderDrawColor(render, WHITE);
+                        rectSlider.x=243;
+                        rectSlider.y=964-(valueSliderRed*2);
+                        SDL_RenderFillRect(render, &rectSlider);
+                        rectSlider.x=338;
+                        rectSlider.y=964-(valueSliderGreen*2);
+                        SDL_RenderFillRect(render, &rectSlider);
+                        rectSlider.x=433;
+                        rectSlider.y=964-(valueSliderBlue*2);
+                        SDL_RenderFillRect(render, &rectSlider);
+                        rectSliderSize.x=269+((valueSliderSize-1)*45);
+                        SDL_RenderFillRect(render, &rectSliderSize);
+                        SDL_SetRenderDrawColor(render, valueSliderRed, valueSliderGreen, valueSliderBlue, 255);
+                        SDL_RenderFillRect(render, &rectColorUser);
+                        SDL_RenderPresent(render);
+                    }
+                }
+                else if (event.button.x>=245 && event.button.x<=471 && event.button.y>=275 && event.button.y<=387)
+                {
+                    if (event.button.x<=282)
+                    {
+                        if (event.button.y<=312)
+                        {
+                            changeColorSlider(255, 255, 255)
+                        }
+                        else if (event.button.y<=349)
+                        {
+                            changeColorSlider(255, 127, 39)
+                        }
+                        else if (event.button.y<=387)
+                        {
+                            changeColorSlider(140, 255, 251)
+                        }
+                    }
+                    else if (event.button.x<=319)
+                    {
+                        if (event.button.y<=312)
+                        {
+                            changeColorSlider(195, 195, 195)
+                        }
+                        else if (event.button.y<=349)
+                        {
+                            changeColorSlider(255, 202, 24)
+                        }
+                        else if (event.button.y<=387)
+                        {
+                            changeColorSlider(0, 168, 253)
+                        }
+                    }
+                    else if (event.button.x<=357)
+                    {
+                        if (event.button.y<=312)
+                        {
+                            changeColorSlider(88, 88, 88)
+                        }
+                        else if (event.button.y<=349)
+                        {
+                            changeColorSlider(253, 236, 166)
+                        }
+                        else if (event.button.y<=387)
+                        {
+                            changeColorSlider(63, 72, 204)
+                        }
+                    }
+                    else if (event.button.x<=396)
+                    {
+                        if (event.button.y<=312)
+                        {
+                            changeColorSlider(0, 0, 0)
+                        }
+                        else if (event.button.y<=349)
+                        {
+                            changeColorSlider(255, 242, 0)
+                        }
+                        else if (event.button.y<=387)
+                        {
+                            changeColorSlider(184, 61, 186)
+                        }
+                    }
+                    else if (event.button.x<=433)
+                    {
+                        if (event.button.y<=312)
+                        {
+                            changeColorSlider(136, 0, 27)
+                        }
+                        else if (event.button.y<=349)
+                        {
+                            changeColorSlider(196, 255, 14)
+                        }
+                        else if (event.button.y<=387)
+                        {
+                            changeColorSlider(255, 174, 200)
+                        }
+                    }
+                    else
+                    {
+                        if (event.button.y<=312)
+                        {
+                            changeColorSlider(236, 28, 36)
+                        }
+                        else if (event.button.y<=349)
+                        {
+                            changeColorSlider(14, 209, 69)
+                        }
+                        else if (event.button.y<=387)
+                        {
+                            changeColorSlider(185, 122, 86)
+                        }
+                    }
+                }
+                break;
+            case SDL_MOUSEBUTTONUP:
+                focus=0;
                 break;
         }
     }
+    SDL_FreeSurface(imageBackGround);
+
+    SDL_DestroyTexture(textureBackground);
 }
 
 int main(int argc, char* argv[])
@@ -5724,18 +10568,48 @@ int main(int argc, char* argv[])
     /*//Initialisation socket and shits
     WSADATA WSAData;
     WSAStartup(MAKEWORD(2, 0), &WSAData);*/
+    int nextPage;
+    char *filename = "save.txt";
+    FILE *fileOpen = fopen(filename, "r");
+    if (fileOpen == NULL)
+    {
+        nextPage=2;
+    }
+    else
+    {
+        const unsigned MAX_LENGTH = 256;
+        char buffer[MAX_LENGTH];
 
+        fgets(buffer, MAX_LENGTH, fileOpen);
+        if (atoi(buffer)==2)
+        {
+            nextPage=2;
+        }
+        else
+        {
+            sound = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            typeChessboard = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            typePieces = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            userIdConnected = atoi(buffer);
+            fgets(buffer, MAX_LENGTH, fileOpen);
+            puzzle_score = atoi(buffer);
+            nextPage=5;
+        }
+
+        fclose(fileOpen);
+    }
     //Initialisation of the window
     SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "2");
     SDL_Window* window = NULL;
     SDL_Renderer* render = NULL;
     SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO);
     TTF_Init();
-    int nextPage=2;
     CreateRenderInNewWindow(window, render)
     while (nextPage!=1)
     {
-        int test1 = nextPage;
         if (nextPage==2)
         {
             loginPage(window, render, &nextPage);
@@ -5746,7 +10620,7 @@ int main(int argc, char* argv[])
         }
         else if (nextPage==4)
         {
-            attenteCodePage(window, render, &nextPage);
+            attenteCodeConfirmationCompte(window, render, &nextPage);
         }
         else if (nextPage==5)
         {
@@ -5766,7 +10640,23 @@ int main(int argc, char* argv[])
         }
         else if (nextPage==10)
         {
-            mainBoard(window, render, &nextPage);
+            leaderBoard(window, render, &nextPage);
+        }
+        else if (nextPage==11)
+        {
+            pseudoChoice(window, render, &nextPage);
+        }
+        else if (nextPage==12)
+        {
+            attenteCodeConfirmationLostPassword(window, render, &nextPage);
+        }
+        else if (nextPage==13)
+        {
+            creationImagePaint(window, render, &nextPage);
+        }
+        else
+        {
+            break;
         }
     }
 
@@ -5776,66 +10666,60 @@ int main(int argc, char* argv[])
     SDL_DestroyRenderer(render);
     SDL_DestroyWindow(window);
 
+    if (stayConnected==1)
+    {
+        FILE *fp = fopen(filename, "w");
+        if (fp == NULL)
+        {
+            SDL_Log("Error when writing in the document: 'save.txt'");
+            return -1;
+        }
+        // sound
+        char soundChar[1];
+        itoa(sound, soundChar, 10);
+        fprintf(fp, soundChar);
+
+        fprintf(fp, "\n");
+        
+        // chessBoard
+        char typeChessBoardChar[1];
+        itoa(typeChessboard, typeChessBoardChar, 10);
+        fprintf(fp, typeChessBoardChar);
+
+        fprintf(fp, "\n");
+        
+        // Pieces
+        char typePiecesChar[1];
+        itoa(typePieces, typePiecesChar, 10);
+        fprintf(fp, typePiecesChar);
+
+        fprintf(fp, "\n");
+
+        // user_id
+        char userIdChar[3];
+        itoa(userIdConnected, userIdChar, 10);
+        fprintf(fp, userIdChar);
+
+        fprintf(fp, "\n");
+
+        //puzzle_score
+        char puzzleScoreChar[4];
+        itoa(puzzle_score, puzzleScoreChar, 10);
+        fprintf(fp, puzzleScoreChar);
+
+        fclose(fp);
+    }
+    else
+    {
+        FILE *fp = fopen(filename, "w");
+        if (fp == NULL)
+        {
+            SDL_Log("Error when writing in the document: 'save.txt'");
+            return -1;
+        }
+        fprintf(fp, "2");
+    }
     return 1;
 }
 
 
-
-
-int giveCaseNumber(int eventX, int eventY)
-{
-    return (eventX-xMinBoard)/lenSquare + (((eventY-yMinBoard)/lenSquare)*8);
-}
-
-
-void drawSquare(int squareNumber, SDL_Renderer* render, int inverse)
-{
-    if (inverse==1)
-    {
-        squareNumber = 63-squareNumber;
-    }
-    SDL_Rect rect;
-    rect.x = (xMinBoard+(squareNumber%8)*lenSquare);
-    rect.y = (yMinBoard+(squareNumber/8)*lenSquare);
-    rect.w = lenSquare;
-    rect.h = lenSquare;
-    SDL_RenderDrawRect(render, &rect);
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+1);
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+1);
-    rect.w = lenSquare-2;
-    rect.h = lenSquare-2;
-    SDL_RenderDrawRect(render, &rect);
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+2);
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare)+2;
-    rect.w = lenSquare-4;
-    rect.h = lenSquare-4;
-    SDL_RenderDrawRect(render, &rect);
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+3);
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+3);
-    rect.w = lenSquare-6;
-    rect.h = lenSquare-6;
-    SDL_RenderDrawRect(render, &rect);
-    rect.x = (xMinBoard + (squareNumber % 8) * lenSquare+4);
-    rect.y = (yMinBoard + (squareNumber / 8) * lenSquare+4);
-    rect.w = lenSquare-8;
-    rect.h = lenSquare-8;
-    SDL_RenderDrawRect(render, &rect);
-}
-
-void drawFullSquarePreviousMove(int squareNumber, SDL_Renderer* render)
-{
-    if (((squareNumber/8)+(squareNumber%8))%2==0)
-    {
-        SDL_SetRenderDrawColor(render, REDLight);
-    }
-    else
-    {
-        SDL_SetRenderDrawColor(render, RED);
-    }
-    SDL_Rect rect;
-    rect.x = (xMinBoard+(squareNumber%8)*lenSquare);
-    rect.y = (yMinBoard+(squareNumber/8)*lenSquare);
-    rect.w = lenSquare;
-    rect.h = lenSquare;
-    SDL_RenderFillRect(render, &rect);
-}

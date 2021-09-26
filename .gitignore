@@ -1,9 +1,6 @@
 my.rc
 *.json
-NSI Chess.exe
 *.db
-Socket.exe
-testsockey.exe
-.gitignore
 *.exe
-test.exe
+id.csv
+save.txt
