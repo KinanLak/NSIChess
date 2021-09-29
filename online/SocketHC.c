@@ -55,7 +55,7 @@ int main()
     char paquet[] = "gros chien";
     envoie(paquet);
     
-    char IP[] = "86.195.96.56";
-    reception(IP);
+    //char IP[] = "86.195.96.56";
+    //reception(IP);
     return 0;
 }

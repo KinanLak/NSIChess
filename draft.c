@@ -1,11 +1,18 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
-#include <string.h>
-#include <mysql.h>
-#include "sqlite3.h"
+//#include <time.h>
+//#include <string.h>
+//#include <mysql.h>
+//#include "sqlite3.h"
+
+int main(int argc, char *argv[]) {
 
 
+
+}
+
+
+/*
 
 //Creation of the structure for each move
 typedef struct MoveStructure MoveStructure;
@@ -149,7 +156,7 @@ void listMovesToFile(FileMoveStructure* file, char* listMoves)
     }
 }
 
-/*void fileToListMoves(FileMoveStructure* file, int numberMoves)
+void fileToListMoves(FileMoveStructure* file, int numberMoves)
 {
     //
     //
@@ -196,7 +203,7 @@ int main(int argc, char* argv[])
 
 
     return 1;
-}*/
+}
 
 
 void FENToList(char* fen, unsigned int* chessBoard, int* rock, int* teamToPlay, int* enPassant)
@@ -463,7 +470,7 @@ int main(int argc, char* argv[])
 }
 
 
-/*int main(int argc, char* argv[])
+int main(int argc, char* argv[])
 {
     sqlite3 *db;
     sqlite3_open("database.db", &db);
@@ -471,4 +478,6 @@ int main(int argc, char* argv[])
     sqlite3_close(db);
 
     return 1;
-}*/
+}
+
+*/
