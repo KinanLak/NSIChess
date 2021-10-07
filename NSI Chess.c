@@ -5,9 +5,15 @@
 #include <SDL2/SDL_ttf.h>
 #include <mysql.h>
 #include <math.h>
+#include <curl/curl.h>
+#include <winsock2.h>
 #include <winuser.h>
+#include <windows.h>
 //#include <SDL2/SDL_image.h>
-//#include <winsock2.h>
+
+#include "functions/hash.h"
+
+
 
 typedef struct DataPlayerRank DataPlayerRank;
 struct DataPlayerRank

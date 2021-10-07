@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <curl/curl.h>
 //#include <time.h>
 //#include <string.h>
 //#include <mysql.h>
