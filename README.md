@@ -1,6 +1,6 @@
 # NSIChess :
-Projet d'école : Chees, IA, C
-
+Projet d'école : Chees, IA, C  
+[Vidéo de présentation](https://www.youtube.com/watch?v=FOjcvK_v8zc)
 # Pour que tout s'affiche correctement : 
 Une fois téléchargé et installé il est nécessaire de faire un **clique droit** sur *NSI Chess* puis "Propriétés" présent dans votre bureau.
 
